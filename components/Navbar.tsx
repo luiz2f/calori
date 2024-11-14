@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import Link from "next/link";
-import Logout from "./Logout";
+import Logout from "./auth/Logout";
 import Image from "next/image";
 
 export default async function Navbar() {
@@ -19,11 +19,18 @@ export default async function Navbar() {
 
         <div className="flex items-center gap-x-5">
           {!session?.user ? (
-            <Link href="/sign-in">
-              <div className="bg-blue-600 text-white text-sm px-4 py-2 rounded-sm">
-                Login
-              </div>
-            </Link>
+            <>
+              <Link href="/login">
+                <div className="bg-blue-600 text-white text-sm px-4 py-2 rounded-sm">
+                  Login
+                </div>
+              </Link>
+              <Link href="/register">
+                <div className="bg-blue-600 text-white text-sm px-4 py-2 rounded-sm">
+                  Create account
+                </div>
+              </Link>
+            </>
           ) : (
             <>
               <div className="flex items-center gap-x-2 text-sm">
