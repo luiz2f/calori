@@ -2,6 +2,7 @@
 
 import { signIn, signOut } from "@/auth";
 import prisma from "@/prisma";
+import { NextApiResponse } from "next";
 import { AuthError } from "next-auth";
 import { revalidatePath } from "next/cache";
 
@@ -15,7 +16,7 @@ export const logout = async () => {
   revalidatePath("/");
 };
 
-const getUserByEmail = async (email: string) => {
+export const getUserByEmail = async (email: string) => {
   try {
     const user = await prisma.user.findUnique({
       where: {
@@ -35,20 +36,44 @@ export const loginWithCredentials = async (formData: FormData) => {
     password: formData.get("password"),
     role: "USER",
     redirectTo: "/",
+    redirect: false,
   };
-
-  const existingUser = await getUserByEmail(rawFormData.email as string);
-  console.log(existingUser);
 
   try {
     await signIn("credentials", rawFormData);
   } catch (error: any) {
     if (error instanceof AuthError) {
       switch (error.type) {
-        case "CredentialsSignin":
-          return { error: "Invalid credentials!" };
+        case "CallbackRouteError" || "CredentialsSignin":
+          return { error: error.message };
         default:
-          return { error: "Something went wrong!" };
+          return { error: error.message };
+      }
+    }
+
+    throw error;
+  }
+  revalidatePath("/");
+};
+
+export const registerWithCredentials = async (formData: FormData) => {
+  const rawFormData = {
+    email: formData.get("email"),
+    password: formData.get("password"),
+    role: "USER",
+    redirect: false,
+    isRegistering: true,
+  };
+
+  try {
+    await signIn("credentials", rawFormData);
+  } catch (error: any) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case "CallbackRouteError" || "CredentialsSignin":
+          return { error: error.message };
+        default:
+          return { error: error.message };
       }
     }
 

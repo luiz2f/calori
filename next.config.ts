@@ -1,7 +1,16 @@
-import type { NextConfig } from "next";
+import { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  images: { domains: ["lh3.googleusercontent.com"] },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+        port: "", // ou null
+        pathname: "/**",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

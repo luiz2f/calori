@@ -1,4 +1,3 @@
-import LoginForm from "@/components/auth/credentials/LoginForm";
 import RegisterForm from "@/components/auth/credentials/RegisterForm";
 import LoginGoogle from "@/components/auth/LoginGoogle";
 import Link from "next/link";
