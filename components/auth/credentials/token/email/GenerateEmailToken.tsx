@@ -7,7 +7,7 @@ import { useState } from "react";
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-export default function GeneratetPasswordToken() {
+export default function GeneratetEmailToken() {
   const [success, setSuccess] = useState<boolean>(false);
   const [error, setError] = useState<string | undefined>(undefined);
   const router = useRouter();
