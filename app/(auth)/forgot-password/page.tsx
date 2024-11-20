@@ -1,13 +1,11 @@
-import VerifyEmailForm from "@/components/auth/credentials/token/VerifyEmailForm";
+"use client";
 
-export default function VerifyEmailPage() {
-  // TODO - function passwordResetVerification
-  // TODO - copy verifyemail structure
-  // if ok  new password form
+import GeneratetPasswordToken from "@/components/auth/credentials/token/password/GeneratetPasswordToken";
 
+export default function ForgotPasswordPage() {
   return (
     <div>
-      <VerifyEmailForm />
+      <GeneratetPasswordToken />
     </div>
   );
 }

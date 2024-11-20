@@ -1,6 +1,6 @@
 "use server";
 
-import { signIn, signOut } from "@/auth";
+import { auth, signIn, signOut } from "@/auth";
 import prisma from "@/prisma";
 import { saltAndHashPassword } from "@/utils/helper";
 import { AuthError } from "next-auth";
@@ -51,6 +51,7 @@ export const loginWithCredentials = async (formData: FormData) => {
 
     throw error;
   }
+  //📌 sera que da bom se logar com conta existente normal?
   revalidatePath("/");
 };
 
@@ -81,6 +82,8 @@ export const registerWithCredentials = async (formData: FormData) => {
 };
 
 export const changePassword = async (userID: string, formData: FormData) => {
+  const session = await auth();
+
   const newPassword = {
     password: formData.get("password"),
     confirmPassword: formData.get("confirmPassword"),
@@ -88,6 +91,10 @@ export const changePassword = async (userID: string, formData: FormData) => {
 
   if (newPassword.password !== newPassword.confirmPassword) {
     return { error: "Passwords do not match" };
+  }
+
+  if (session?.user?.id === userID) {
+    return { error: "An unexpected error occurred" };
   }
 
   const hash = saltAndHashPassword(newPassword.password);

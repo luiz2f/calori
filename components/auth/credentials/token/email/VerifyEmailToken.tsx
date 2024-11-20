@@ -1,11 +1,11 @@
 "use client";
-import { verifyResetPasswordToken } from "@/actions/token";
+import { verifyEmailToken } from "@/actions/token";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { BiCheck, BiError } from "react-icons/bi";
-import ResetPasswordForm from "./ResetPasswordForm";
 
-export default function VerifyPasswordResetForm() {
+export default function VerifyEmailToken() {
   const [error, setError] = useState<string | undefined>(undefined);
   const [success, setSuccess] = useState<string | undefined>(undefined);
   const searchParams = useSearchParams();
@@ -21,7 +21,8 @@ export default function VerifyPasswordResetForm() {
       return;
     }
 
-    verifyResetPasswordToken(token)
+    verifyEmailToken(token)
+      // ERROR HANDLING(token)
       .then((data) => {
         if ("success" in data) {
           setSuccess(data.success);
@@ -51,34 +52,21 @@ export default function VerifyPasswordResetForm() {
         </div>
       </div>
       <div className="p-6 pt-0">
-        {/* // 🔒🔒🔒 */}
         <div className="flex items-center w-full justify-center">
           {!success && !error && <p>Loading</p>}
-
-          {success && token && (
-            <>
-              <div className="flex space-x-4 items-center p-2 rounded-lg text-emerald-500 bg-emerald-500/30">
-                <BiCheck className="w-4 h-4 " />
-                <p>{success}</p>
-              </div>
-
-              <ResetPasswordForm token={token} />
-            </>
-          )}
-
+          <div className="flex space-x-4 items-center p-2 rounded-lg text-emerald-500 bg-emerald-500/30">
+            <BiCheck className="w-4 h-4 " />
+            <p>{success}</p>
+            <Link href={`/login`}>Fazer Login</Link>
+          </div>
           {!success && (
             <div className="flex space-x-4 items-center p-2 rounded-lg text-emerald-500 bg-emerald-500/30">
               <BiError className="w-4 h-4 " />
               {error === "Invalid token" || error === "Token has expired" ? (
                 <>
                   <p>{error}</p>
-                  <button>Recuperar a senha novamente</button>
-                </>
-              ) : error === "User not verified" ? (
-                <>
-                  <p>{error}</p>
-                  <p>Verifique sua caixa de spam</p>
-                  <button>Enviar email de verificação</button>
+                  <button>Enviar novo email de verificação</button>
+                  {/* TODO TODO TODO TODO TODO */}
                 </>
               ) : (
                 <p>{error}</p>
@@ -86,6 +74,11 @@ export default function VerifyPasswordResetForm() {
             </div>
           )}
         </div>
+      </div>
+      <div className="flex items-center p-6 pt-0">
+        <button className="font-normal w-full">
+          <Link href="/auth/login">Back to Login</Link>
+        </button>
       </div>
     </div>
   );

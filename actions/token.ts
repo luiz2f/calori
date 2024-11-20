@@ -168,8 +168,19 @@ export async function generateTokenAndSendEmailVerification(email: string) {
   if ("error" in verificationToken) {
     return verificationToken;
   }
-  await sendEmailVerification(email, verificationToken.token);
+
+  const emailResult = await sendEmailVerification(
+    email,
+    verificationToken.token
+  );
+
+  if (emailResult && "error" in emailResult) {
+    return emailResult; // Retorna o erro de envio de e-mail
+  }
+
+  return { success: true }; // Indica sucesso explícito
 }
+
 // 🛡️🔒
 export async function generatePasswordResetToken(email: string) {
   const user = await getUserByEmail(email);
@@ -179,7 +190,7 @@ export async function generatePasswordResetToken(email: string) {
   }
 
   if (user.emailVerified) {
-    return { error: "Verify your email" };
+    return { error: "Verify your account" };
   }
 
   const token = uuidv4();
@@ -211,5 +222,14 @@ export async function generateTokenAndSendPasswordResetEmail(email: string) {
   if ("error" in verificationToken) {
     return verificationToken;
   }
-  await sendPasswordResetEmail(email, verificationToken.token);
+  const emailResult = await sendPasswordResetEmail(
+    email,
+    verificationToken.token
+  );
+
+  if (emailResult && "error" in emailResult) {
+    return emailResult; // Retorna o erro de envio de e-mail
+  }
+
+  return { success: true }; // Indica sucesso explícito
 }

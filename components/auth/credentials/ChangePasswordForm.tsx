@@ -1,15 +1,14 @@
 "use client";
-import { changePasswordByToken } from "@/actions/token";
+import { changePassword } from "@/actions/auth";
 import AuthButton from "@/components/auth/AuthButton";
-import Link from "next/link";
 import { useState } from "react";
 
 interface ResetPasswordFormProps {
-  token: string;
+  userID: string;
 }
 
 // FORM A SER EXIBIDO CASO O TOKEN DO RESETPASSWORD SEJA VALIDO
-export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
+export default function ChangePasswordForm({ userID }: ResetPasswordFormProps) {
   const [success, setSuccess] = useState<string | undefined>(undefined);
   const [error, setError] = useState<string | undefined>(undefined);
   const handleSubmit = async (event: React.FormEvent) => {
@@ -28,7 +27,7 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       return; // Retorna sem fazer o login
     }
 
-    changePasswordByToken(token, formData)
+    changePassword(userID, formData)
       .then((data) => {
         if ("success" in data) {
           setSuccess(data.success);
@@ -78,7 +77,6 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       ) : (
         <>
           <p>Senha alterada com sucesso!</p>
-          <Link href={`/login`}>Fazer Login</Link>
         </>
       )}
     </div>

@@ -2,70 +2,79 @@
 
 import { registerWithCredentials } from "@/actions/auth";
 import AuthButton from "../AuthButton";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { useRouter } from "next/navigation";
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-export default function RegisterForm() {
+interface RegisterFormProps {
+  setExistentUser: Dispatch<SetStateAction<boolean>>;
+}
+
+export default function RegisterForm({ setExistentUser }: RegisterFormProps) {
   const router = useRouter();
   const [errors, setErrors] = useState<{
     email?: string | boolean;
     password?: string | boolean;
     confirmPassword?: string;
-  }>({}); // Inicializando com objeto vazio
+  }>({});
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     const formData = new FormData(event.target as HTMLFormElement);
-    const newErrors: {
+
+    let newErrors: {
       email?: string | boolean;
       password?: string | boolean;
       confirmPassword?: string;
     } = {};
-    const { email, password, confirmPassword } = Object.fromEntries(formData);
-    console.log(email);
+    let errorMessage: string = "";
+
+    const { email, password, confirmPassword } = Object.fromEntries(
+      formData
+    ) as Record<string, string>;
+
     if (!email || !emailRegex.test(email as string)) {
       newErrors.email = "Please enter a valid email.";
     }
     if (password !== confirmPassword) {
       newErrors.password = true;
       newErrors.confirmPassword = "Passwords do not match.";
-    } else if (
-      !password ||
-      password.length < 8 ||
-      !confirmPassword ||
-      confirmPassword.length < 8
-    ) {
+    } else if (!password || password.length < 8) {
       newErrors.password = true;
       newErrors.confirmPassword =
         "Password must be at least 8 characters long.";
     }
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return; // Retorna sem fazer o login
     }
 
-    const response = await registerWithCredentials(formData);
+    registerWithCredentials(formData)
+      .then((data) => {
+        if (data) {
+          if ("error" in data) {
+            errorMessage = data.error.split(".")[0];
+          }
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        errorMessage = "An unexpected error occurred";
+      });
 
-    if (response?.error) {
-      const errorMessage = response?.error.split(".")[0];
-      // VER TODOS OS ERROS POSSIVELS E USAR THEN
-      // USUARIO JA CADASTRADO? OFERECER DUAS OPÇÕES
-      // LOGIN || RECUPERAR SENHA
-      if (errorMessage === "Token sent") {
-        return router?.push("/token-sent");
-      } else {
-        const newErrors: {
-          email?: string | boolean;
-          password?: string | boolean;
-          confirmPassword?: string;
-        } = {
-          email: true,
-          password: true,
-          confirmPassword: errorMessage,
-        };
-        setErrors(newErrors);
-      }
+    if (errorMessage === "Token sent") {
+      return router?.push("/token-sent");
+    } else if (errorMessage === "User already exists") {
+      setExistentUser(true);
+    } else {
+      newErrors = {
+        email: true,
+        password: true,
+        confirmPassword: errorMessage,
+      };
+      setErrors(newErrors);
     }
   };
 
@@ -119,7 +128,7 @@ export default function RegisterForm() {
           )}
         </div>
 
-        <AuthButton />
+        <AuthButton actionText="Sign Up" />
       </form>
     </div>
   );

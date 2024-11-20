@@ -1,9 +1,9 @@
-import VerifyEmailForm from "@/components/auth/credentials/token/VerifyEmailForm";
+import VerifyEmailToken from "@/components/auth/credentials/token/email/VerifyEmailToken";
 
 export default function VerifyEmailPage() {
   return (
     <div>
-      <VerifyEmailForm />
+      <VerifyEmailToken />
     </div>
   );
 }

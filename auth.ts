@@ -5,13 +5,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 import { saltAndHashPassword } from "./utils/helper";
-import { FormError } from "./app/models/FormError";
-import {
-  generateTokenAndSendEmailVerification,
-  generateVerificationToken,
-} from "./actions/token";
-import { sendEmailVerification } from "./actions/email";
-import { revalidatePath } from "next/cache";
+import { generateTokenAndSendEmailVerification } from "./actions/token";
 
 class CustomError extends CredentialsSignin {
   code = "custom";
@@ -87,6 +81,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             throw new CustomError("Invalid credentials");
           } else if (!user.hashedPassword) {
             throw new CustomError("Invalid credentials");
+          } else if (!user.emailVerified) {
+            await generateTokenAndSendEmailVerification(email);
+            throw new CustomError("Token sent");
           } else {
             const isMatch = bcrypt.compareSync(
               credentials.password as string,

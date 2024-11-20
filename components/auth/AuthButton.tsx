@@ -1,16 +1,24 @@
 import { useFormStatus } from "react-dom";
-
-export default function AuthButton() {
+interface AuthButtonProps {
+  actionText: string;
+  disableAction?: boolean;
+}
+export default function AuthButton({
+  actionText,
+  disableAction,
+}: AuthButtonProps) {
   const { pending } = useFormStatus();
+
+  const disabled = pending || disableAction;
   return (
     <button
-      disabled={pending}
+      disabled={disabled}
       type="submit"
       className={`${
-        pending ? "bg-gray-600" : "bg-blue-600"
+        disabled ? "bg-gray-600" : "bg-blue-600"
       } rounded-md w-full px-12 py-3 text-sm font-medium text-white`}
     >
-      {pending ? "Loading..." : "Sign in"}
+      {pending ? "Loading..." : actionText}
     </button>
   );
 }

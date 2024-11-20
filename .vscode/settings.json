@@ -4,6 +4,10 @@
       "path": "caloricalori\\app\\(auth)\\forgot-password\\",
       "color": "foldercustomization.AnsiColor11",
       "badge": "😀"
+    },
+    {
+      "path": "caloricalori\\app\\(auth)\\(user)\\change-password\\",
+      "badge": "😂"
     }
   ]
 }

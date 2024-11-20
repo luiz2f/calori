@@ -3,10 +3,13 @@
 import { loginWithCredentials } from "@/actions/auth";
 import AuthButton from "../AuthButton";
 import { useState } from "react";
+import { useRouter } from "next/router";
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 export default function LoginForm() {
+  const router = useRouter();
+
   const [errors, setErrors] = useState<{
     email?: string | boolean;
     password?: string;
@@ -15,7 +18,10 @@ export default function LoginForm() {
     event.preventDefault();
     const formData = new FormData(event.target as HTMLFormElement);
     const newErrors: { email?: string | boolean; password?: string } = {};
-    const { email, password } = Object.fromEntries(formData);
+    const { email, password } = Object.fromEntries(formData) as Record<
+      string,
+      string
+    >;
     if (!email || !emailRegex.test(email as string)) {
       newErrors.email = "Please enter a valid email.";
       return;
@@ -29,17 +35,26 @@ export default function LoginForm() {
       return;
     }
 
-    const response = await loginWithCredentials(formData);
+    loginWithCredentials(formData)
+      .then((data) => {
+        if ("error" in data) {
+          newErrors.email = true;
+          newErrors.password = data.error.split(".")[0];
+          setErrors(newErrors);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        newErrors.email = true;
+        newErrors.password = "An unexpected error occurred 😢";
+      });
 
-    if (response?.error) {
-      const newErrors: { email?: boolean; password?: string } = {
-        email: true,
-        password: response?.error.split(".")[0],
-      };
-
-      setErrors(newErrors);
+    setErrors(newErrors);
+    if (errors.email === "Token sent") {
+      return router?.push("/token-sent");
     }
   };
+
   return (
     <div>
       <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
@@ -72,7 +87,7 @@ export default function LoginForm() {
             <span className="text-red-500">{errors.password}</span>
           )}
         </div>
-        <AuthButton />
+        <AuthButton actionText="Login" />
       </form>
     </div>
   );
