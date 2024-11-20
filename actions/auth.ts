@@ -2,7 +2,7 @@
 
 import { signIn, signOut } from "@/auth";
 import prisma from "@/prisma";
-import { NextApiResponse } from "next";
+import { saltAndHashPassword } from "@/utils/helper";
 import { AuthError } from "next-auth";
 import { revalidatePath } from "next/cache";
 
@@ -17,17 +17,15 @@ export const logout = async () => {
 };
 
 export const getUserByEmail = async (email: string) => {
-  try {
-    const user = await prisma.user.findUnique({
-      where: {
-        email,
-      },
-    });
-    return user;
-  } catch (error) {
-    console.log(error);
-    return null;
+  const user = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
+  if (!user) {
+    return { error: "User not found" };
   }
+  return user;
 };
 
 export const loginWithCredentials = async (formData: FormData) => {
@@ -80,4 +78,28 @@ export const registerWithCredentials = async (formData: FormData) => {
     throw error;
   }
   revalidatePath("/");
+};
+
+export const changePassword = async (userID: string, formData: FormData) => {
+  const newPassword = {
+    password: formData.get("password"),
+    confirmPassword: formData.get("confirmPassword"),
+  };
+
+  if (newPassword.password !== newPassword.confirmPassword) {
+    return { error: "Passwords do not match" };
+  }
+
+  const hash = saltAndHashPassword(newPassword.password);
+
+  try {
+    await prisma.user.update({
+      where: { id: userID },
+      data: { hashedPassword: hash },
+    });
+    return { success: "Password successfully changed" };
+  } catch (error) {
+    console.error(error);
+    return { error: "Failed to change password" };
+  }
 };

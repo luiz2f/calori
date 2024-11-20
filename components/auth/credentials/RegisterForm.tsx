@@ -46,14 +46,14 @@ export default function RegisterForm() {
     }
 
     const response = await registerWithCredentials(formData);
-    console.log(response);
-    console.log(response?.error);
 
     if (response?.error) {
       const errorMessage = response?.error.split(".")[0];
-
+      // VER TODOS OS ERROS POSSIVELS E USAR THEN
+      // USUARIO JA CADASTRADO? OFERECER DUAS OPÇÕES
+      // LOGIN || RECUPERAR SENHA
       if (errorMessage === "Token sent") {
-        return router?.push("/verify-email");
+        return router?.push("/token-sent");
       } else {
         const newErrors: {
           email?: string | boolean;

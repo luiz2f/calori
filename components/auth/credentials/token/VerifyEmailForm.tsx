@@ -1,4 +1,5 @@
 "use client";
+import { verifyEmailToken } from "@/actions/token";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -20,12 +21,13 @@ export default function VerifyEmailForm() {
       return;
     }
 
-    newVerification(token)
+    verifyEmailToken(token)
+      // ERROR HANDLING(token)
       .then((data) => {
-        if (data.success) {
+        if ("success" in data) {
           setSuccess(data.success);
         }
-        if (data.error) {
+        if ("error" in data) {
           setError(data.error);
         }
       })
@@ -51,15 +53,24 @@ export default function VerifyEmailForm() {
       </div>
       <div className="p-6 pt-0">
         <div className="flex items-center w-full justify-center">
+          {/* // 📩📩📩 */}
           {!success && !error && <p>Loading</p>}
           <div className="flex space-x-4 items-center p-2 rounded-lg text-emerald-500 bg-emerald-500/30">
             <BiCheck className="w-4 h-4 " />
             <p>{success}</p>
+            <Link href={`/login`}>Fazer Login</Link>
           </div>
           {!success && (
             <div className="flex space-x-4 items-center p-2 rounded-lg text-emerald-500 bg-emerald-500/30">
               <BiError className="w-4 h-4 " />
-              <p>{error}</p>
+              {error === "Invalid token" || error === "Token has expired" ? (
+                <>
+                  <p>{error}</p>
+                  <button>Enviar novo email de verificação</button>
+                </>
+              ) : (
+                <p>{error}</p>
+              )}
             </div>
           )}
         </div>

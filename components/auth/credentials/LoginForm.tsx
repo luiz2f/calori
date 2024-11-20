@@ -18,13 +18,15 @@ export default function LoginForm() {
     const { email, password } = Object.fromEntries(formData);
     if (!email || !emailRegex.test(email as string)) {
       newErrors.email = "Please enter a valid email.";
+      return;
     }
     if (!password || password.length < 8) {
       newErrors.password = "Password must be at least 8 characters long.";
+      return;
     }
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      return; // Retorna sem fazer o login
+      return;
     }
 
     const response = await loginWithCredentials(formData);

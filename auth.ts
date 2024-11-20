@@ -7,7 +7,7 @@ import { prisma } from "./prisma";
 import { saltAndHashPassword } from "./utils/helper";
 import { FormError } from "./app/models/FormError";
 import {
-  generateTokenAndSentEmailVerification,
+  generateTokenAndSendEmailVerification,
   generateVerificationToken,
 } from "./actions/token";
 import { sendEmailVerification } from "./actions/email";
@@ -55,13 +55,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (credentials.isRegistering) {
           // usuario não existe
           if (!user) {
-            // user = await prisma.user.create({
-            //   data: {
-            //     email,
-            //     hashedPassword: hash,
-            //   },
-            // });
-            // await generateTokenAndSentEmailVerification(email);
+            user = await prisma.user.create({
+              data: {
+                email,
+                hashedPassword: hash,
+              },
+            });
+            await generateTokenAndSendEmailVerification(email);
             throw new CustomError("Token sent");
             // usuario existe, mas não tem senha
           } else if (!user.hashedPassword) {
@@ -70,12 +70,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               data: { hashedPassword: hash },
             });
             ////// Update user hashedpassword + token de verificação
-            // await generateTokenAndSentEmailVerification(email);
+            await generateTokenAndSendEmailVerification(email);
             throw new CustomError("Token sent");
 
             // usuario existe, tem senha, mas não verificou o token
           } else if (!user.emailVerified) {
-            // await generateTokenAndSentEmailVerification(email);
+            await generateTokenAndSendEmailVerification(email);
             throw new CustomError("Token sent");
             // usuario existe, tem senha, verificou o token
           } else {
