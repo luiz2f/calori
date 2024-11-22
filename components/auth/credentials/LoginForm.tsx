@@ -2,8 +2,8 @@
 
 import { loginWithCredentials } from "@/actions/auth";
 import AuthButton from "../AuthButton";
-import { useState } from "react";
-import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
@@ -35,23 +35,25 @@ export default function LoginForm() {
       return;
     }
 
-    loginWithCredentials(formData)
-      .then((data) => {
-        if ("error" in data) {
-          newErrors.email = true;
-          newErrors.password = data.error.split(".")[0];
-          setErrors(newErrors);
+    try {
+      const data = await loginWithCredentials(formData);
+      if (data && "error" in data) {
+        const dataError = data.error.split(".")[0];
+        if (dataError === "Token sent") {
+          router?.push("/token-sent");
+        } else {
+          setErrors({
+            email: true,
+            password: dataError,
+          });
         }
-      })
-      .catch((error) => {
-        console.error(error);
-        newErrors.email = true;
-        newErrors.password = "An unexpected error occurred 😢";
+      }
+    } catch (error) {
+      console.error(error);
+      setErrors({
+        email: true,
+        password: "An unexpected error occurred 😢",
       });
-
-    setErrors(newErrors);
-    if (errors.email === "Token sent") {
-      return router?.push("/token-sent");
     }
   };
 

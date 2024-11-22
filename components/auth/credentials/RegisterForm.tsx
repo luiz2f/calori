@@ -23,12 +23,11 @@ export default function RegisterForm({ setExistentUser }: RegisterFormProps) {
     event.preventDefault();
     const formData = new FormData(event.target as HTMLFormElement);
 
-    let newErrors: {
+    const newErrors: {
       email?: string | boolean;
       password?: string | boolean;
       confirmPassword?: string;
     } = {};
-    let errorMessage: string = "";
 
     const { email, password, confirmPassword } = Object.fromEntries(
       formData
@@ -51,30 +50,33 @@ export default function RegisterForm({ setExistentUser }: RegisterFormProps) {
       return; // Retorna sem fazer o login
     }
 
-    registerWithCredentials(formData)
-      .then((data) => {
-        if (data) {
-          if ("error" in data) {
-            errorMessage = data.error.split(".")[0];
-          }
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        errorMessage = "An unexpected error occurred";
-      });
+    try {
+      const data = await registerWithCredentials(formData);
 
-    if (errorMessage === "Token sent") {
-      return router?.push("/token-sent");
-    } else if (errorMessage === "User already exists") {
-      setExistentUser(true);
-    } else {
-      newErrors = {
+      if (data && "error" in data) {
+        const dataError = data.error.split(".")[0];
+        console.log(dataError);
+        if (dataError === "Token sent") {
+          router?.push("/token-sent");
+        } else if (dataError === "User already exists") {
+          console.log(2);
+          setExistentUser(true);
+        } else {
+          console.log(3);
+          setErrors({
+            email: true,
+            password: true,
+            confirmPassword: dataError,
+          });
+        }
+      }
+    } catch (error: any) {
+      console.error(error);
+      setErrors({
         email: true,
         password: true,
-        confirmPassword: errorMessage,
-      };
-      setErrors(newErrors);
+        confirmPassword: error,
+      });
     }
   };
 
@@ -92,7 +94,6 @@ export default function RegisterForm({ setExistentUser }: RegisterFormProps) {
               errors.email ? "border-red-500" : "border-gray-200"
             } bg-white text-sm text-gray-700`}
           />
-          {errors.email && <span className="text-red-500">{errors.email}</span>}
         </div>
         <div>
           <label htmlFor="password">Password</label>
@@ -106,9 +107,6 @@ export default function RegisterForm({ setExistentUser }: RegisterFormProps) {
               errors.password ? "border-red-500" : "border-gray-200"
             } bg-white text-sm text-gray-700`}
           />
-          {errors.password && (
-            <span className="text-red-500">{errors.password}</span>
-          )}
         </div>
 
         <div>

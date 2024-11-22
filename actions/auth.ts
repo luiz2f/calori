@@ -3,11 +3,14 @@
 import { auth, signIn, signOut } from "@/auth";
 import prisma from "@/prisma";
 import { saltAndHashPassword } from "@/utils/helper";
+import { User } from "@prisma/client";
 import { AuthError } from "next-auth";
 import { revalidatePath } from "next/cache";
+import bcrypt from "bcryptjs";
 
 export const login = async (provider: string) => {
-  await signIn(provider, { redirectTo: "/" });
+  const user = await signIn(provider, { redirectTo: "/" });
+  console.log(user);
   revalidatePath("/");
 };
 
@@ -16,7 +19,9 @@ export const logout = async () => {
   revalidatePath("/");
 };
 
-export const getUserByEmail = async (email: string) => {
+export const getUserByEmail = async (
+  email: string
+): Promise<User | { error: string }> => {
   const user = await prisma.user.findUnique({
     where: {
       email,
@@ -34,7 +39,6 @@ export const loginWithCredentials = async (formData: FormData) => {
     password: formData.get("password"),
     role: "USER",
     redirectTo: "/",
-    redirect: false,
   };
 
   try {
@@ -81,32 +85,63 @@ export const registerWithCredentials = async (formData: FormData) => {
   revalidatePath("/");
 };
 
-export const changePassword = async (userID: string, formData: FormData) => {
+export const changePasswordByEmail = async (
+  userEmail: string,
+  formData: FormData
+) => {
   const session = await auth();
+  const user = await getUserByEmail(userEmail);
 
-  const newPassword = {
-    password: formData.get("password"),
-    confirmPassword: formData.get("confirmPassword"),
-  };
+  if (!user || "error" in user) {
+    console.log(2);
+    return { error: "An unexpected error occurred" };
+  }
+  const { currentPassword, newPassword, confirmNewPassword } =
+    Object.fromEntries(formData) as Record<string, string>;
 
-  if (newPassword.password !== newPassword.confirmPassword) {
-    return { error: "Passwords do not match" };
+  const isMatch = bcrypt.compareSync(
+    currentPassword as string,
+    user.hashedPassword!
+  );
+
+  if (!isMatch) {
+    return { error: "Invalid current password" };
   }
 
-  if (session?.user?.id === userID) {
+  if (newPassword !== confirmNewPassword) {
+    return { error: "New passwords do not match" };
+  }
+  if (session?.user?.email !== userEmail) {
     return { error: "An unexpected error occurred" };
   }
 
-  const hash = saltAndHashPassword(newPassword.password);
+  const newHash = saltAndHashPassword(newPassword);
 
   try {
     await prisma.user.update({
-      where: { id: userID },
-      data: { hashedPassword: hash },
+      where: { id: user.id },
+      data: { hashedPassword: newHash },
     });
     return { success: "Password successfully changed" };
   } catch (error) {
     console.error(error);
     return { error: "Failed to change password" };
+  }
+};
+
+export const updateUser = async (
+  userID: string,
+  name: string,
+  image: string
+) => {
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { id: userID },
+      data: { name, image },
+    });
+    return updatedUser;
+  } catch (error) {
+    console.error(error);
+    return null;
   }
 };

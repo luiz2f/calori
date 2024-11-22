@@ -11,7 +11,7 @@ export default function VerifyEmailToken() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
-  const onSubmit = useCallback(() => {
+  const onSubmit = useCallback(async () => {
     if (success || error) {
       return;
     }
@@ -21,20 +21,19 @@ export default function VerifyEmailToken() {
       return;
     }
 
-    verifyEmailToken(token)
-      // ERROR HANDLING(token)
-      .then((data) => {
-        if ("success" in data) {
-          setSuccess(data.success);
-        }
-        if ("error" in data) {
-          setError(data.error);
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        setError("An unexpected error occurred");
-      });
+    // TODO📌
+    try {
+      const data = await verifyEmailToken(token);
+
+      if ("success" in data) {
+        setSuccess(data.success);
+      } else if ("error" in data) {
+        setError(data.error);
+      }
+    } catch (error) {
+      console.error(error);
+      setError("An unexpected error occurred");
+    }
   }, [token, success, error]);
 
   useEffect(() => {

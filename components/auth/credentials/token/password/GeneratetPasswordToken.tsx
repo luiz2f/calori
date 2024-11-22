@@ -23,26 +23,23 @@ export default function GeneratetPasswordToken() {
     }
 
     let errorMessage: string = "";
-
-    generateTokenAndSendPasswordResetEmail(email)
-      .then((data) => {
-        if ("success" in data) {
-          setSuccess(data.success);
-        }
-        if ("error" in data) {
-          errorMessage = data.error;
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        errorMessage = "An unexpected error occurred 😢";
-      });
+    try {
+      const data = await generateTokenAndSendPasswordResetEmail(email);
+      if ("success" in data) {
+        setSuccess(data.success);
+      } else if (data && "error" in data) {
+        errorMessage = data.error;
+      }
+    } catch (error) {
+      console.error(error);
+      errorMessage = "An unexpected error occurred 😢";
+    }
 
     if (errorMessage === "Verify your account first") {
       setAccountNotVerified(true);
       setError("Verify your account first");
     } else if (errorMessage === "User not found") {
-      setError("No user was found with that email address");
+      setError("Invalid credentials");
     } else {
       setError(errorMessage);
     }

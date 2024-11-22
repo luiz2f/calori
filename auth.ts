@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 import { saltAndHashPassword } from "./utils/helper";
 import { generateTokenAndSendEmailVerification } from "./actions/token";
+import { getUserByEmail, updateUser } from "./actions/auth";
 
 class CustomError extends CredentialsSignin {
   code = "custom";
@@ -18,6 +19,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      allowDangerousEmailAccountLinking: true,
     }),
     Credentials({
       name: "Credentials",
@@ -57,24 +59,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             });
             await generateTokenAndSendEmailVerification(email);
             throw new CustomError("Token sent");
-            // usuario existe, mas não tem senha
           } else if (!user.hashedPassword) {
             user = await prisma.user.update({
               where: { email },
               data: { hashedPassword: hash },
             });
-            ////// Update user hashedpassword + token de verificação
             await generateTokenAndSendEmailVerification(email);
             throw new CustomError("Token sent");
-
-            // usuario existe, tem senha, mas não verificou o token
           } else if (!user.emailVerified) {
             await generateTokenAndSendEmailVerification(email);
             throw new CustomError("Token sent");
-            // usuario existe, tem senha, verificou o token
           } else {
             throw new CustomError("User already exists");
-            //// client options : fazer login ou recuperar senha
           }
         } else {
           if (!user) {
@@ -90,7 +86,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               user.hashedPassword
             );
             if (!isMatch) {
-              throw new CustomError("Invalid credentials");
+              throw new CustomError("Invalid credentials 3");
             }
           }
         }
@@ -98,6 +94,27 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
+  callbacks: {
+    async signIn({ user, account, profile }) {
+      if (account?.provider === "google") {
+        const existingUser = user?.email
+          ? await getUserByEmail(user.email)
+          : null;
+        if (existingUser && "id" in existingUser) {
+          if (existingUser.name && existingUser.image) {
+            return true;
+          }
+          const name = existingUser.name || profile?.name || "";
+          const image = existingUser.image || profile?.picture || "";
+
+          await updateUser(existingUser.id, name, image);
+        } else if (!profile) {
+          return false;
+        }
+      }
+      return true;
+    },
+  },
 });
 
 // console.log("W");

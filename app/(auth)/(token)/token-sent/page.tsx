@@ -1,5 +1,4 @@
 export default function TokenSent() {
-  // 📌
   return (
     <div>
       <p>A verification link was sent to your email</p>

@@ -12,8 +12,9 @@ export default function VerifyPasswordToken() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
-  const onSubmit = useCallback(() => {
+  const onSubmit = useCallback(async () => {
     if (success || error) {
+      console.log(1);
       return;
     }
 
@@ -22,19 +23,19 @@ export default function VerifyPasswordToken() {
       return;
     }
 
-    verifyResetPasswordToken(token)
-      .then((data) => {
-        if ("success" in data) {
-          setSuccess(data.success);
-        }
-        if ("error" in data) {
-          setError(data.error);
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        setError("An unexpected error occurred");
-      });
+    try {
+      const data = await verifyResetPasswordToken(token);
+
+      if (data && "success" in data) {
+        setSuccess(data.success);
+      }
+      if (data && "error" in data) {
+        setError(data.error);
+      }
+    } catch (error) {
+      console.error(error);
+      setError("An unexpected error occurred");
+    }
   }, [token, success, error]);
 
   useEffect(() => {
@@ -46,9 +47,7 @@ export default function VerifyPasswordToken() {
       <div className="flex flex-col space-y-1.5 p-6">
         <div className="w-full flex flex-col gap-y-4 items-center justify-center">
           <h1 className="text-3xl font-semibold">Confirming now...</h1>
-          <p className="text-muted-foreground text-sm">
-            Confirming your email address
-          </p>
+          <p className="text-muted-foreground text-sm">Verifying your token</p>
         </div>
       </div>
       <div className="p-6 pt-0">

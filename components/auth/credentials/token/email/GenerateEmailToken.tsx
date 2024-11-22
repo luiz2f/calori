@@ -2,7 +2,7 @@
 
 import { generateTokenAndSendEmailVerification } from "@/actions/token";
 import AuthButton from "@/components/auth/AuthButton";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { useState } from "react";
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -25,19 +25,20 @@ export default function GeneratetEmailToken() {
 
     let errorMessage: string = "";
 
-    generateTokenAndSendEmailVerification(email)
-      .then((data) => {
-        if ("success" in data) {
-          setSuccess(data.success);
-        }
-        if ("error" in data) {
-          errorMessage = data.error;
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        errorMessage = "An unexpected error occurred 😢";
-      });
+    // TODO📌
+
+    try {
+      const data = await generateTokenAndSendEmailVerification(email);
+      if ("success" in data) {
+        setSuccess(data.success);
+      }
+      if ("error" in data) {
+        errorMessage = data.error;
+      }
+    } catch (error) {
+      console.error(error);
+      errorMessage = "An unexpected error occurred 😢";
+    }
 
     if (errorMessage === "User not found") {
       setError("No user was found with that email address");

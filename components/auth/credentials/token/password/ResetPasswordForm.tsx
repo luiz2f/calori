@@ -27,20 +27,18 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       setError("Password must be at least 8 characters long.");
       return; // Retorna sem fazer o login
     }
-
-    changePasswordByToken(token, formData)
-      .then((data) => {
-        if ("success" in data) {
-          setSuccess(data.success);
-        }
-        if ("error" in data) {
-          setError(data.error);
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        setError("An unexpected error occurred");
-      });
+    try {
+      const data = await changePasswordByToken(token, formData);
+      if ("success" in data) {
+        setSuccess(data.success);
+      }
+      if ("error" in data) {
+        setError(data.error);
+      }
+    } catch (error) {
+      console.error(error);
+      setError("An unexpected error occurred");
+    }
   };
   return (
     <div>

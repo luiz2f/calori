@@ -1,9 +1,9 @@
 "use server";
 import prisma from "@/prisma";
 import { v4 as uuidv4 } from "uuid";
-import { changePassword, getUserByEmail } from "./auth";
 import { sendEmailVerification, sendPasswordResetEmail } from "./email";
 import { Verificarion_purpose as VerificationPurpose } from "@prisma/client";
+import { changePasswordByEmail, getUserByEmail } from "./auth";
 
 const PurposeMap: Record<string, VerificationPurpose> = {
   email: VerificationPurpose.EMAIL_VERIFICATION,
@@ -45,7 +45,19 @@ export async function getTokenByToken(token: string) {
 
   return verificationToken;
 }
-
+export async function deleteToken(token: string) {
+  try {
+    const deletedToken = await prisma.verificationRequest.delete({
+      where: { token: token },
+    });
+    if (!deletedToken) {
+      return { error: "Error deleting token" };
+    } else return { success: "Token deleted" };
+  } catch (error) {
+    console.error(error);
+    return { error: "Error deleting token" };
+  }
+}
 // ✅
 export async function checkTokenByType(token: string, type: string) {
   const purpose = PurposeMap[type.toLowerCase()];
@@ -101,9 +113,11 @@ export async function verifyEmailToken(token: string) {
     },
   });
 
-  await prisma.verificationRequest.delete({
-    where: { id: existingToken.id },
-  });
+  const tokenDeleted = await deleteToken(token);
+
+  if ("error" in tokenDeleted) {
+    return tokenDeleted;
+  }
 
   return { success: "Email verified" };
 }
@@ -127,7 +141,17 @@ export async function changePasswordByToken(token: string, formData: FormData) {
   }
   const { existingUser } = result;
 
-  const response = changePassword(existingUser.id, formData);
+  const response = changePasswordByEmail(existingUser.email!, formData);
+
+  if ("error" in result) {
+    return response;
+  }
+
+  const tokenDeleted = await deleteToken(token);
+
+  if ("error" in tokenDeleted) {
+    return tokenDeleted;
+  }
 
   return response;
 }
@@ -189,7 +213,7 @@ export async function generatePasswordResetToken(email: string) {
     return user;
   }
 
-  if (user.emailVerified) {
+  if (!user.emailVerified) {
     return { error: "Verify your account" };
   }
 

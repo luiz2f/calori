@@ -1,8 +1,15 @@
+import { auth } from "@/auth";
 import LoginForm from "@/components/auth/credentials/LoginForm";
 import LoginGoogle from "@/components/auth/LoginGoogle";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
-export default function SignIn() {
+export default async function SignIn() {
+  const session = await auth();
+  if (session?.user) {
+    redirect("/");
+  }
+
   return (
     <div className="w-full flex mt-20 justify-center">
       <section className="flex flex-col w-[400px]">

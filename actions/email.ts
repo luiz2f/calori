@@ -2,7 +2,7 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const domain = "https://localhost:3000";
+const domain = "http://localhost:3000";
 
 export const sendEmailVerification = async (email: string, token: string) => {
   const confirmationLink = `${domain}/verify-email?token=${token}`;

@@ -4,7 +4,13 @@ import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const protectedRoutes = ["/middleware"];
+const protectedRoutes = ["/middleware", "/change-password"];
+const noUserRoutes = [
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/reset-password",
+];
 
 export default async function middleware(request: NextRequest) {
   const session = await auth();
@@ -13,7 +19,16 @@ export default async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith(route)
   );
 
+  const isPublic = noUserRoutes.some((route) =>
+    request.nextUrl.pathname.startsWith(route)
+  );
+
   if (!session && isProtected) {
+    const absoluteURL = new URL("/", request.nextUrl.origin);
+    return NextResponse.redirect(absoluteURL.toString());
+  }
+
+  if (session && isPublic) {
     const absoluteURL = new URL("/", request.nextUrl.origin);
     return NextResponse.redirect(absoluteURL.toString());
   }

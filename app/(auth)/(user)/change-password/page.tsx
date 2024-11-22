@@ -9,8 +9,8 @@ export default async function ChangePassword() {
     redirect("/");
   }
 
-  const userID = session.user.id; // ID do usuário autenticado
-  if (userID) {
-    return <ChangePasswordForm userID={userID} />;
-  } // Passa o userID para o formulário
+  const userEmail = session.user.email;
+  if (userEmail) {
+    return <ChangePasswordForm userEmail={userEmail} />;
+  }
 }
