@@ -20,12 +20,12 @@ export default function ChangePasswordForm({
       formData
     ) as Record<string, string>;
     if (newPassword !== confirmNewPassword) {
-      setError("Passwords do not match");
+      setError("As senhas não coincidem");
       return; // Retorna sem fazer o login
     }
 
     if (!newPassword || newPassword?.length < 8) {
-      setError("Password must be at least 8 characters long.");
+      setError("A senha deve ter no mínimo 8 caracteres.");
       return; // Retorna sem fazer o login
     }
 
@@ -39,7 +39,7 @@ export default function ChangePasswordForm({
       }
     } catch (error) {
       console.error(error);
-      setError("An unexpected error occurred");
+      setError("Um erro inesperado ocorreu 😢");
     }
   };
   return (
@@ -84,7 +84,7 @@ export default function ChangePasswordForm({
                 error ? "border-red-500" : "border-gray-200"
               } bg-white text-sm text-gray-700`}
             />
-            {error && <span className="text-red-500">{error}</span>}
+            {error && <span className="text-darkred">{error}</span>}
           </div>
           <AuthButton actionText="Alterar senha" />
         </form>

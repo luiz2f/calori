@@ -4,6 +4,8 @@ import { registerWithCredentials } from "@/actions/auth";
 import AuthButton from "../AuthButton";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useRouter } from "next/navigation";
+import Input from "@/components/ui/Input";
+import PasswordInput from "@/components/ui/PasswordInput";
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
@@ -21,8 +23,8 @@ export default function RegisterForm({ setExistentUser }: RegisterFormProps) {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const formData = new FormData(event.target as HTMLFormElement);
 
+    const formData = new FormData(event.target as HTMLFormElement);
     const newErrors: {
       email?: string | boolean;
       password?: string | boolean;
@@ -34,7 +36,7 @@ export default function RegisterForm({ setExistentUser }: RegisterFormProps) {
     ) as Record<string, string>;
 
     if (!email || !emailRegex.test(email as string)) {
-      newErrors.email = "Please enter a valid email.";
+      newErrors.email = "Por favor insira um e-mail válido.";
     }
     if (password !== confirmPassword) {
       newErrors.password = true;
@@ -46,17 +48,20 @@ export default function RegisterForm({ setExistentUser }: RegisterFormProps) {
     }
 
     if (Object.keys(newErrors).length > 0) {
+      console.log(newErrors);
       setErrors(newErrors);
       return; // Retorna sem fazer o login
     }
+    console.log(1);
 
     try {
       const data = await registerWithCredentials(formData);
 
       if (data && "error" in data) {
         const dataError = data.error.split(".")[0];
-        console.log(dataError);
-        if (dataError === "Token sent") {
+        if (dataError.startsWith("Read more")) {
+          unexpectedError();
+        } else if (dataError === "Token sent") {
           router?.push("/token-sent");
         } else if (dataError === "User already exists") {
           console.log(2);
@@ -72,61 +77,48 @@ export default function RegisterForm({ setExistentUser }: RegisterFormProps) {
       }
     } catch (error: any) {
       console.error(error);
-      setErrors({
-        email: true,
-        password: true,
-        confirmPassword: error,
-      });
+      unexpectedError();
     }
   };
 
+  function unexpectedError() {
+    setErrors({
+      email: true,
+      password: true,
+      confirmPassword: "Um erro inesperado ocorreu 😢",
+    });
+  }
+
+  function handleBlur(type: string) {
+    setErrors((prevErrors) => ({ ...prevErrors, [type]: undefined }));
+  }
   return (
     <div>
-      <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
-        <div>
-          <label>Email</label>
-          <input
-            type="email"
-            id="email"
-            placeholder="Email"
-            name="email"
-            className={`mt-1 w-full px-4 p-2 h-10 rounded-md border ${
-              errors.email ? "border-red-500" : "border-gray-200"
-            } bg-white text-sm text-gray-700`}
-          />
-        </div>
-        <div>
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            autoComplete="new-password"
-            id="password"
-            name="password"
-            placeholder="Password"
-            className={`mt-1 w-full px-4 p-2 h-10 rounded-md border ${
-              errors.password ? "border-red-500" : "border-gray-200"
-            } bg-white text-sm text-gray-700`}
-          />
-        </div>
+      <form onSubmit={handleSubmit} className="w-full flex flex-col gap-2">
+        <Input
+          id="email"
+          type="email"
+          placeholder="Email"
+          error={errors?.email}
+          onBlur={() => handleBlur("email")}
+          onChange={() => handleBlur("email")}
+        />
+        <PasswordInput
+          id="password"
+          placeholder="Password"
+          error={errors?.password}
+          newPassword={true}
+          // função pra caso senha menor que 8 erro senha muito curta
+        />
+        <PasswordInput
+          id="confirmPassword"
+          placeholder="Confirm Password"
+          error={errors.confirmPassword}
+          newPassword={true}
+          // função pra caso senha menor que 8 erro senha muito curta
+        />
 
-        <div>
-          <label htmlFor="confirmPassword">Confirm Password</label>
-          <input
-            type="password"
-            autoComplete="new-password"
-            id="confirmPassword"
-            name="confirmPassword"
-            placeholder="Confirm Password"
-            className={`mt-1 w-full px-4 p-2 h-10 rounded-md border ${
-              errors.confirmPassword ? "border-red-500" : "border-gray-200"
-            } bg-white text-sm text-gray-700`}
-          />
-          {errors.confirmPassword && (
-            <span className="text-red-500">{errors.confirmPassword}</span>
-          )}
-        </div>
-
-        <AuthButton actionText="Sign Up" />
+        <AuthButton actionText="Sign Up" className="mt-2" />
       </form>
     </div>
   );

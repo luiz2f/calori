@@ -1,6 +1,10 @@
 "use client";
 import { changePasswordByToken } from "@/actions/token";
 import AuthButton from "@/components/auth/AuthButton";
+import SuccessPage from "@/components/by-page/auth/SucessPage";
+import NavAnchor from "@/components/ui/NavAnchor";
+import NavButton from "@/components/ui/NavButton";
+import PasswordInput from "@/components/ui/PasswordInput";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -19,12 +23,12 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       formData
     ) as Record<string, string>;
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError("As senhas não coincidem");
       return; // Retorna sem fazer o login
     }
 
     if (!password || password?.length < 8) {
-      setError("Password must be at least 8 characters long.");
+      setError("A senha deve ter no mínimo 8 caracteres.");
       return; // Retorna sem fazer o login
     }
     try {
@@ -37,48 +41,51 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       }
     } catch (error) {
       console.error(error);
-      setError("An unexpected error occurred");
+      setError("Um erro inesperado ocorreu 😢");
     }
   };
   return (
-    <div>
+    <>
       {!success ? (
-        <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
-          <div>
-            <label>Password</label>
-            <input
-              type="password"
-              autoComplete="current-password"
-              id="password"
-              name="password"
-              placeholder="Password"
-              className={`mt-1 w-full px-4 p-2 h-10 rounded-md border ${
-                error ? "border-red-500" : "border-gray-200"
-              } bg-white text-sm text-gray-700`}
-            />
+        <div className="flex flex-col h-full justify-between pt-6 pb-2">
+          <div className="flex flex-col w-full ">
+            <h1 className="text-2xl w-full text-center font-bold mb-2">
+              Redefinir Senha
+            </h1>
+            <h4 className="text-xl text-darkgreen w-full text-center  mb-6">
+              Insira sua nova senha para continuar
+            </h4>
+
+            <form
+              onSubmit={handleSubmit}
+              className="w-full flex flex-col gap-2 "
+            >
+              <PasswordInput
+                id="password"
+                placeholder="Senha"
+                newPassword={true}
+                error={error}
+              />
+              <PasswordInput
+                id="confirmPassword"
+                placeholder="Confirmar senha"
+                error={error}
+                errorText={true}
+                newPassword={true}
+              />
+              <AuthButton actionText="Alterar senha" className="mt-2" />
+            </form>
           </div>
-          <div>
-            <label>Confirm Password</label>
-            <input
-              type="password"
-              autoComplete="current-password"
-              id="confirmPassword"
-              name="confirmPassword"
-              placeholder="Confirm password"
-              className={`mt-1 w-full px-4 p-2 h-10 rounded-md border ${
-                error ? "border-red-500" : "border-gray-200"
-              } bg-white text-sm text-gray-700`}
-            />
-            {error && <span className="text-red-500">{error}</span>}
-          </div>
-          <AuthButton actionText="Alterar senha" />
-        </form>
+          <NavAnchor href="/login">Entrar com sua conta</NavAnchor>
+        </div>
       ) : (
-        <>
-          <p>Senha alterada com sucesso!</p>
-          <Link href={`/login`}>Fazer Login</Link>
-        </>
+        <SuccessPage
+          title="Senha alterada com sucesso!"
+          subtitle="Sua nova senha está pronta para uso"
+        >
+          <NavButton href="/login">Fazer Login</NavButton>
+        </SuccessPage>
       )}
-    </div>
+    </>
   );
 }

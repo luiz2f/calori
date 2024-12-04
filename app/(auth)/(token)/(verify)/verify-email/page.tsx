@@ -1,9 +1,5 @@
 import VerifyEmailToken from "@/components/auth/credentials/token/email/VerifyEmailToken";
 
 export default function VerifyEmailPage() {
-  return (
-    <div>
-      <VerifyEmailToken />
-    </div>
-  );
+  return <VerifyEmailToken />;
 }

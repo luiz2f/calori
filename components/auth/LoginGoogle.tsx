@@ -1,18 +1,23 @@
 "use client";
 import { login } from "@/actions/auth";
-import { FaGoogle } from "react-icons/fa";
+import Button from "../ui/Button";
+import { FcGoogle } from "react-icons/fc";
 
 type LoginGoogleProps = {
   isLogin?: boolean;
 };
 export default function LoginGoogle({ isLogin = true }: LoginGoogleProps) {
   return (
-    <div
+    <Button
       onClick={() => login("google")}
-      className="w-full gap-4  hover:cursor-pointer mt-6 h-12 bg-black rounded-md p-4 flex justify-center items-center"
+      cw="light"
+      className="!text-base
+"
     >
-      <FaGoogle className="text-white" />
-      <p className="text-white">{isLogin ? "Login" : "Register"} with Google</p>
-    </div>
+      <div className="flex justify-center items-center gap-x-2">
+        <FcGoogle className="w-7 h-7" />
+        <p>{isLogin ? "Login" : "Register"} with Google</p>
+      </div>
+    </Button>
   );
 }

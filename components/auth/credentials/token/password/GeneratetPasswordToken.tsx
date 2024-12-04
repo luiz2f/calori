@@ -2,12 +2,18 @@
 
 import { generateTokenAndSendPasswordResetEmail } from "@/actions/token";
 import AuthButton from "@/components/auth/AuthButton";
-import Link from "next/link";
-import { useState } from "react";
+import ErrorPage from "@/components/by-page/auth/ErrorPage";
+import Input from "@/components/ui/Input";
+import NavAnchor from "@/components/ui/NavAnchor";
+import NavButton from "@/components/ui/NavButton";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 export default function GeneratetPasswordToken() {
+  const router = useRouter();
+
   const [accountNotVerified, setAccountNotVerified] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
   const [error, setError] = useState<string | undefined>(undefined);
@@ -18,7 +24,7 @@ export default function GeneratetPasswordToken() {
     const { email } = Object.fromEntries(formData) as Record<string, string>;
 
     if (!email || !emailRegex.test(email as string)) {
-      setError("Please enter a valid email.");
+      setError("Por favor insira um e-mail válido.");
       return;
     }
 
@@ -32,43 +38,56 @@ export default function GeneratetPasswordToken() {
       }
     } catch (error) {
       console.error(error);
-      errorMessage = "An unexpected error occurred 😢";
+      errorMessage = "Um erro inesperado ocorreu 😢";
     }
 
     if (errorMessage === "Verify your account first") {
       setAccountNotVerified(true);
-      setError("Verify your account first");
+      setError("Verifique sua conta primeiro");
     } else if (errorMessage === "User not found") {
-      setError("Invalid credentials");
+      setError("Credenciais invalidas");
     } else {
       setError(errorMessage);
     }
   };
 
+  useEffect(() => {
+    if (success) {
+      router?.push("/token-sent");
+    }
+  }, [success, router]);
   return (
-    <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
-      <div>
-        <label>Email</label>
-        <input
-          type="email"
-          id="email"
-          placeholder="Email"
-          name="email"
-          className={`mt-1 w-full px-4 p-2 h-10 rounded-md border ${
-            error ? "border-red-500" : "border-gray-200"
-          } bg-white text-sm text-gray-700`}
-        />
-        {error && <span className="text-red-500">{error}</span>}
-      </div>
-      {success && <p>Recovery password email was sent</p>}
+    <>
+      {!accountNotVerified ? (
+        <form onSubmit={handleSubmit} className="w-full flex flex-col pt-6">
+          <div className="flex flex-col w-full ">
+            <h1 className="text-2xl w-full text-center font-bold mb-2">
+              Esqueci a Senha
+            </h1>
+            <h4 className="text-xl text-darkgreen w-full text-center  mb-6">
+              Insira seu e-mail para recuperar
+              <br /> sua senha
+            </h4>
+          </div>
 
-      <AuthButton
-        actionText="Recover password"
-        disableAction={accountNotVerified}
-      />
-      {accountNotVerified && (
-        <Link href="/request-email-verify">Verify your email</Link>
+          <Input id="email" placeholder="Email" type="email" error={error} />
+          <AuthButton
+            actionText="Recuperar Senha"
+            disableAction={accountNotVerified}
+            className="mt-4"
+          />
+          <NavAnchor href="/login">Fazer Login</NavAnchor>
+        </form>
+      ) : (
+        <ErrorPage
+          title="Email Não Verificado"
+          subtitle="Verifique seu e-mail para continuar"
+        >
+          <NavButton href="/request-email-verify">
+            Ir Para Verificação
+          </NavButton>
+        </ErrorPage>
       )}
-    </form>
+    </>
   );
 }

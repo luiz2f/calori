@@ -160,6 +160,10 @@ export async function changePasswordByToken(token: string, formData: FormData) {
 export async function generateVerificationToken(email: string) {
   const user = await getUserByEmail(email);
 
+  if (user?.emailVerified) {
+    return { error: "User already verified" };
+  }
+
   if ("error" in user) {
     return user;
   }
@@ -246,6 +250,7 @@ export async function generateTokenAndSendPasswordResetEmail(email: string) {
   if ("error" in verificationToken) {
     return verificationToken;
   }
+
   const emailResult = await sendPasswordResetEmail(
     email,
     verificationToken.token

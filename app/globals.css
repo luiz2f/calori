@@ -2,7 +2,41 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  background-color: #1d1d1d;
-  color: white;
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus,
+input:-webkit-autofill::first-line {
+  -webkit-box-shadow: 0 0 0 0 #ffffff inset;
+  transition: background-color 150ms ease-in-out 0s;
+  -webkit-text-fill-color: #000;
+  color: #000;
+}
+
+#spinner {
+  margin: 0 auto;
+  margin-bottom: 1rem;
+  width: 2rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(farthest-side, #3e7b32 94%, transparent) top/10px
+      5px no-repeat,
+    conic-gradient(transparent 30%, #3e7b32);
+  -webkit-mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - 4px),
+    black 0
+  );
+  animation: rotate 1.5s infinite linear;
+}
+
+@keyframes rotate {
+  to {
+    transform: rotate(1turn);
+  }
 }

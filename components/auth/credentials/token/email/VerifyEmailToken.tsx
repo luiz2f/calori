@@ -1,9 +1,15 @@
 "use client";
 import { verifyEmailToken } from "@/actions/token";
+import ErrorPage from "@/components/by-page/auth/ErrorPage";
+import LoadingPage from "@/components/by-page/auth/LoadingPage";
+import SuccessPage from "@/components/by-page/auth/SucessPage";
+import NavButton from "@/components/ui/NavButton";
+import Spinner from "@/components/ui/Spinner";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { BiCheck, BiError } from "react-icons/bi";
+import { HiCheck, HiOutlineX } from "react-icons/hi";
 
 export default function VerifyEmailToken() {
   const [error, setError] = useState<string | undefined>(undefined);
@@ -17,11 +23,10 @@ export default function VerifyEmailToken() {
     }
 
     if (!token) {
-      setError("No token provided");
+      setError("Nenhum token fornecido");
       return;
     }
 
-    // TODO📌
     try {
       const data = await verifyEmailToken(token);
 
@@ -32,7 +37,7 @@ export default function VerifyEmailToken() {
       }
     } catch (error) {
       console.error(error);
-      setError("An unexpected error occurred");
+      setError("Um erro inesperado ocorreu 😢");
     }
   }, [token, success, error]);
 
@@ -41,44 +46,34 @@ export default function VerifyEmailToken() {
   }, []);
 
   return (
-    <div className="rounded-lg border bg-card text-card-foreground  shadow-md w-full">
-      <div className="flex flex-col space-y-1.5 p-6">
-        <div className="w-full flex flex-col gap-y-4 items-center justify-center">
-          <h1 className="text-3xl font-semibold">Confirming now...</h1>
-          <p className="text-muted-foreground text-sm">
-            Confirming your email address
-          </p>
-        </div>
-      </div>
-      <div className="p-6 pt-0">
-        <div className="flex items-center w-full justify-center">
-          {!success && !error && <p>Loading</p>}
-          <div className="flex space-x-4 items-center p-2 rounded-lg text-emerald-500 bg-emerald-500/30">
-            <BiCheck className="w-4 h-4 " />
-            <p>{success}</p>
-            <Link href={`/login`}>Fazer Login</Link>
-          </div>
-          {!success && (
-            <div className="flex space-x-4 items-center p-2 rounded-lg text-emerald-500 bg-emerald-500/30">
-              <BiError className="w-4 h-4 " />
-              {error === "Invalid token" || error === "Token has expired" ? (
-                <>
-                  <p>{error}</p>
-                  <button>Enviar novo email de verificação</button>
-                  {/* TODO TODO TODO TODO TODO */}
-                </>
-              ) : (
-                <p>{error}</p>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-      <div className="flex items-center p-6 pt-0">
-        <button className="font-normal w-full">
-          <Link href="/auth/login">Back to Login</Link>
-        </button>
-      </div>
-    </div>
+    <>
+      {!error && !success && (
+        <LoadingPage
+          title="Verificando token"
+          subtitle="Só alguns segundos 😉"
+        ></LoadingPage>
+      )}
+      {success && (
+        <SuccessPage
+          title="Token Verificado"
+          subtitle="Seu e-mail foi verificado com sucesso!"
+        >
+          <NavButton href="/login">Fazer Login</NavButton>
+        </SuccessPage>
+      )}
+      {error &&
+        (error == "Invalid token" || error == "Token has expired" ? (
+          <ErrorPage
+            title="Token Invalido"
+            subtitle="Gere um novo token de verificação"
+          >
+            <NavButton href="/verify-email">Gerar Novo Token</NavButton>
+          </ErrorPage>
+        ) : (
+          <ErrorPage title="Erro" subtitle={error}>
+            <NavButton href="/login">Voltar</NavButton>
+          </ErrorPage>
+        ))}
+    </>
   );
 }

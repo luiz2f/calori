@@ -2,6 +2,8 @@
 
 import { generateTokenAndSendEmailVerification } from "@/actions/token";
 import AuthButton from "@/components/auth/AuthButton";
+import Input from "@/components/ui/Input";
+import NavAnchor from "@/components/ui/NavAnchor";
 import { useRouter } from "next/compat/router";
 import { useState } from "react";
 
@@ -19,13 +21,11 @@ export default function GeneratetEmailToken() {
     const { email } = Object.fromEntries(formData) as Record<string, string>;
 
     if (!email || !emailRegex.test(email as string)) {
-      setError("Please enter a valid email.");
+      setError("Por favor insira um e-mail válido.");
       return;
     }
 
     let errorMessage: string = "";
-
-    // TODO📌
 
     try {
       const data = await generateTokenAndSendEmailVerification(email);
@@ -37,7 +37,7 @@ export default function GeneratetEmailToken() {
       }
     } catch (error) {
       console.error(error);
-      errorMessage = "An unexpected error occurred 😢";
+      errorMessage = "Um erro inesperado ocorreu 😢";
     }
 
     if (errorMessage === "User not found") {
@@ -51,23 +51,21 @@ export default function GeneratetEmailToken() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
-      <div>
-        <label>Email</label>
-        <input
-          type="email"
-          id="email"
-          placeholder="Email"
-          name="email"
-          className={`mt-1 w-full px-4 p-2 h-10 rounded-md border ${
-            error ? "border-red-500" : "border-gray-200"
-          } bg-white text-sm text-gray-700`}
-        />
-        {error && <span className="text-red-500">{error}</span>}
+    <form onSubmit={handleSubmit} className="w-full flex flex-col pt-6">
+      <div className="flex flex-col w-full ">
+        <h1 className="text-2xl w-full text-center font-bold mb-2">
+          Verificar Email
+        </h1>
+        <h4 className="text-xl text-darkgreen w-full text-center  mb-6">
+          Insira seu e-mail para enviar
+          <br />o token de verificação
+        </h4>
       </div>
-      {success && <p>Recovery password email was sent</p>}
 
-      <AuthButton actionText="Recover password" />
+      <Input id="email" placeholder="Email" type="email" error={error} />
+      <AuthButton actionText="Recover password" className="mt-4" />
+
+      <NavAnchor href="/login">Entrar com sua conta</NavAnchor>
     </form>
   );
 }

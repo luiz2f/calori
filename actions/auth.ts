@@ -38,7 +38,7 @@ export const loginWithCredentials = async (formData: FormData) => {
     email: formData.get("email"),
     password: formData.get("password"),
     role: "USER",
-    redirectTo: "/",
+    redirect: false,
   };
 
   try {

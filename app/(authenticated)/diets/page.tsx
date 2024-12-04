@@ -1,10 +1,10 @@
 import SuccessPage from "@/components/by-page/auth/SucessPage";
 import NavAnchor from "@/components/ui/NavAnchor";
 
-export default function TokenSent() {
+export default function DietPage() {
   const subtitle = (
     <>
-      Verifique seu <strong></strong>e-mail e siga os passos <br />
+      Verifique seu <strong>email</strong> e siga os passos <br />
       para continuar
     </>
   );

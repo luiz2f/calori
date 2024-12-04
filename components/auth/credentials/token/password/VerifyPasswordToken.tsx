@@ -1,17 +1,22 @@
 "use client";
 import { verifyResetPasswordToken } from "@/actions/token";
+import ErrorPage from "@/components/by-page/auth/ErrorPage";
+import LoadingPage from "@/components/by-page/auth/LoadingPage";
+import SuccessPage from "@/components/by-page/auth/SucessPage";
+import NavButton from "@/components/ui/NavButton";
+import Spinner from "@/components/ui/Spinner";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { BiCheck, BiError } from "react-icons/bi";
 import ResetPasswordForm from "./ResetPasswordForm";
 
 // PÁGINA (EM COMPONENTE) QUE VERIFICA O TOKEN PELA PRIMEIRA VEZ
 export default function VerifyPasswordToken() {
   const [error, setError] = useState<string | undefined>(undefined);
   const [success, setSuccess] = useState<string | undefined>(undefined);
+  const [showForm, setShowForm] = useState<boolean>(false);
   const searchParams = useSearchParams();
-  const token = searchParams.get("token");
-
+  // const token = searchParams.get("token");
+  const token = "21321";
   const onSubmit = useCallback(async () => {
     if (success || error) {
       console.log(1);
@@ -19,12 +24,13 @@ export default function VerifyPasswordToken() {
     }
 
     if (!token) {
-      setError("No token provided");
+      setError("Nenhum token fornecido");
       return;
     }
 
     try {
-      const data = await verifyResetPasswordToken(token);
+      // const data = await verifyResetPasswordToken(token);
+      const data = { success: "Token verificado" };
 
       if (data && "success" in data) {
         setSuccess(data.success);
@@ -34,59 +40,54 @@ export default function VerifyPasswordToken() {
       }
     } catch (error) {
       console.error(error);
-      setError("An unexpected error occurred");
+      setError("Um erro inesperado ocorreu 😢");
     }
   }, [token, success, error]);
 
   useEffect(() => {
     onSubmit();
   }, []);
+  useEffect(() => {
+    if (success) {
+      setTimeout(() => {
+        setShowForm(true);
+      }, 1000);
+    }
+  }, [success]);
 
   return (
-    <div className="rounded-lg border bg-card text-card-foreground  shadow-md w-full">
-      <div className="flex flex-col space-y-1.5 p-6">
-        <div className="w-full flex flex-col gap-y-4 items-center justify-center">
-          <h1 className="text-3xl font-semibold">Confirming now...</h1>
-          <p className="text-muted-foreground text-sm">Verifying your token</p>
-        </div>
-      </div>
-      <div className="p-6 pt-0">
-        {/* // 🔒🔒🔒 */}
-        <div className="flex items-center w-full justify-center">
-          {!success && !error && <p>Loading</p>}
-
-          {success && token && (
-            <>
-              <div className="flex space-x-4 items-center p-2 rounded-lg text-emerald-500 bg-emerald-500/30">
-                <BiCheck className="w-4 h-4 " />
-                <p>{success}</p>
-              </div>
-
-              <ResetPasswordForm token={token} />
-            </>
-          )}
-
-          {!success && (
-            <div className="flex space-x-4 items-center p-2 rounded-lg text-emerald-500 bg-emerald-500/30">
-              <BiError className="w-4 h-4 " />
-              {error === "Invalid token" || error === "Token has expired" ? (
-                <>
-                  <p>{error}</p>
-                  <button>Recuperar a senha novamente</button>
-                </>
-              ) : error === "User not verified" ? (
-                <>
-                  <p>{error}</p>
-                  <p>Verifique sua caixa de spam</p>
-                  <button>Enviar email de verificação</button>
-                </>
-              ) : (
-                <p>{error}</p>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+    <>
+      {!error && !success && (
+        <LoadingPage
+          title="Verificando token"
+          subtitle="Só alguns segundos 😉"
+        ></LoadingPage>
+      )}
+      {success &&
+        token &&
+        (showForm ? (
+          <ResetPasswordForm token={token} />
+        ) : (
+          <SuccessPage
+            title="Token Verificado"
+            subtitle="Você será redirecionado em instantes"
+          >
+            <Spinner />
+          </SuccessPage>
+        ))}
+      {error &&
+        (error == "Invalid token" || error == "Token has expired" ? (
+          <ErrorPage
+            title="Token Invalido"
+            subtitle="Gere um novo token de verificação"
+          >
+            <NavButton href="/forgot-password">Gerar Novo Token</NavButton>
+          </ErrorPage>
+        ) : (
+          <ErrorPage title="Erro" subtitle={error}>
+            <NavButton href="/login">Voltar</NavButton>
+          </ErrorPage>
+        ))}
+    </>
   );
 }

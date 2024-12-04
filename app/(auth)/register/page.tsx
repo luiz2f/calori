@@ -1,38 +1,27 @@
 "use client";
 
-import RegisterForm from "@/components/auth/credentials/RegisterForm";
-import LoginGoogle from "@/components/auth/LoginGoogle";
-import Link from "next/link";
+import ErrorPage from "@/components/by-page/auth/ErrorPage";
+import RegisterPage from "@/components/by-page/auth/register/RegisterPage";
+import NavAnchor from "@/components/ui/NavAnchor";
+import NavButton from "@/components/ui/NavButton";
 import { useState } from "react";
 
 export default function SignUp() {
   const [existentUser, setExistentUser] = useState(false);
-  console.log(existentUser);
   return (
-    <div className="w-full flex mt-20 justify-center">
-      <section className="flex flex-col w-[400px]">
-        <h1 className="text-3xl w-full text-center font-bold mb-6">Register</h1>
+    <div className="w-full h-full flex pt-6 pb-3">
+      <section className="flex flex-col w-full h-full justify-between ">
         {!existentUser ? (
-          <>
-            <LoginGoogle isLogin={false} />
-            <RegisterForm setExistentUser={setExistentUser} />
-            <Link href="/login" className="text-center mt-2 underline">
-              <p>Já possuo uma conta</p>
-            </Link>
-          </>
+          <RegisterPage setExistentUser={setExistentUser} />
         ) : (
-          <>
-            <h3> Usuário já existente </h3>
-            <Link href="/login" className="text-center mt-2 underline">
-              <p>Fazer Login</p>
-            </Link>
-            <Link
-              href="/forgot-password"
-              className="text-center mt-2 underline"
-            >
-              <p>Recuperar Senha</p>
-            </Link>
-          </>
+          <ErrorPage
+            title="Cadastro não realizado"
+            subtitle="Usuário já existente"
+          >
+            <NavButton href="/login">Fazer Login</NavButton>
+
+            <NavAnchor href="/forgot-password">Recuperar Senha</NavAnchor>
+          </ErrorPage>
         )}
       </section>
     </div>

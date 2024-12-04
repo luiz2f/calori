@@ -15,7 +15,7 @@ export default async function RequestEmailVerify() {
   const isVerified = !!user?.emailVerified;
   return (
     <div>
-      {isVerified ? <p>User already verified 😉</p> : <GeneratetEmailToken />}{" "}
+      {isVerified ? <p>User already verified 😉</p> : <GeneratetEmailToken />}
     </div>
   );
 }
