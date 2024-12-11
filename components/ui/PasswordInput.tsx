@@ -29,13 +29,13 @@ export default function PasswordInput({
   });
 
   const hideButtonClass = clsx("w-5 h-5 text-grey30");
-
+  console.log(error);
   return (
     <>
       {/* <label>{placeholder}</label> */}
       <div className="relative">
         <input
-          onChange={(e) => handleChange(e)}
+          // onChange={(e) => handleChange(e)}
           type={showPassword ? "text" : "password"}
           autoComplete={newPassword ? "new-password" : "current-password"}
           id={id}

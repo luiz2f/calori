@@ -4,12 +4,8 @@ import ErrorPage from "@/components/by-page/auth/ErrorPage";
 import LoadingPage from "@/components/by-page/auth/LoadingPage";
 import SuccessPage from "@/components/by-page/auth/SucessPage";
 import NavButton from "@/components/ui/NavButton";
-import Spinner from "@/components/ui/Spinner";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { BiCheck, BiError } from "react-icons/bi";
-import { HiCheck, HiOutlineX } from "react-icons/hi";
 
 export default function VerifyEmailToken() {
   const [error, setError] = useState<string | undefined>(undefined);

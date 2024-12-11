@@ -39,8 +39,8 @@ export default async function RootLayout({
     <SessionProvider session={session}>
       <html lang="en" className={expose.className}>
         <body className="h-svh">
-          <div className="mx-auto max-w-screen-lg h-svh flex flex-col bg-white text-black border-darkgreen">
-            <div className="flex-grow">{children}</div>
+          <div className="mx-auto max-w-screen-lg h-svh flex flex-col bg-white text-black">
+            <div className="flex flex-col flex-grow">{children}</div>
           </div>
         </body>
       </html>

@@ -40,6 +40,7 @@ export default function LoginForm() {
       if (data && "error" in data) {
         const dataError = data.error.split(".")[0];
         if (dataError.startsWith("Read more")) {
+          console.log(4);
           unexpectedError();
         } else if (dataError === "Token sent") {
           router?.push("/token-sent");
@@ -56,13 +57,15 @@ export default function LoginForm() {
     }
 
     function unexpectedError() {
+      console.log(3);
+
       setErrors({
         email: true,
         password: "Um erro inesperado ocorreu 😢",
       });
     }
   };
-
+  console.log(errors);
   function handleBlur(type: string) {
     setErrors((prevErrors) => ({ ...prevErrors, [type]: undefined }));
   }
@@ -82,7 +85,7 @@ export default function LoginForm() {
           id="password"
           placeholder="Password"
           error={errors?.password}
-
+          errorText={true}
           // função pra caso senha menor que 8 erro senha muito curta
         />
 
