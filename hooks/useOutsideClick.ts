@@ -8,7 +8,14 @@ export function useOutsideClick<T extends HTMLElement>(
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      const menu = document.getElementById("menu-container");
+
+      if (
+        ref.current &&
+        !ref.current.contains(target) &&
+        !(menu && menu.contains(target))
+      ) {
         handler();
       }
     }

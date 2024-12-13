@@ -29,7 +29,7 @@ export default function Button({
     "bg-darkgreen text-white border-darkgreen": cw === "darkgreen",
     "bg-white text-blacklight border-blacklight": cw === "grey",
     "bg-white text-darkred border-darkred": cw === "lightred",
-    "bg-reddark text-white border-reddark": cw === "red",
+    "bg-darkred text-white border-darkred": cw === "red",
     "!text-base !h-fit !py-2": size === "small",
   });
 

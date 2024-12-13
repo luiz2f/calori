@@ -4,7 +4,7 @@ export default function RefSlider() {
   const iconStyle = "w-5 h-5 ";
 
   return (
-    <div className="flex w-full p-2 justify-between text-darkgreen mt-4 ">
+    <div className="flex w- p-2 justify-between text-darkgreen mt-1 mb-1 ">
       <div className="flex items-center w-20 ">
         <HiChevronLeft className={iconStyle} />
       </div>

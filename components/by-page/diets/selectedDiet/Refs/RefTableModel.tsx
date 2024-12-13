@@ -1,3 +1,4 @@
+"use client";
 import { createContext, useContext, ReactNode } from "react";
 import RefSlider from "./RefSlider";
 
@@ -42,7 +43,7 @@ function Header({
     <div
       role="row"
       style={{ gridTemplateColumns: context.columns }}
-      className="grid mt-2 flex border-b-1 border-darkgreen  pr-1  text-darkgreen"
+      className="grid mt-4 pr-1 text-darkgreen"
     >
       <div className="text-left align-bottom text-xl font-normal self-end">
         {name}
@@ -89,7 +90,7 @@ function Row({
     <div
       role="row"
       style={{ gridTemplateColumns: context.columns }}
-      className="grid border-b-1 border-greylight text-sm pr-1  [&>div]:py-1 [&>div]:text-center [&>div]:text-blacklight last:text-right last:border-b-0"
+      className="grid border-b-1 border-white text-sm pr-1  [&>div]:py-1 [&>div]:text-center [&>div]:text-blacklight last:text-right last:border-b-0"
     >
       <div role="cell" className="pl-2 !text-left !text-black  ">
         {name}
@@ -114,7 +115,7 @@ function Body<T>({
   render: (item: T, index: number) => ReactNode;
 }) {
   return (
-    <div role="rowgroup" className="bg-ulgrey">
+    <div role="rowgroup" className="bg-ulgrey border-y-1 border-grey5">
       {data.map(render)}
     </div>
   );

@@ -12,10 +12,4 @@ export default function SelectedDiet() {
       <DietRefsPage />
     </div>
   );
-
-  {
-  }
-  {
-    /* Delete */
-  }
 }

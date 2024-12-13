@@ -53,7 +53,11 @@ function Menus({ children }: MenusProps) {
 }
 
 function Menu({ children, className }: MenusProps) {
-  return <div className={`flex items-baseline ${className}`}>{children}</div>;
+  return (
+    <div className={`flex items-baseline ${className ? className : ""}`}>
+      {children}
+    </div>
+  );
 }
 
 function Toggle({ id, children, className }: ToggleProps) {
@@ -61,6 +65,7 @@ function Toggle({ id, children, className }: ToggleProps) {
   if (!context) throw new Error("Toggle must be used within a Menus component");
 
   const { openId, close, open, setPosition } = context;
+  // talvez um settimout pro mousedown/ touch start
 
   function handleClick(e: MouseEvent<HTMLButtonElement>) {
     e.stopPropagation();
@@ -69,6 +74,7 @@ function Toggle({ id, children, className }: ToggleProps) {
       return;
     } else {
       const rect = e.currentTarget.getBoundingClientRect();
+      // se posição menor que tamanho, usar 0
       setPosition({
         x: window.innerWidth - rect.width - rect.x,
         y: rect.y + rect.height + 8,
@@ -100,6 +106,7 @@ function List({ id, children }: ListProps) {
 
   return createPortal(
     <ul
+      id="menu-container"
       ref={ref}
       className="fixed bg-white shadow-md rounded-md z-[5000]"
       style={{ right: `${position.x}px`, top: `${position.y}px` }}

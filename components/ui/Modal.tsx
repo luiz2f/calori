@@ -33,7 +33,7 @@ type ModalChildProps = {
   onCloseModal: () => void;
 };
 
-const ModalContext = createContext<ModalContextType>({
+export const ModalContext = createContext<ModalContextType>({
   open: () => {},
   openNames: [],
   close: () => {},
@@ -78,7 +78,7 @@ function Window({ children, name }: WindowProps) {
     <div className="fixed top-0 left-0 w-full h-screen z-[1000]">
       <div className="fixed inset-0 bg-black bg-opacity-50" />
       <div
-        className="fixed top-1/2 left-1/2 transform -translate-x-1/2  -translate-y-1/2 p-5 w-11/12 bg-white rounded-lg"
+        className="fixed top-1/2 left-1/2 transform -translate-x-1/2  -translate-y-1/2 p-4 w-11/12 bg-white rounded-lg"
         ref={ref}
       >
         <button

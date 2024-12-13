@@ -5,33 +5,34 @@ import {
   HiOutlineTrash,
 } from "react-icons/hi";
 
-export default function DietEditRefRow({ ref }) {
+export default function RefEditVarRow({ refvar }) {
   return (
-    <div key={ref.name} className="flex gap-2">
-      <input
-        value={ref.name}
-        className="border-1 border-grey-50 w-full p-1 pl-2 rounded-lg"
-      />
-      <input
-        value={ref.time}
-        className="border-1 border-grey-50 w-14 text-center text-darkgreen p-1 rounded-lg font-medium"
-      />
-      <Menus.Menu className="border-1 border-grey-50 rounded-lg align-center">
+    <div
+      key={refvar.name}
+      className="flex gap-2  border-greylight border-b-1 py-1 "
+    >
+      <div className="underline underline-offset-4 text-darkgreen w-full p-1 pl-2 rounded-lg">
+        {refvar.name}
+      </div>
+      <div className=" w-fit text-center text-darkgreen p-1 rounded-lg font-medium">
+        {refvar.kcal}
+      </div>
+      <Menus.Menu className="rounded-lg align-center">
         <Menus.Toggle
-          id={ref.name}
+          id={refvar.name}
           className="flex items-center justify-center  w-8 h-8 rounded-lg p-1"
         >
           <HiDotsVertical />
         </Menus.Toggle>
 
-        <Menus.List id={ref.name}>
+        <Menus.List id={refvar.name}>
           <Menus.Button icon={<HiOutlinePencilAlt />}>
-            Editar refeição
+            Editar variação
             {/* modal🐥 */}
           </Menus.Button>
 
           <Menus.Button icon={<HiOutlineTrash />}>
-            Apagar refeição
+            Apagar variação
             {/* confirm ⛔ */}
             {/* action 🐥 */}
           </Menus.Button>

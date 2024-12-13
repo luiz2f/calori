@@ -5,7 +5,7 @@ import DietBox from "./DietBox";
 import AddDiet from "./dietSlider/AddDiet";
 import Modal from "@/components/ui/Modal";
 import Menus from "@/components/ui/Menu";
-import CreateDiet from "./dietSlider/CreateDiet";
+import CreateDiet from "./dietSlider/createEditModal/CreateDiet";
 
 const diets = [
   {
