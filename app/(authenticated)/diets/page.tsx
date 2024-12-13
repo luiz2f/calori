@@ -1,5 +1,3 @@
-"use client";
-
 import SelectedDiet from "@/components/by-page/diets/SelectedDiet";
 import DietsSlider from "@/components/by-page/diets/DietsSlider";
 import Header from "@/components/Header";
@@ -18,7 +16,6 @@ const diets = [
 ];
 
 export default function DietPage() {
-  const [selectedModal, openModal] = useState(diets[0]);
   return (
     <>
       <Header />

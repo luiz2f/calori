@@ -3,6 +3,9 @@
 import { useState } from "react";
 import DietBox from "./DietBox";
 import AddDiet from "./dietSlider/AddDiet";
+import Modal from "@/components/ui/Modal";
+import Menus from "@/components/ui/Menu";
+import CreateDiet from "./dietSlider/CreateDiet";
 
 const diets = [
   {
@@ -27,23 +30,37 @@ export default function DietsSlider() {
   // 📌🐪 buscar
   // 📌🐳 opções do modal
   return (
-    <div className="mt-14 flex flex-col w-full pt-8 bg-white z-10">
-      <div className="pl-6">Minhas Dietas</div>
-      <div className="flex w-full overflow-x-auto gap-4 px-6 pt-2 pb-4">
-        {sortedDiets.map((dieta, index) => {
-          return (
-            <DietBox
-              name={dieta.name}
-              kcal={dieta.kcal}
-              dieta={dieta}
-              active={selectedDiet === dieta.index}
-              key={index}
-              onClick={() => handleDietClick(dieta.index)} // Evento de clique para selecionar
-            />
-          );
-        })}
-        <AddDiet />
-      </div>
-    </div>
+    <Modal>
+      <Menus>
+        <div className="mt-14 flex flex-col w-full pt-8 bg-white z-10">
+          <div className="pl-6">Minhas Dietas</div>
+          <div className="flex w-full overflow-x-auto gap-4 px-6 pt-2 pb-4">
+            {sortedDiets.map((dieta, index) => {
+              return (
+                <DietBox
+                  name={dieta.name}
+                  kcal={dieta.kcal}
+                  dieta={dieta}
+                  active={selectedDiet === dieta.index}
+                  key={index}
+                  onClick={() => handleDietClick(dieta.index)} // Evento de clique para selecionar
+                />
+              );
+            })}
+
+            <Modal.Open opens="new-diet">
+              <button>
+                {/* ainda não sei pq só funciona com o botão */}
+                <AddDiet />
+              </button>
+            </Modal.Open>
+
+            <Modal.Window name="new-diet">
+              <CreateDiet />
+            </Modal.Window>
+          </div>
+        </div>
+      </Menus>
+    </Modal>
   );
 }

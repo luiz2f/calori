@@ -1,4 +1,5 @@
 "use client";
+
 import { HiXMark } from "react-icons/hi2";
 import { createPortal } from "react-dom";
 import React, {
@@ -11,7 +12,7 @@ import { useOutsideClick } from "@/hooks/useOutsideClick";
 
 interface ModalContextType {
   open: (name: string) => void;
-  openName: string;
+  openNames: string[];
   close: () => void;
 }
 
@@ -34,17 +35,18 @@ type ModalChildProps = {
 
 const ModalContext = createContext<ModalContextType>({
   open: () => {},
-  openName: "",
+  openNames: [],
   close: () => {},
 });
 
 function Modal({ children }: ModalProps) {
-  const [openName, setOpenName] = useState("");
-  const close = () => setOpenName("");
-  const open = setOpenName;
+  const [openNames, setOpenNames] = useState<string[]>([]);
+
+  const open = (name: string) => setOpenNames((prev) => [...prev, name]);
+  const close = () => setOpenNames((prev) => prev.slice(0, prev.length - 1)); // Fecha o modal mais recente
 
   return (
-    <ModalContext.Provider value={{ open, openName, close }}>
+    <ModalContext.Provider value={{ open, close, openNames }}>
       {children}
     </ModalContext.Provider>
   );
@@ -53,15 +55,19 @@ function Modal({ children }: ModalProps) {
 function Open({ children, opens }: OpenProps) {
   const { open } = useContext(ModalContext);
 
-  return cloneElement(children, { onClick: () => open(opens) });
+  return cloneElement(children, {
+    onClick: () => {
+      open(opens);
+    },
+  });
 }
 
 function Window({ children, name }: WindowProps) {
-  const { openName, close } = useContext(ModalContext);
+  const { openNames, close } = useContext(ModalContext);
 
   const ref = useOutsideClick<HTMLDivElement>(close);
 
-  if (name !== openName) return null;
+  if (openNames[openNames.length - 1] !== name) return null; // Apenas o modal mais recente é renderizado
 
   if (!React.isValidElement(children)) {
     console.error("`children` must be a valid React element");
@@ -70,15 +76,16 @@ function Window({ children, name }: WindowProps) {
 
   return createPortal(
     <div className="fixed top-0 left-0 w-full h-screen z-[1000]">
+      <div className="fixed inset-0 bg-black bg-opacity-50" />
       <div
-        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-8"
+        className="fixed top-1/2 left-1/2 transform -translate-x-1/2  -translate-y-1/2 p-5 w-11/12 bg-white rounded-lg"
         ref={ref}
       >
         <button
           onClick={close}
-          className="absolute top-3 right-4 p-1 translate-x-2 bg-none border-none hover:bg-gray-100 rounded-sm"
+          className="absolute top-3 right-4 p-2 translate-x-2 bg-none border-none hover:bg-gray-100 rounded-sm"
         >
-          <HiXMark className="w-6 h-6 text-gray-500" />
+          <HiXMark className="w-4 h-4 text-gray-500" />
         </button>
         <div>{cloneElement(children, { onCloseModal: close })}</div>
       </div>

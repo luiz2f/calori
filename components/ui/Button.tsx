@@ -12,6 +12,7 @@ export default function Button({
   type = "button",
   cw = "green",
   className,
+  size,
   ...props
 }: Readonly<{
   children: React.ReactNode;
@@ -19,6 +20,7 @@ export default function Button({
   disabled?: boolean;
   type?: "button" | "submit" | "reset";
   cw?: "light" | "green" | "darkgreen" | "lightred" | "red" | "grey";
+  size?: "normal" | "small";
   className?: string;
 }>) {
   const buttonClass = clsx(className, basicButtonClass, {
@@ -28,6 +30,7 @@ export default function Button({
     "bg-white text-blacklight border-blacklight": cw === "grey",
     "bg-white text-darkred border-darkred": cw === "lightred",
     "bg-reddark text-white border-reddark": cw === "red",
+    "!text-base !h-fit !py-2": size === "small",
   });
 
   return (

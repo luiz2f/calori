@@ -34,7 +34,7 @@ export default {
       },
       padding: {
         lng: "48px 24px",
-        db: "10px 12px 6px 12px",
+        db: "0px 0px 3px 12px",
         db1: "9px 11px 5px 11px",
       },
       boxShadow: {
