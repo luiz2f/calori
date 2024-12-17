@@ -52,7 +52,6 @@ export default function RegisterForm({ setExistentUser }: RegisterFormProps) {
       setErrors(newErrors);
       return; // Retorna sem fazer o login
     }
-    console.log(1);
 
     try {
       const data = await registerWithCredentials(formData);
@@ -64,10 +63,8 @@ export default function RegisterForm({ setExistentUser }: RegisterFormProps) {
         } else if (dataError === "Token sent") {
           router?.push("/token-sent");
         } else if (dataError === "User already exists") {
-          console.log(2);
           setExistentUser(true);
         } else {
-          console.log(3);
           setErrors({
             email: true,
             password: true,
@@ -99,6 +96,7 @@ export default function RegisterForm({ setExistentUser }: RegisterFormProps) {
           id="email"
           type="email"
           placeholder="Email"
+          autoComplete="username"
           error={errors?.email}
           onBlur={() => handleBlur("email")}
           onChange={() => handleBlur("email")}

@@ -1,13 +1,15 @@
 "use client";
 
-import { useOutsideClick } from "@/hooks/useOutsideClick";
 import React, {
   createContext,
   useContext,
   useState,
   ReactNode,
   MouseEvent,
+  useRef,
+  useEffect,
 } from "react";
+
 import { createPortal } from "react-dom";
 
 type Position = {
@@ -65,16 +67,16 @@ function Toggle({ id, children, className }: ToggleProps) {
   if (!context) throw new Error("Toggle must be used within a Menus component");
 
   const { openId, close, open, setPosition } = context;
-  // talvez um settimout pro mousedown/ touch start
 
   function handleClick(e: MouseEvent<HTMLButtonElement>) {
     e.stopPropagation();
+    e.preventDefault(); // Adicionado para prevenir navegação indesejada
+
+    // Verificar se o menu já está aberto
     if (openId === id) {
       close();
-      return;
     } else {
       const rect = e.currentTarget.getBoundingClientRect();
-      // se posição menor que tamanho, usar 0
       setPosition({
         x: window.innerWidth - rect.width - rect.x,
         y: rect.y + rect.height + 8,
@@ -84,7 +86,7 @@ function Toggle({ id, children, className }: ToggleProps) {
   }
 
   return (
-    <button onClick={handleClick} className={className}>
+    <button onClick={handleClick} className={`cursor-pointer ${className}`}>
       {children}
     </button>
   );
@@ -100,8 +102,8 @@ function List({ id, children }: ListProps) {
   if (!context) throw new Error("List must be used within a Menus component");
 
   const { openId, position, close } = context;
-  const ref = useOutsideClick(close, false);
-
+  const mounted = openId === id;
+  const ref = useMenuOutsideClick(close, false, mounted);
   if (openId !== id || !position) return null;
 
   return createPortal(
@@ -129,7 +131,9 @@ function Button({ children, icon, onClick }: ButtonProps) {
 
   const { close } = context;
 
-  function handleClick() {
+  function handleClick(e: MouseEvent<HTMLButtonElement>) {
+    e.stopPropagation();
+    e.preventDefault(); // Adicionado para prevenir navegação indesejada
     onClick?.();
     close();
   }
@@ -153,3 +157,35 @@ Menus.List = List;
 Menus.Button = Button;
 
 export default Menus;
+
+function useMenuOutsideClick<T extends HTMLElement>(
+  handler: () => void,
+  listenCapturing: boolean = true,
+  mounted: boolean
+) {
+  const ref = useRef<T | null>(null);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (!mounted) return;
+      console.log("🐥 Menu outsideclick");
+      const target = e.target as Node;
+      const menu = document.getElementById("menu-container");
+      if (
+        ref.current &&
+        !ref.current.contains(target) &&
+        !(menu && menu.contains(target))
+      ) {
+        handler();
+      }
+    }
+
+    document.addEventListener("click", handleClick, listenCapturing);
+
+    return () => {
+      document.removeEventListener("click", handleClick);
+    };
+  }, [handler, listenCapturing]);
+
+  return ref;
+}

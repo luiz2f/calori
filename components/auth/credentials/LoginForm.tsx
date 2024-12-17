@@ -2,7 +2,7 @@
 
 import { loginWithCredentials } from "@/actions/auth";
 import AuthButton from "../AuthButton";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Input from "@/components/ui/Input";
 import PasswordInput from "@/components/ui/PasswordInput";
@@ -34,13 +34,11 @@ export default function LoginForm() {
       setErrors(newErrors);
       return;
     }
-
     try {
       const data = await loginWithCredentials(formData);
       if (data && "error" in data) {
         const dataError = data.error.split(".")[0];
         if (dataError.startsWith("Read more")) {
-          console.log(4);
           unexpectedError();
         } else if (dataError === "Token sent") {
           router?.push("/token-sent");
@@ -57,8 +55,6 @@ export default function LoginForm() {
     }
 
     function unexpectedError() {
-      console.log(3);
-
       setErrors({
         email: true,
         password: "Um erro inesperado ocorreu 😢",
@@ -77,6 +73,7 @@ export default function LoginForm() {
           id="email"
           type="email"
           placeholder="Email"
+          autoComplete="username"
           error={errors?.email}
           onBlur={() => handleBlur("email")}
           onChange={() => handleBlur("email")}

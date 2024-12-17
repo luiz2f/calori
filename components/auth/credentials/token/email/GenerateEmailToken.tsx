@@ -62,7 +62,13 @@ export default function GeneratetEmailToken() {
         </h4>
       </div>
 
-      <Input id="email" placeholder="Email" type="email" error={error} />
+      <Input
+        id="email"
+        placeholder="Email"
+        autoComplete="username"
+        type="email"
+        error={error}
+      />
       <AuthButton actionText="Recover password" className="mt-4" />
 
       <NavAnchor href="/login">Entrar com sua conta</NavAnchor>

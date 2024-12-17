@@ -17,8 +17,6 @@ export default function EditRef() {
   const [type, setType] = useState<"Lista" | "Alimentos">("Alimentos");
   const { close } = useContext(ModalContext);
 
-  console.log(type);
-
   const toggleType = (type: "Lista" | "Alimentos") => {
     setType(type);
   };

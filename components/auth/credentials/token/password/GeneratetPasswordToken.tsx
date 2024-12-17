@@ -70,7 +70,13 @@ export default function GeneratetPasswordToken() {
             </h4>
           </div>
 
-          <Input id="email" placeholder="Email" type="email" error={error} />
+          <Input
+            id="email"
+            placeholder="Email"
+            autoComplete="username"
+            type="email"
+            error={error}
+          />
           <AuthButton
             actionText="Recuperar Senha"
             disableAction={accountNotVerified}

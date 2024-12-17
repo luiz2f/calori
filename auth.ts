@@ -114,6 +114,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return true;
     },
+    async jwt({ token, user }) {
+      // Se o user existir (ex.: durante o login), adiciona o userId ao token
+      if (user) {
+        token.userId = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      // Inclui o userId na sessão, disponível no client-side
+
+      session.userId = token.userId;
+      return session;
+    },
   },
 });
 

@@ -10,8 +10,7 @@ import bcrypt from "bcryptjs";
 
 export const login = async (provider: string) => {
   const user = await signIn(provider, { redirectTo: "/" });
-  console.log(user);
-  revalidatePath("/");
+  revalidatePath("/diets");
 };
 
 export const logout = async () => {
@@ -19,6 +18,7 @@ export const logout = async () => {
   revalidatePath("/");
 };
 
+// 📌 SEGURANÇA - NAO DEIXAR BUSCAR A HASHED, APENAS  ID NOME EMAIL IMAGEM
 export const getUserByEmail = async (
   email: string
 ): Promise<User | { error: string }> => {

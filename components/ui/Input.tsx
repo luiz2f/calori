@@ -9,11 +9,13 @@ export default function Input({
   type = "text",
   placeholder,
   error,
+  autoComplete,
   ...props
 }: Readonly<{
   id: string;
   type?: string;
   placeholder?: string;
+  autoComplete?: string;
   error?: string | boolean | undefined;
 }>) {
   const inputClass = clsx(basicInputClass, {
@@ -29,6 +31,7 @@ export default function Input({
         id={id}
         name={id}
         placeholder={placeholder}
+        autoComplete={autoComplete}
         className={inputClass}
         {...props}
       />

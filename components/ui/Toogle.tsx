@@ -22,7 +22,6 @@ export default function Toogle({ options, value, onChange, className }) {
 }
 
 function OptionButton({ option, onChange, isSelected, value, fixedWidth }) {
-  console.log(isSelected, option, value);
   if (isSelected) {
     return (
       <SelectedToogle

@@ -77,7 +77,7 @@ model Diet {
   id        String   @id @default(cuid())
   name      String
   userId    String
-  index     Int
+  index     Int      
   archived  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

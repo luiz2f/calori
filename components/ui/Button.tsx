@@ -16,7 +16,7 @@ export default function Button({
   ...props
 }: Readonly<{
   children: React.ReactNode;
-  onClick?: () => void; // Agora opcional
+  onClick?: () => void;
   disabled?: boolean;
   type?: "button" | "submit" | "reset";
   cw?: "light" | "green" | "darkgreen" | "lightred" | "red" | "grey";

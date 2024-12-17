@@ -3,6 +3,7 @@ import Button from "./Button";
 type ConfirmDeleteProps = {
   resource: string;
   resourceName: string;
+  modalName: string;
   onConfirm: () => void;
   onCloseModal?: () => void;
   disabled: boolean;
@@ -14,7 +15,14 @@ function ConfirmDelete({
   onConfirm,
   disabled,
   onCloseModal,
+  modalName,
 }: ConfirmDeleteProps) {
+  async function handleConfirm(e) {
+    e.stopPropagation();
+
+    await onConfirm();
+    onCloseModal(modalName);
+  }
   return (
     <div className="w-full flex flex-col gap-3">
       <div className="font-bold text-xl mb-6 text-center">
@@ -31,11 +39,19 @@ function ConfirmDelete({
           cw="grey"
           size="small"
           disabled={disabled}
-          onClick={onCloseModal}
+          onClick={(e) => {
+            e.stopPropagation();
+            onCloseModal(modalName);
+          }}
         >
           Cancelar
         </Button>
-        <Button cw="red" size="small" disabled={disabled} onClick={onConfirm}>
+        <Button
+          cw="red"
+          size="small"
+          disabled={disabled}
+          onClick={(e) => handleConfirm(e)}
+        >
           Apagar
         </Button>
       </div>

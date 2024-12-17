@@ -19,7 +19,6 @@ export default function VerifyPasswordToken() {
   const token = "21321";
   const onSubmit = useCallback(async () => {
     if (success || error) {
-      console.log(1);
       return;
     }
 

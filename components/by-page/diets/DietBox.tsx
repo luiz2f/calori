@@ -10,18 +10,25 @@ import {
 } from "react-icons/hi";
 import ConfirmDelete from "@/components/ui/ConfirmDelete";
 import EditDiet from "./dietSlider/createEditModal/EditDiet";
+import { deleteDiet, duplicateDiet } from "@/actions/diets/diets";
+import { useDietContext } from "@/app/context/useDietContext";
+import { useEffect } from "react";
+
+export const dynamic = "force-dynamic";
+
 const characterLimit = 36;
+
 export default function DietBox({
   name,
   kcal,
   active,
-  dieta,
+  diet,
   onClick,
 }: {
   name: string;
   kcal: number;
   active: boolean;
-  dieta: { name: string; index: number; kcal: number };
+  diet: any;
   onClick: () => void; // Tipando o evento de clique
 }) {
   const adaptedName =
@@ -29,12 +36,28 @@ export default function DietBox({
   // db: "10px 12px 6px 12px",
 
   const borderClass = clsx(
-    "flex flex-col clickable justify-between w-44 h-24 text-left white flex-shrink-0 rounded-lg p-db ",
+    "flex flex-col cursor-pointer justify-between w-44 h-24 text-left  white flex-shrink-0 rounded-lg p-db ",
     {
       " shadow-dbbd text-darkgreen": active,
       " shadow-dbde text-blacklight   ": !active,
     }
   );
+
+  const handleDeleteDiet = async () => {
+    try {
+      await deleteDiet(diet.id);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const handleDuplicateDiet = async () => {
+    try {
+      await duplicateDiet(diet.id);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className={borderClass} onClick={onClick}>
       <div className="flex justify-between w-full">
@@ -42,22 +65,25 @@ export default function DietBox({
           {adaptedName}
         </div>
         <Menus.Menu>
-          <Menus.Toggle id={name} className="p-3">
+          <Menus.Toggle id={`DietToogle${diet.id}`} className="p-3">
             <HiDotsHorizontal />
           </Menus.Toggle>
 
-          <Menus.List id={name}>
+          <Menus.List id={`DietToogle${diet.id}`}>
             <Modal.Open opens={`edit ${name}`}>
               <Menus.Button icon={<HiOutlinePencilAlt />}>
                 Editar dieta
                 {/* modal🐥 */}
               </Menus.Button>
             </Modal.Open>
-            <Menus.Button icon={<HiOutlineDuplicate />}>
+            <Menus.Button
+              icon={<HiOutlineDuplicate />}
+              onClick={handleDuplicateDiet}
+            >
               Duplicar dieta
               {/* action 🐥 */}
             </Menus.Button>
-            <Modal.Open opens={`delete ${name}`}>
+            <Modal.Open opens={`deleteDiet${diet.id}`}>
               <Menus.Button icon={<HiOutlineTrash />}>
                 Apagar dieta
                 {/* confirm ⛔ */}
@@ -66,17 +92,26 @@ export default function DietBox({
             </Modal.Open>
           </Menus.List>
         </Menus.Menu>
-        <Modal.Window name={`delete ${name}`}>
-          {/* action 🐥 */}
-
-          <ConfirmDelete resource="Dieta" resourceName={name} />
+        <Modal.Window name={`deleteDiet${diet.id}`}>
+          <ConfirmDelete
+            resource="Dieta"
+            resourceName={`${name}`}
+            onConfirm={handleDeleteDiet}
+            modalName={`deleteDiet${diet.id}`}
+          />
         </Modal.Window>
         <Modal.Window name={`edit ${name}`}>
           <EditDiet />
         </Modal.Window>
       </div>
       <div className="font-bold pr-3 w-full align-bottom text-right">
-        {kcal} <span className="text-xs">kcal</span>
+        {kcal ? (
+          <span>
+            {kcal} <span className="text-xs">kcal</span>
+          </span>
+        ) : (
+          ""
+        )}
         {/* 📌 TODO - inter font*/}
       </div>
     </div>
