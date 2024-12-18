@@ -40,10 +40,9 @@ export async function getDietIndex(userId) {
   return newIndex;
 }
 
-export async function createDiet(userId, dietName, refs) {
-  console.log(userId);
-  console.log(dietName);
-  console.log(refs);
+export async function createDiet({ userId, dietName, refs }) {
+  console.log(`[${new Date().toLocaleTimeString()}] createDiet server`);
+
   const newIndex = await getDietIndex(userId);
 
   try {
@@ -59,10 +58,13 @@ export async function createDiet(userId, dietName, refs) {
           })),
         },
       },
+      include: { meals: true },
     });
-
-    revalidatePath("/diets");
-    return;
+    console.log(
+      `[${new Date().toLocaleTimeString()}] createDiet server concluído`
+    );
+    // revalidatePath("/diets");
+    return newDiet;
   } catch (error) {
     console.error("Erro ao criar a dieta:", error);
     throw new Error("Erro ao criar a dieta");
@@ -72,25 +74,35 @@ export async function createDiet(userId, dietName, refs) {
 export async function duplicateDiet(dietId: string) {
   try {
     const dietToDuplicate = await prisma.diet.findUnique({
-      where: {
-        id: dietId,
-      },
+      where: { id: dietId },
+      include: { meals: true },
     });
 
-    const newIndex = await getDietIndex(dietToDuplicate?.userId);
-    const newDietName = `${dietToDuplicate?.name} - Copy`;
+    if (!dietToDuplicate) {
+      throw new Error("Dieta não encontrada");
+    }
 
+    const newIndex = await getDietIndex(dietToDuplicate.userId);
+    const newDietName = `${dietToDuplicate.name} - Cópia`;
+
+    // Cria a nova dieta com os meals diretamente
     const newDiet = await prisma.diet.create({
       data: {
         name: newDietName,
-        userId: dietToDuplicate?.userId,
+        userId: dietToDuplicate.userId,
         index: newIndex,
         archived: false,
+        meals: {
+          create: dietToDuplicate.meals.map((meal) => ({
+            name: meal.name,
+            time: meal.time,
+          })),
+        },
       },
+      include: { meals: true }, // Inclui os meals no retorno
     });
 
-    revalidatePath("/diets");
-    return;
+    return newDiet;
   } catch (error) {
     console.error("Erro ao duplicar dieta:", error);
     throw new Error("Erro ao duplicar dieta");
@@ -104,8 +116,8 @@ export async function deleteDiet(dietId: string) {
         id: dietId,
       },
     });
-    revalidatePath("/diets");
-    return;
+    // revalidatePath("/diets");
+    return dietId;
   } catch (error) {
     console.error("Erro ao apagar a dieta:", error);
     throw new Error("Erro ao apagar a dieta");

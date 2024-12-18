@@ -10,9 +10,8 @@ import {
 } from "react-icons/hi";
 import ConfirmDelete from "@/components/ui/ConfirmDelete";
 import EditDiet from "./dietSlider/createEditModal/EditDiet";
-import { deleteDiet, duplicateDiet } from "@/actions/diets/diets";
-import { useDietContext } from "@/app/context/useDietContext";
-import { useEffect } from "react";
+import { useDeleteDiet } from "@/app/data/diets/useDeleteDiet";
+import { useDuplicateDiet } from "@/app/data/diets/useDuplicateDiet";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +30,8 @@ export default function DietBox({
   diet: any;
   onClick: () => void; // Tipando o evento de clique
 }) {
+  const { isDeleting, deleteDiet, isSuccess } = useDeleteDiet();
+  const { isDuplicating, duplicateDiet } = useDuplicateDiet();
   const adaptedName =
     name.length > characterLimit ? name.slice(0, characterLimit) + "..." : name;
   // db: "10px 12px 6px 12px",
@@ -44,18 +45,10 @@ export default function DietBox({
   );
 
   const handleDeleteDiet = async () => {
-    try {
-      await deleteDiet(diet.id);
-    } catch (error) {
-      console.error(error);
-    }
+    await deleteDiet(diet.id);
   };
   const handleDuplicateDiet = async () => {
-    try {
-      await duplicateDiet(diet.id);
-    } catch (error) {
-      console.error(error);
-    }
+    await duplicateDiet(diet.id);
   };
 
   return (
@@ -94,6 +87,8 @@ export default function DietBox({
         </Menus.Menu>
         <Modal.Window name={`deleteDiet${diet.id}`}>
           <ConfirmDelete
+            loading={isDeleting}
+            loaded={!isDeleting && isSuccess}
             resource="Dieta"
             resourceName={`${name}`}
             onConfirm={handleDeleteDiet}

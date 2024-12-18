@@ -2,21 +2,21 @@
 
 import prisma from "@/prisma";
 import { getSessionId } from "../session";
-import { revalidatePath } from "next/cache";
 
 export async function getDietMeals(dietId: string) {
   if (!dietId) {
     return null;
   }
-  const dietMeals = await prisma.meal.findMany({
-    where: {
-      dietId,
-    },
-    orderBy: {
-      time: "asc",
+  const dietMeals = await prisma.diet.findUnique({
+    where: { id: dietId },
+    include: {
+      meals: {
+        orderBy: {
+          time: "asc", // Ordena os meals por time
+        },
+      },
     },
   });
-
   return dietMeals;
 }
 
@@ -38,7 +38,7 @@ export async function deleteMeal(mealId: string) {
     },
   });
 
-  revalidatePath("/diets");
+  // revalidatePath("/diets");
 
   return;
 }
@@ -55,7 +55,7 @@ export async function createMeal(dietId, meal) {
   } catch (error) {
     console.error("Erro ao criar refeição:", error);
   } finally {
-    revalidatePath("/diets");
+    // revalidatePath("/diets");
   }
 
   return;

@@ -7,13 +7,12 @@ import Modal from "@/components/ui/Modal";
 import Menus from "@/components/ui/Menu";
 import CreateDiet from "./dietSlider/createEditModal/CreateDiet";
 import { useDietContext } from "@/app/context/useDietContext";
-import { useDiets } from "@/app/data/useDiets";
+import { useDiets } from "@/app/data/diets/useDiets";
 
 export default function DietsSlider({ initialDataDiets }) {
   const { data: diets, isLoading } = useDiets(initialDataDiets);
   const [active, setActive] = useState(0);
   const { setSelectedDiet } = useDietContext();
-  console.log(diets);
   const handleDietClick = (dietId) => {
     setSelectedDiet(dietId);
     setActive(dietId);
@@ -53,3 +52,6 @@ export default function DietsSlider({ initialDataDiets }) {
     </>
   );
 }
+
+// 📌 - DELETAR DIETA
+// 📌 - CRIAR REFEIÇÃO
