@@ -1,22 +1,22 @@
 "use client";
-import { updateDiet as updateDietAPI } from "@/actions/diets/diets";
+import { updateMeal as updateMealAPI } from "@/actions/diets/meals";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-export function useUpdateDiet() {
+export function useUpdateMeal() {
   const queryClient = useQueryClient();
   const {
     isPending: isUpdating,
     isSuccess,
-    mutate: updateDiet,
+    mutate: updateMeal,
   } = useMutation({
-    mutationFn: updateDietAPI,
+    mutationFn: updateMealAPI,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: [`meals-diet-${data}`] });
-      queryClient.invalidateQueries({
-        queryKey: ["diets"],
-      });
+      // queryClient.invalidateQueries({
+      //   queryKey: ["diets"],
+      // });
     },
   });
 
-  return { isUpdating, updateDiet, isSuccess };
+  return { isUpdating, updateMeal, isSuccess };
 }

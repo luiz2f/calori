@@ -39,7 +39,7 @@ function ConfirmDelete({
   if (loaded) {
     onCloseModal(modalName);
   }
-  console.log(modalName, onCloseModal, modalName);
+
   return (
     <div className="w-full flex flex-col gap-3 relative">
       <div className="font-bold text-xl mb-6 text-center">

@@ -1,10 +1,13 @@
+"use client";
+
 import RefEditVarRow from "./RefEditVarRow";
 
 export default function EditRefList({
   mealsList,
   onDeleteVariation,
   onSelectVariation,
-  handleAddVariation,
+  onAddVariation,
+  onDuplicateVariation,
 }) {
   return (
     <>
@@ -17,11 +20,12 @@ export default function EditRefList({
             refvar={mealvar}
             onSelectVariation={onSelectVariation}
             onDelete={onDeleteVariation}
+            onDuplicateVariation={onDuplicateVariation}
           />
         ))}
       </div>
       <button
-        onClick={(e) => handleAddVariation(e)}
+        onClick={(e) => onAddVariation(e)}
         className={`text-blacklight pl-2 mb-6 ${
           !mealsList.length
             ? "cursor-pointer text-xl text-center pl-2 mt-1 underline  underline-offset-4 text-darkgreen"

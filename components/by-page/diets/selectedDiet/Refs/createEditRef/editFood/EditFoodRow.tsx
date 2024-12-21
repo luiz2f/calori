@@ -15,18 +15,23 @@ export default function EditFoodRow({
   mealId,
   food,
   onFoodChange,
-  onDelete,
   onDeleteFood,
 }) {
   const { data: foods } = useFoods();
-  const unityDefault = { value: food.unity.id, label: food.unity.un };
-  const foodDefault = { value: food.food.id, label: food.food.name };
+  const unityDefault = {
+    value: food.unity.id,
+    label: food.unity.un,
+  };
+  const foodDefault = {
+    value: food.food.id,
+    label: food.food.name,
+  };
+  console.log(food.selectedFood);
+  console.log(food.food.id);
 
   const [selectedFood, setSelectedFood] = useState(foodDefault || null);
   const [selectedUnity, setSelectedUnity] = useState(unityDefault || null);
   const [quantity, setQuantity] = useState(food.quantity || 0);
-
-  // Converter foods para o formato do react-select
   const foodOptions = foods?.map((obj) => ({
     value: obj.id,
     label: obj.name,
@@ -35,14 +40,13 @@ export default function EditFoodRow({
       label: unit.un,
     })),
   }));
-
   const unityOptions =
     foodOptions?.find((obj) => obj.value === selectedFood?.value)?.unities ||
     [];
 
   useEffect(() => {
     onFoodChange(food.id, { selectedFood, selectedUnity, quantity });
-  }, [selectedFood, selectedUnity, quantity]);
+  }, [selectedFood, selectedUnity, quantity, food.id]);
 
   const handleFoodChange = (selected) => {
     setSelectedFood(selected);
@@ -101,14 +105,21 @@ export default function EditFoodRow({
     }),
   };
   const modalName = `deletereffood${food?.id}`;
-
+  const error = {
+    food: food?.food?.erro || false,
+    unity: food?.unity?.erro || false,
+  };
   return (
     <>
       <input
         type="number"
         value={quantity}
-        onChange={() => handleQuantityChange(e)}
-        className="border-1 py-[2px] text-center border-grey10 rounded-lg"
+        onChange={(e) => handleQuantityChange(e)}
+        className={`border-1 py-[2px] text-center rounded-lg pl-4 ${
+          quantity === ""
+            ? "bg-lightred border-darkred text-darkred"
+            : "border-grey10"
+        }`}
       />
 
       <Select
@@ -117,14 +128,31 @@ export default function EditFoodRow({
         onChange={handleUnityChange}
         placeholder=""
         isDisabled={!selectedFood}
-        styles={selectStyle}
+        styles={{
+          ...selectStyle,
+          control: (base, state) => ({
+            ...base,
+            transition: "200ms all ease",
+            borderColor: error?.unity ? "#7B3232" : "#d1d1d1",
+            backgroundColor: error?.unity ? "#FFEDED" : "white",
+            color: error?.unity ? "#7B3232" : "inherit",
+          }),
+        }}
       />
       <Select
         options={foodOptions}
         value={selectedFood}
         placeholder="Selecionar Alimento"
         onChange={handleFoodChange}
-        styles={selectStyle}
+        styles={{
+          ...selectStyle,
+          control: (base, state) => ({
+            ...base,
+            borderColor: error?.food ? "#7B3232" : "#d1d1d1",
+            backgroundColor: error?.food ? "#FFEDED" : "white",
+            color: error?.food ? "#7B3232" : "inherit",
+          }),
+        }}
         noOptionsMessage={() => "Nenhum alimento encontrado"}
       />
 

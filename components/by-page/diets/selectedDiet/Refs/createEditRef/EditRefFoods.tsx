@@ -29,7 +29,7 @@ export default function EditRefFoods({
     } else {
       setVariationName("");
     }
-  }, [currentIndex, mealsList]);
+  }, [currentIndex, mealsList, setIndex, setVariationName]);
   const goLeft = () => {
     const newIndex = currentIndex > 0 ? currentIndex - 1 : mealsList.length - 1;
     const newName = mealsList[newIndex]?.name || "";
@@ -57,7 +57,6 @@ export default function EditRefFoods({
     <>
       {!!mealsList.length ? (
         <>
-          {" "}
           <RefSlider
             onLeft={goLeft}
             onRight={goRight}
@@ -125,11 +124,9 @@ export default function EditRefFoods({
                   <EditFoodRow
                     mealId={currentMeal?.id}
                     onDeleteFood={deleteFoodFromMeal}
-                    id={food.id + index}
-                    key={index}
+                    key={`${food.id}-${index}-${currentMeal?.id}`}
                     food={food}
                     onFoodChange={handleFoodChangeWrapper}
-                    onDelete={(foodId) => handleFoodChangeWrapper(foodId, null)}
                   />
                 ))}
               </div>

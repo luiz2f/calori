@@ -1,11 +1,10 @@
-// export { auth as middleware } from "@/auth";
-
 import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 const protectedRoutes = ["/middleware", "/change-password", "/diets"];
 const noUserRoutes = [
+  "/",
   "/login",
   "/register",
   "/forgot-password",
@@ -14,23 +13,18 @@ const noUserRoutes = [
 
 export default async function middleware(request: NextRequest) {
   const session = await auth();
+  const pathname = request.nextUrl.pathname;
 
-  const isProtected = protectedRoutes.some((route) =>
-    request.nextUrl.pathname.startsWith(route)
-  );
+  const isProtected = protectedRoutes.some((route) => pathname === route);
 
-  const isPublic = noUserRoutes.some((route) =>
-    request.nextUrl.pathname.startsWith(route)
-  );
+  const isPublic = noUserRoutes.some((route) => pathname === route);
 
   if (!session && isProtected) {
-    const absoluteURL = new URL("/", request.nextUrl.origin);
-    return NextResponse.redirect(absoluteURL.toString());
+    return NextResponse.redirect(new URL("/", request.nextUrl.origin));
   }
 
-  if (session && isPublic) {
-    const absoluteURL = new URL("/diets", request.nextUrl.origin);
-    return NextResponse.redirect(absoluteURL.toString());
+  if (session && isPublic && pathname !== "/diets") {
+    return NextResponse.redirect(new URL("/diets", request.nextUrl.origin));
   }
 
   return NextResponse.next();

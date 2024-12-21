@@ -1,5 +1,5 @@
 "use client";
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, use } from "react";
 import Button from "@/components/ui/Button";
 import Menus from "@/components/ui/Menu";
 import { ModalContext } from "@/components/ui/Modal";
@@ -8,6 +8,7 @@ import EditRefFoods from "./EditRefFoods";
 import Toogle from "@/components/ui/Toogle";
 import { useDiets } from "@/app/data/diets/useDiets";
 import { v4 as uuidv4 } from "uuid";
+import { useUpdateMeal } from "@/app/data/meals/useUpdateMeal";
 
 export default function EditRef({ meal, currentIndex, goLeft, goRight }) {
   const { data: diets } = useDiets();
@@ -19,8 +20,10 @@ export default function EditRef({ meal, currentIndex, goLeft, goRight }) {
   const [mealList, setMealList] = useState(meal.mealList || []);
   const [originalMealList, setOriginalMealList] = useState(meal.mealList || []);
   const [isModified, setIsModified] = useState(false);
-  const [errors, setErrors] = useState({ name: "", time: "" });
+  const [errors, setErrors] = useState({ name: "", time: "", food: false });
+  const disabled = !!errors.name || !!errors.time;
   const diet = diets.filter((obj) => obj.id === meal.dietId)[0];
+  const { isUpdating, updateMeal, isSuccess } = useUpdateMeal();
 
   useEffect(() => {
     if (meal.mealList) {
@@ -101,6 +104,25 @@ export default function EditRef({ meal, currentIndex, goLeft, goRight }) {
     ]);
     handleAddFood(mealId);
   };
+
+  const handleDuplicateVariation = (id) => {
+    console.log(id);
+    const variationToDuplicate = mealList.find((meal) => meal.id === id);
+    console.log(variationToDuplicate);
+    if (!variationToDuplicate) {
+      console.error("Variação não encontrada");
+      return;
+    }
+    const newVar = {
+      ...variationToDuplicate,
+      id: uuidv4(),
+      name: `${variationToDuplicate.name} - (Cópia)`,
+    };
+    console.log(newVar);
+
+    setMealList((prevMealList) => [...prevMealList, newVar]);
+  };
+
   const handleDeleteVariation = (id) => {
     const length = mealList?.length;
     if (selectedVariation + 1 === length && length > 1) {
@@ -113,7 +135,35 @@ export default function EditRef({ meal, currentIndex, goLeft, goRight }) {
   };
 
   const handleSave = async () => {
-    // Save logic here
+    let error = false;
+
+    const updatedMealList = mealList.map((list) => ({
+      ...list,
+      mealListItems: list.mealListItems.map((item) => {
+        if (!item.food.id) {
+          item.food.erro = true;
+          error = true; // Marca que existe um erro
+        }
+        if (!item.unity.id) {
+          item.unity.erro = true;
+          error = true; // Marca que existe um erro
+        }
+        return item;
+      }),
+    }));
+
+    setMealList(updatedMealList);
+    console.log(error);
+    console.log(mealList);
+    if (error) {
+      return;
+    }
+    await updateMeal({
+      mealId: meal?.id,
+      mealName,
+      mealTime,
+      refs: updatedMealList,
+    });
   };
 
   const selectVariation = (index) => {
@@ -128,7 +178,27 @@ export default function EditRef({ meal, currentIndex, goLeft, goRight }) {
           ? {
               ...variation,
               mealListItems: variation.mealListItems.map((item) =>
-                item.id === foodId ? { ...item, ...data } : item
+                item.id === foodId
+                  ? {
+                      ...item,
+                      foodId: data.selectedFood.value,
+                      unityId: data.selectedUnity.value,
+                      quantity: data.quantity,
+                      food: {
+                        id: data.selectedFood.value,
+                        name: data.selectedFood.label,
+                        carb: item.food.carb,
+                        protein: item.food.protein,
+                        fat: item.food.fat,
+                      },
+                      unity: {
+                        id: data.selectedUnity.value,
+                        foodId: data.selectedFood.value,
+                        un: data.selectedUnity.label,
+                        unitMultiplier: item.unity.unitMultiplier,
+                      },
+                    }
+                  : item
               ),
             }
           : variation
@@ -247,7 +317,8 @@ export default function EditRef({ meal, currentIndex, goLeft, goRight }) {
             mealsList={mealList}
             onSelectVariation={selectVariation}
             onDeleteVariation={handleDeleteVariation}
-            handleAddVariation={handleAddVariation}
+            onAddVariation={handleAddVariation}
+            onDuplicateVariation={handleDuplicateVariation}
           />
         ) : (
           <EditRefFoods
@@ -267,7 +338,11 @@ export default function EditRef({ meal, currentIndex, goLeft, goRight }) {
           <Button size="small" cw="lightred" onClick={() => closeLast()}>
             Cancelar
           </Button>
-          <Button size="small" onClick={handleSave} disabled={!isModified}>
+          <Button
+            size="small"
+            onClick={handleSave}
+            disabled={!isModified || disabled}
+          >
             Salvar
           </Button>
         </div>

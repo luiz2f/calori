@@ -16,7 +16,6 @@ export function useMeals(initialData, dietId) {
     queryFn: () => getDietMeals(dietId),
     initialData: initialUsed ? undefined : initialData,
   });
-  console.log(data);
 
   return { data, isLoading, isSuccess };
 }

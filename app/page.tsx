@@ -2,6 +2,8 @@ import LandingActionButtons from "@/components/by-page/landing/LandingActionButt
 import Logo from "@/components/ui/Logo";
 
 export default function Home() {
+
+
   return (
     <main className=" flex items-center  flex-col flex-grow h-full">
       <div className="w-full grid grid-rows-[100px_1fr]  h-full">

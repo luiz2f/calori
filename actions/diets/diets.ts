@@ -121,7 +121,6 @@ export async function createDiet({ userId, dietName, refs }) {
   }
 }
 export async function duplicateDiet(dietId: string) {
-  console.log(1);
   try {
     const dietToDuplicate = await prisma.diet.findUnique({
       where: { id: dietId },
@@ -129,7 +128,6 @@ export async function duplicateDiet(dietId: string) {
         meals: { include: { mealList: { include: { mealListItems: true } } } },
       },
     });
-    console.log(2);
 
     if (!dietToDuplicate) {
       throw new Error("Dieta não encontrada");
@@ -138,7 +136,6 @@ export async function duplicateDiet(dietId: string) {
     const newIndex = await getDietIndex(dietToDuplicate.userId);
     const newDietName = `${dietToDuplicate.name} - Cópia`;
 
-    console.log(3);
     const newDiet = await prisma.diet.create({
       data: {
         name: newDietName,
@@ -178,7 +175,6 @@ export async function duplicateDiet(dietId: string) {
         },
       },
     });
-    console.log(4);
 
     return newDiet;
   } catch (error) {
@@ -237,7 +233,7 @@ export async function updateDiet({ dietId, dietName, refs }) {
 
   // Aguardar todas as operações assíncronas serem concluídas
   await Promise.all([...updatedMeals, ...deletedMeals]);
-  return;
+  return dietId;
 }
 
 export async function deleteDiet(dietId: string) {
