@@ -43,6 +43,7 @@ export const ModalContext = createContext<ModalContextType>({
 function Modal({ children }: ModalProps) {
   const [openNames, setOpenNames] = useState<string[]>([]);
   // console.log(openNames);
+  // console.log(openNames);
   const open = (name: string) => setOpenNames((prev) => [...prev, name]);
   const close = (name: string) => {
     // console.log("🐇 fechando especifico");
@@ -70,17 +71,14 @@ function Modal({ children }: ModalProps) {
 
 function Open({ children, opens }: OpenProps) {
   const { open } = useContext(ModalContext);
-
-  // useEffect(() => {
-  //   console.log(`Open mounted: ${name}`);
-  //   return () => {
-  //     console.log(`Open unmounted: ${name}`);
-  //   };
-  // });
-
   return cloneElement(children, {
-    onClick: () => {
+    onClick: (e) => {
+      e?.stopPropagation();
+      e?.preventDefault();
       open(opens);
+      if (children.props.onClick) {
+        children.props.onClick(e); // Chama a função onClick original se existir
+      }
     },
   });
 }
@@ -126,7 +124,7 @@ function Window({ children, name }: WindowProps) {
             e.stopPropagation();
             close(name);
           }}
-          className="absolute top-3 right-4 p-2 translate-x-2 bg-none border-none hover:bg-gray-100 rounded-sm"
+          className="absolute top-3 right-4 p-2 translate-x-2 bg-none border-none hover:bg-gray-100 rounded-sm z-50"
         >
           <HiXMark className="w-4 h-4 text-gray-500" />
         </button>

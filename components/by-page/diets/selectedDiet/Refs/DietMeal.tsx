@@ -9,19 +9,23 @@ import {
 import Modal from "@/components/ui/Modal";
 import ConfirmDelete from "@/components/ui/ConfirmDelete";
 import EditRef from "./createEditRef/EditRef";
-import { deleteMeal } from "@/actions/diets/meals";
-import { useDietContext } from "@/app/context/useDietContext";
+import { useState } from "react";
+import RefTable from "./RefTable";
 
 export default function DietMeal({ meal }) {
-  const { setMeals } = useDietContext();
-
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const goLeft = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex > 0 ? prevIndex - 1 : meal?.mealList?.length - 1
+    );
+  };
+  const goRight = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex < meal?.mealList?.length - 1 ? prevIndex + 1 : 0
+    );
+  };
   const handleDeleteMeal = async () => {
-    try {
-      await deleteMeal(meal.id);
-      setMeals((prevMeals) => prevMeals.filter((m) => m.id !== meal.id));
-    } catch (error) {
-      console.error(error);
-    }
+    // await deleteMeal(meal.id);
   };
 
   return (
@@ -52,7 +56,7 @@ export default function DietMeal({ meal }) {
             </Modal.Open>
           </Menus.List>
           <Modal.Window name={`editMeal${meal.id}`}>
-            <EditRef />
+            <EditRef meal={meal} currentIndex={currentIndex} />
           </Modal.Window>
           <Modal.Window name={`deleteMeal${meal.id}`}>
             <ConfirmDelete
@@ -63,7 +67,12 @@ export default function DietMeal({ meal }) {
             />
           </Modal.Window>
         </Menus.Menu>
-        <RefTableTest />
+        <RefTable
+          currentIndex={currentIndex}
+          goLeft={goLeft}
+          goRight={goRight}
+          mealsList={meal?.mealList}
+        />
         {/* 😀 */}
       </div>
     </div>

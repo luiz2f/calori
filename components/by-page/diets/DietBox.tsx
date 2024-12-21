@@ -57,13 +57,13 @@ export default function DietBox({
         <div className="text-sm font-medium max-w-32 overflow-hidden ellipsis h-14 pt-2">
           {adaptedName}
         </div>
-        <Menus.Menu>
+        <Menus.Menu className="!items-baseline">
           <Menus.Toggle id={`DietToogle${diet.id}`} className="p-3">
             <HiDotsHorizontal />
           </Menus.Toggle>
 
           <Menus.List id={`DietToogle${diet.id}`}>
-            <Modal.Open opens={`edit ${name}`}>
+            <Modal.Open opens={`editDiet${diet.id}`}>
               <Menus.Button icon={<HiOutlinePencilAlt />}>
                 Editar dieta
                 {/* modal🐥 */}
@@ -95,8 +95,8 @@ export default function DietBox({
             modalName={`deleteDiet${diet.id}`}
           />
         </Modal.Window>
-        <Modal.Window name={`edit ${name}`}>
-          <EditDiet />
+        <Modal.Window name={`editDiet${diet.id}`}>
+          <EditDiet diet={diet} />
         </Modal.Window>
       </div>
       <div className="font-bold pr-3 w-full align-bottom text-right">

@@ -12,12 +12,14 @@ const queryClient = new QueryClient({
     queries: { staleTime: 60 * 1000 * 7 },
   },
 });
-export default function App({ empty, defaultDiet, diets }) {
-  const { id } = defaultDiet;
-  // console.log(id, meals);
+export default function App({ empty, defaultDiet, diets, foods }) {
+  const { id } = defaultDiet || {};
   useEffect(() => {
-    queryClient.setQueryData(["diets"], diets);
-    queryClient.setQueryData([`meals-diet-${id}`], defaultDiet);
+    if (diets) {
+      queryClient.setQueryData(["diets"], diets);
+      queryClient.setQueryData([`meals-diet-${id}`], defaultDiet);
+      queryClient.setQueryData(["foods"], foods);
+    }
   }, []);
   return (
     <QueryClientProvider client={queryClient}>

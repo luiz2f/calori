@@ -48,7 +48,6 @@ export default function RegisterForm({ setExistentUser }: RegisterFormProps) {
     }
 
     if (Object.keys(newErrors).length > 0) {
-      console.log(newErrors);
       setErrors(newErrors);
       return; // Retorna sem fazer o login
     }

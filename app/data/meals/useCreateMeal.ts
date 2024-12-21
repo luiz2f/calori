@@ -2,7 +2,7 @@
 import { createDiet as createDietAPI } from "@/actions/diets/diets";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-export function useCreateDiet() {
+export function useCreateMeal() {
   const queryClient = useQueryClient();
   const {
     isPending: isCreating,

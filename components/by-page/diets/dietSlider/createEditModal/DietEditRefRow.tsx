@@ -99,28 +99,22 @@ export default function DietEditRefRow({
             : "border-grey-50"
         }`}
       />
-      <Menus.Menu className="border-1 border-grey-50 rounded-lg align-center">
-        <Menus.Toggle
-          id={`${refData.id}${refData.name}${refData.time}`}
-          className="flex items-center justify-center  w-8 h-8 rounded-lg p-1"
-        >
-          <HiDotsVertical />
-        </Menus.Toggle>
 
-        <Menus.List id={`${refData.id}${refData.name}${refData.time}`}>
-          <Menus.Button icon={<HiOutlinePencilAlt />}>
-            Editar refeição
-            {/* fazer por ultimo caso n faça sentido 📌📌 */}
-          </Menus.Button>
-          <Modal.Open
-            opens={`deleteRef${refData.id}${refData.name}${refData.time}`}
-          >
-            <Menus.Button icon={<HiOutlineTrash />}>
-              Apagar refeição
-            </Menus.Button>
-          </Modal.Open>
-        </Menus.List>
-      </Menus.Menu>
+      <Modal.Open
+        opens={`deleteRef${refData.id}${refData.name}${refData.time}`}
+      >
+        <button
+          onClick={(e) => {
+            {
+              e.stopPropagation();
+              e.preventDefault();
+            }
+          }}
+          className="cursor-pointer border-1 border-grey-50 flex items-center justify-center  w-8 h-8 rounded-lg p-1"
+        >
+          <HiOutlineTrash />
+        </button>
+      </Modal.Open>
       <Modal.Window
         name={`deleteRef${refData.id}${refData.name}${refData.time}`}
       >

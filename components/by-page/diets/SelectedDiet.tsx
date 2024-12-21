@@ -14,18 +14,16 @@ export default function SelectedDiet({ serverData }) {
   const dietId = selectedDietContext || selectedDietServer;
 
   const { data: dietsSlider } = useDiets();
-  const { data: diet } = useMeals(serverData?.defaultDiet, dietId);
-  // const { meals, name } = diet;
-  // console.log("😍😎", meals, name);
+  const {
+    data: diet,
+    isLoading,
+    isSuccess,
+  } = useMeals(serverData?.defaultDiet, dietId);
   const selectedDietName = dietsSlider.filter((obj) => obj.id === dietId)[0]
     ?.name;
+
   const name = selectedDietName || diet?.name;
-
-  // console.log("🐣", selectedDietServer);
-  // console.log("☢", selectedDietContext);
-  // console.log("🦈", dietId);
-
-  if (empty) {
+  if (dietsSlider?.length === 0) {
     return (
       <div className="w-full flex flex-col h-full text-center">
         <DietName name="Crie sua primeira dieta para começar" />
@@ -37,7 +35,9 @@ export default function SelectedDiet({ serverData }) {
     <div className="w-full flex flex-col h-full">
       <DietName name={name} />
       <DietMacros />
-      <DietMealsPage meals={diet?.meals} dietId={dietId} />
+      {!!diet?.meals.length && (
+        <DietMealsPage meals={diet?.meals} dietId={dietId} />
+      )}
     </div>
   );
 }

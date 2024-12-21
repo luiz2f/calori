@@ -4,7 +4,7 @@ import Spinner from "./Spinner";
 
 type ConfirmDeleteProps = {
   loading: boolean;
-  loaded: boolean;
+  loaded: boolean | undefined;
   resource: string;
   resourceName: string;
   modalName: string;
@@ -29,11 +29,17 @@ function ConfirmDelete({
       await onConfirm();
     } catch (error) {
       console.error(error);
+    } finally {
+      if (loaded === undefined) {
+        // caso não seja passada a condição de loaded, o modal é fechado automaticamente no fim do Confirm
+        onCloseModal(modalName);
+      }
     }
   }
   if (loaded) {
     onCloseModal(modalName);
   }
+  console.log(modalName, onCloseModal, modalName);
   return (
     <div className="w-full flex flex-col gap-3 relative">
       <div className="font-bold text-xl mb-6 text-center">

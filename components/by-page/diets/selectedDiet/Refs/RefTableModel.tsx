@@ -1,6 +1,5 @@
 "use client";
 import { createContext, useContext, ReactNode } from "react";
-import RefSlider from "./RefSlider";
 
 const TableContext = createContext<{ columns: string } | undefined>(undefined);
 
@@ -16,7 +15,6 @@ export default function Table({
       <div role="table" className="flex flex-col w-full p-2 ">
         {children}
       </div>
-      <RefSlider />
     </TableContext.Provider>
   );
 }
@@ -116,7 +114,7 @@ function Body<T>({
 }) {
   return (
     <div role="rowgroup" className="bg-ulgrey border-y-1 border-grey5">
-      {data.map(render)}
+      {data?.map(render)}
     </div>
   );
 }

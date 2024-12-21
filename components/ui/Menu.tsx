@@ -56,7 +56,7 @@ function Menus({ children }: MenusProps) {
 
 function Menu({ children, className }: MenusProps) {
   return (
-    <div className={`flex items-baseline ${className ? className : ""}`}>
+    <div className={`flex items-center ${className ? className : ""}`}>
       {children}
     </div>
   );
@@ -168,7 +168,6 @@ function useMenuOutsideClick<T extends HTMLElement>(
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (!mounted) return;
-      console.log("🐥 Menu outsideclick");
       const target = e.target as Node;
       const menu = document.getElementById("menu-container");
       if (

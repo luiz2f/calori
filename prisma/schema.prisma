@@ -21,13 +21,13 @@ model Session {
 }
 
 model VerificationRequest {
-  id         String   @id @default(cuid())
+  id         String                @id @default(cuid())
   identifier String
-  token      String   @unique
+  token      String                @unique
   expires    DateTime
   purpose    Verificarion_purpose? @default(EMAIL_VERIFICATION)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @updatedAt
 
   @@unique([identifier, token])
 }
@@ -44,31 +44,33 @@ model BodyInfo {
 }
 
 model Food {
-  id        String   @id @default(cuid())
-  name      String
-  carb      Float
-  protein   Float
-  fat       Float
-  satFat    Float
-  fiber     Float
-  userFood  Boolean  @default(false)
-  userId    String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User?    @relation(fields: [userId], references: [id])
-  unities   Unity[]
+  id            String         @id @default(cuid())
+  name          String
+  carb          Float
+  protein       Float
+  fat           Float
+  satFat        Float
+  fiber         Float
+  userFood      Boolean        @default(false)
+  userId        String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  user          User?          @relation(fields: [userId], references: [id])
+  unities       Unity[]
+  mealListItems MealListItem[]
 
   @@index([userId], map: "Food_userId_fkey")
 }
 
 model Unity {
-  id             String   @id @default(cuid())
+  id             String         @id @default(cuid())
   foodId         String
   un             String
   unitMultiplier Float
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  food           Food     @relation(fields: [foodId], references: [id], onDelete: Cascade)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  food           Food           @relation(fields: [foodId], references: [id], onDelete: Cascade)
+  mealListItems  MealListItem[]
 
   @@index([foodId], map: "Unity_foodId_fkey")
 }
@@ -77,7 +79,7 @@ model Diet {
   id        String   @id @default(cuid())
   name      String
   userId    String
-  index     Int      
+  index     Int
   archived  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -102,6 +104,7 @@ model Meal {
 
 model MealList {
   id            String         @id @default(cuid())
+  name          String
   mealId        String
   index         Int
   createdAt     DateTime       @default(now())
@@ -115,58 +118,63 @@ model MealList {
 model MealListItem {
   id         String   @id @default(cuid())
   foodId     String
+  unityId    String
   quantity   Float
-  unity      String
   mealListId String
   index      Int
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
   mealList   MealList @relation(fields: [mealListId], references: [id], onDelete: Cascade)
+  food       Food     @relation(fields: [foodId], references: [id], onDelete: Cascade)
+  unity      Unity    @relation(fields: [unityId], references: [id], onDelete: Cascade)
 
   @@index([mealListId], map: "MealListItem_mealListId_fkey")
+  @@index([foodId], map: "MealListItem_foodId_fkey")
+  @@index([unityId], map: "MealListItem_unityId_fkey")
 }
 
 model Account {
- id                String   @id @default(cuid())
- userId            String
- type              String
- provider          String
- providerAccountId String
- refresh_token     String?  @db.Text
- access_token      String?  @db.Text
- expires_at        Int?
- token_type        String?
- scope             String?
- id_token          String?  @db.Text
- session_state     String?
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
- user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String   @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?  @db.Text
+  access_token      String?  @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?  @db.Text
+  session_state     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
- @@unique([provider, providerAccountId])
+  @@unique([provider, providerAccountId])
 }
 
 model User {
-  id            String     @id @default(cuid())
-  name          String?
-  email         String?    @unique
+  id             String     @id @default(cuid())
+  name           String?
+  email          String?    @unique
   hashedPassword String?
-  emailVerified DateTime?
-  image         String?
-  role          User_role? @default(USER)
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  Account       Account[]
-  bodyInfo      BodyInfo?
-  diets         Diet[]
-  foods         Food[]
-  sessions      Session[]
+  emailVerified  DateTime?
+  image          String?
+  role           User_role? @default(USER)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  Account        Account[]
+  bodyInfo       BodyInfo?
+  diets          Diet[]
+  foods          Food[]
+  sessions       Session[]
 }
 
 enum User_role {
   ADMIN
   USER
 }
+
 enum Verificarion_purpose {
   EMAIL_VERIFICATION
   PASSWORD_RESET

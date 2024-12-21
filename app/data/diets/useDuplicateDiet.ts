@@ -10,10 +10,10 @@ export function useDuplicateDiet() {
     onSuccess: (data) => {
       queryClient.setQueryData([`meals-diet-${data?.id}`], data);
 
+      console.log(data);
       queryClient.invalidateQueries({
         queryKey: ["diets"],
       });
-      console.log("useDuplicateDiet");
     },
   });
 

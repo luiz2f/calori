@@ -24,13 +24,11 @@ export default async function middleware(request: NextRequest) {
   );
 
   if (!session && isProtected) {
-    console.log(2);
     const absoluteURL = new URL("/", request.nextUrl.origin);
     return NextResponse.redirect(absoluteURL.toString());
   }
 
   if (session && isPublic) {
-    console.log(1);
     const absoluteURL = new URL("/diets", request.nextUrl.origin);
     return NextResponse.redirect(absoluteURL.toString());
   }

@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useRef, useContext } from "react";
 import { ModalContext } from "@/components/ui/Modal";
 
@@ -14,14 +15,15 @@ export function useOutsideClick<T extends HTMLElement>(
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (!mounted || !isLast) return; // Cancel the handler if the component is not mounted
-      console.log("🖱🖱", name, mounted);
-      const target = e.target as Node;
+      const target = e.target as Element;
       const menu = document.getElementById("menu-container");
-      const lastOpenName = openNames[openNames.length - 1];
+      // const lastOpenName = openNames[openNames.length - 1];
+      const isSelectMenu = target.role === "option";
       if (
         ref.current &&
         !ref.current.contains(target) &&
-        !(menu && menu.contains(target))
+        !(menu && menu.contains(target)) &&
+        !isSelectMenu
         // (!ref.current.dataset.name ||
         //   lastOpenName === ref.current?.dataset.name)
       ) {

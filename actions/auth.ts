@@ -93,7 +93,6 @@ export const changePasswordByEmail = async (
   const user = await getUserByEmail(userEmail);
 
   if (!user || "error" in user) {
-    console.log(2);
     return { error: "An unexpected error occurred" };
   }
   const { currentPassword, newPassword, confirmNewPassword } =

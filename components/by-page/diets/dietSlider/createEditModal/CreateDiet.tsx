@@ -4,7 +4,6 @@ import Button from "@/components/ui/Button";
 import Menus from "@/components/ui/Menu";
 import { ModalContext } from "@/components/ui/Modal";
 import DietEditRefRow from "./DietEditRefRow";
-import { useFormStatus } from "react-dom";
 import { v4 as uuidv4 } from "uuid";
 import Spinner from "@/components/ui/Spinner";
 import { useSession } from "next-auth/react";
@@ -53,7 +52,6 @@ export default function CreateDiet({ modalName }) {
       console.error(error);
     }
   }
-  console.log(isCreating);
   useEffect(() => {
     const hasError = Object.values(errors).some(Boolean);
     const hasEmptyName = refs.some((ref) => ref.name.trim() === "");
@@ -91,15 +89,45 @@ export default function CreateDiet({ modalName }) {
   };
 
   const handleAddRef = () => {
-    setRefs([...refs, { id: uuidv4(), name: "Nova Refeição", time: "00:00" }]);
+    setRefs([...refs, { id: uuidv4(), name: "Nova Refeição", time: "23:00" }]);
   };
 
   const handleTimeBlur = useCallback(() => {
-    const sortedRefs = [...refs].sort((a, b) => {
+    const sortedRefs = [...refs].map((ref) => {
+      let { time } = ref;
+
+      if (/^\d{4}$/.test(time)) {
+        time = `${time.slice(0, 2)}:${time.slice(2)}`;
+      }
+
+      let [hours, minutes] = time.split(":");
+
+      if (!hours || isNaN(Number(hours))) hours = "";
+      if (!minutes || isNaN(Number(minutes))) minutes = "";
+
+      hours = hours.padStart(2, "0");
+      minutes = minutes.padStart(2, "0");
+
+      if (
+        hours === "" ||
+        minutes === "" ||
+        Number(hours) > 24 ||
+        Number(minutes) > 59
+      ) {
+        ref.time = time; // Mantém o valor original se for inválido
+        return ref;
+      }
+
+      ref.time = `${hours}:${minutes}`;
+      return ref;
+    });
+
+    sortedRefs.sort((a, b) => {
       const [aHours, aMinutes] = a.time.split(":").map(Number);
       const [bHours, bMinutes] = b.time.split(":").map(Number);
       return aHours - bHours || aMinutes - bMinutes;
     });
+
     setRefs(sortedRefs);
   }, [refs]);
 
@@ -168,7 +196,3 @@ export default function CreateDiet({ modalName }) {
     </Menus>
   );
 }
-
-// 😎 - Função createDiet
-// Implementar
-//

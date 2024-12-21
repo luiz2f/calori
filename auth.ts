@@ -130,7 +130,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
 });
 
-// console.log("W");
 // if (!user) {
 //   user = await prisma.user.create({
 //     data: {
