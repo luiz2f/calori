@@ -59,6 +59,10 @@ export default {
         frq: "repeat(4,  1fr)",
         edref: "56px 56px 1fr 25px",
       },
+      backgroundImage: {
+        "half-lightred-transparent":
+          "linear-gradient(to top, #FFEDED 50%, transparent 51%)",
+      },
     },
   },
   plugins: [],

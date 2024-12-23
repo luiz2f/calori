@@ -31,6 +31,7 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       setError("A senha deve ter no mínimo 8 caracteres.");
       return; // Retorna sem fazer o login
     }
+
     try {
       const data = await changePasswordByToken(token, formData);
       if ("success" in data) {

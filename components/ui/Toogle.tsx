@@ -22,7 +22,6 @@ export default function Toogle({ options, value, onChange, className }) {
 }
 
 function OptionButton({ option, onChange, isSelected, value, fixedWidth }) {
-  console.log(isSelected, option, value);
   if (isSelected) {
     return (
       <SelectedToogle
@@ -43,9 +42,15 @@ function OptionButton({ option, onChange, isSelected, value, fixedWidth }) {
 }
 
 function OptionToogle({ option, onChange, fixedWidth }) {
+  function handleClick(e) {
+    e.stopPropagation();
+    onChange(option);
+  }
   return (
     <button
-      onClick={onChange}
+      onClick={(e) => {
+        handleClick(e);
+      }}
       className={`px-2 rounded-lg ${fixedWidth ? "w-16" : ""}`}
     >
       {option}
@@ -54,6 +59,10 @@ function OptionToogle({ option, onChange, fixedWidth }) {
 }
 
 function SelectedToogle({ option, onChange, fixedWidth }) {
+  function handleClick(e) {
+    e.stopPropagation();
+    onChange(option);
+  }
   return (
     <div
       className={`text-transparent px-2 border-red-600 rounded-lg relative ${
@@ -62,7 +71,9 @@ function SelectedToogle({ option, onChange, fixedWidth }) {
     >
       {option}
       <button
-        onClick={onChange}
+        onClick={(e) => {
+          handleClick(e);
+        }}
         className={`text-darkgreen border-1 border-lightgreen bg-whitegreen z-10 px-2 rounded-lg absolute top-[-1px] right-[-1px] left-[-1px] bottom-[-1px] `}
       >
         {option}

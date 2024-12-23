@@ -4,8 +4,8 @@ import { generateTokenAndSendEmailVerification } from "@/actions/token";
 import AuthButton from "@/components/auth/AuthButton";
 import Input from "@/components/ui/Input";
 import NavAnchor from "@/components/ui/NavAnchor";
-import { useRouter } from "next/compat/router";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
@@ -45,10 +45,13 @@ export default function GeneratetEmailToken() {
     } else {
       setError(errorMessage);
     }
-    if (success) {
-      return router?.push("/token-sent");
-    }
   };
+
+  useEffect(() => {
+    if (success) {
+      router?.push("/token-sent");
+    }
+  }, [success, router]);
 
   return (
     <form onSubmit={handleSubmit} className="w-full flex flex-col pt-6">
@@ -62,8 +65,14 @@ export default function GeneratetEmailToken() {
         </h4>
       </div>
 
-      <Input id="email" placeholder="Email" type="email" error={error} />
-      <AuthButton actionText="Recover password" className="mt-4" />
+      <Input
+        id="email"
+        placeholder="Email"
+        autoComplete="username"
+        type="email"
+        error={error}
+      />
+      <AuthButton actionText="Verificar email" className="mt-4" />
 
       <NavAnchor href="/login">Entrar com sua conta</NavAnchor>
     </form>

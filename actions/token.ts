@@ -3,7 +3,7 @@ import prisma from "@/prisma";
 import { v4 as uuidv4 } from "uuid";
 import { sendEmailVerification, sendPasswordResetEmail } from "./email";
 import { Verificarion_purpose as VerificationPurpose } from "@prisma/client";
-import { changePasswordByEmail, getUserByEmail } from "./auth";
+import { changePasswordByEmail, getUserByEmail, resetPassword } from "./auth";
 
 const PurposeMap: Record<string, VerificationPurpose> = {
   email: VerificationPurpose.EMAIL_VERIFICATION,
@@ -140,8 +140,13 @@ export async function changePasswordByToken(token: string, formData: FormData) {
     return result;
   }
   const { existingUser } = result;
+  const userEmail = existingUser?.email;
 
-  const response = changePasswordByEmail(existingUser.email!, formData);
+  if (!userEmail) {
+    return { error: "User not found" };
+  }
+
+  const response = resetPassword(userEmail, formData);
 
   if ("error" in result) {
     return response;
@@ -203,10 +208,10 @@ export async function generateTokenAndSendEmailVerification(email: string) {
   );
 
   if (emailResult && "error" in emailResult) {
-    return emailResult; // Retorna o erro de envio de e-mail
+    return emailResult;
   }
 
-  return { success: true }; // Indica sucesso explícito
+  return { success: true };
 }
 
 // 🛡️🔒

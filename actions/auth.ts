@@ -7,11 +7,11 @@ import { User } from "@prisma/client";
 import { AuthError } from "next-auth";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
+import { redirect } from "next/dist/server/api-utils";
 
 export const login = async (provider: string) => {
   const user = await signIn(provider, { redirectTo: "/" });
-  console.log(user);
-  revalidatePath("/");
+  revalidatePath("/diets");
 };
 
 export const logout = async () => {
@@ -19,6 +19,7 @@ export const logout = async () => {
   revalidatePath("/");
 };
 
+// 📌 SEGURANÇA - NAO DEIXAR BUSCAR A HASHED, APENAS  ID NOME EMAIL IMAGEM
 export const getUserByEmail = async (
   email: string
 ): Promise<User | { error: string }> => {
@@ -38,7 +39,8 @@ export const loginWithCredentials = async (formData: FormData) => {
     email: formData.get("email"),
     password: formData.get("password"),
     role: "USER",
-    redirect: false,
+    redirect: true,
+    redirectTo: "/diets",
   };
 
   try {
@@ -93,7 +95,6 @@ export const changePasswordByEmail = async (
   const user = await getUserByEmail(userEmail);
 
   if (!user || "error" in user) {
-    console.log(2);
     return { error: "An unexpected error occurred" };
   }
   const { currentPassword, newPassword, confirmNewPassword } =
@@ -116,6 +117,36 @@ export const changePasswordByEmail = async (
   }
 
   const newHash = saltAndHashPassword(newPassword);
+
+  try {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { hashedPassword: newHash },
+    });
+    return { success: "Password successfully changed" };
+  } catch (error) {
+    console.error(error);
+    return { error: "Failed to change password" };
+  }
+};
+
+export const resetPassword = async (userEmail: string, formData: FormData) => {
+  const user = await getUserByEmail(userEmail);
+
+  if (!user || "error" in user) {
+    return { error: "An unexpected error occurred" };
+  }
+
+  const { password, confirmPassword } = Object.fromEntries(formData) as Record<
+    string,
+    string
+  >;
+
+  if (password !== confirmPassword) {
+    return { error: "New passwords do not match" };
+  }
+
+  const newHash = saltAndHashPassword(password);
 
   try {
     await prisma.user.update({

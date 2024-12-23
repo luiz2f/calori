@@ -3,14 +3,18 @@ import Logo from "./ui/Logo";
 
 export default function Header() {
   return (
-    <div className="bg-white fixed h-14 w-full border-b-2 border-lightgreen flex  items-center justify-center z-50">
-      <div className="w-32 m-auto">
-        <Logo />
+    <header className="">
+      <div className="mx-auto max-w-screen-lg bg-white fixed h-14 w-full border-b-2 border-lightgreen flex  items-center justify-center z-50">
+        <div className="w-32 m-auto">
+          <Logo />
+        </div>
+        {/* TODO ONCLICK */}
+        {/* MODAL USER */}
+        {/* MODAL FOODS */}
+        <div className="absolute right-2 top-50% text-2xl text-grey40">
+          <IoPersonCircleOutline className="w-7 h-7 " />
+        </div>
       </div>
-      {/* TODO ONCLICK */}
-      <div className="absolute right-2 top-50% text-2xl text-grey40">
-        <IoPersonCircleOutline className="w-7 h-7 " />
-      </div>
-    </div>
+    </header>
   );
 }

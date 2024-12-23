@@ -15,11 +15,10 @@ export default function VerifyPasswordToken() {
   const [success, setSuccess] = useState<string | undefined>(undefined);
   const [showForm, setShowForm] = useState<boolean>(false);
   const searchParams = useSearchParams();
+  const token = searchParams.get("token");
   // const token = searchParams.get("token");
-  const token = "21321";
   const onSubmit = useCallback(async () => {
     if (success || error) {
-      console.log(1);
       return;
     }
 
@@ -29,8 +28,7 @@ export default function VerifyPasswordToken() {
     }
 
     try {
-      // const data = await verifyResetPasswordToken(token);
-      const data = { success: "Token verificado" };
+      const data = await verifyResetPasswordToken(token);
 
       if (data && "success" in data) {
         setSuccess(data.success);

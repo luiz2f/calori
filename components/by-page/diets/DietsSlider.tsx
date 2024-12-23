@@ -1,66 +1,55 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DietBox from "./DietBox";
 import AddDiet from "./dietSlider/AddDiet";
 import Modal from "@/components/ui/Modal";
 import Menus from "@/components/ui/Menu";
 import CreateDiet from "./dietSlider/createEditModal/CreateDiet";
+import { useDietContext } from "@/app/context/useDietContext";
+import { useDiets } from "@/app/data/diets/useDiets";
 
-const diets = [
-  {
-    name: "Dieta A Nome muito grande exemssssssssssssssssssssplo",
-    index: 2,
-    kcal: 2321,
-  },
-  { name: "Dieta B", index: 3, kcal: 1721 },
-  { name: "Dieta C", index: 4, kcal: 1721 },
-  { name: "Dieta D", index: 1, kcal: 2128 },
-];
-
-export default function DietsSlider() {
-  const sortedDiets = [...diets].sort((a, b) => a.index - b.index); // Ordena pelo index
-  const [selectedDiet, setSelectedDiet] = useState(1);
-
-  const handleDietClick = (index: number) => {
-    setSelectedDiet(index); // Atualiza o estado quando uma dieta é clicada
+export default function DietsSlider({ initialDataDiets }) {
+  const { data: diets, isLoading } = useDiets(initialDataDiets);
+  const { selectedDiet, setSelectedDiet } = useDietContext();
+  const handleDietClick = (dietId) => {
+    setSelectedDiet(dietId);
   };
-  // TODO 📌 ONHOLD MUDAR INDEX
-  // 📌🐳 modal
-  // 📌🐪 buscar
-  // 📌🐳 opções do modal
+
   return (
-    <Modal>
-      <Menus>
-        <div className="mt-14 flex flex-col w-full pt-8 bg-white z-10">
-          <div className="pl-6">Minhas Dietas</div>
-          <div className="flex w-full overflow-x-auto gap-4 px-6 pt-2 pb-4">
-            {sortedDiets.map((dieta, index) => {
-              return (
+    <>
+      <Modal>
+        <Menus>
+          <div className="mt-14 flex flex-col w-full pt-8 bg-white z-10">
+            <div className="pl-6">Minhas Dietas</div>
+            <div className="flex w-full overflow-x-auto gap-4 px-6 pt-2 pb-4">
+              {diets?.map((diet, index) => (
                 <DietBox
-                  name={dieta.name}
-                  kcal={dieta.kcal}
-                  dieta={dieta}
-                  active={selectedDiet === dieta.index}
-                  key={index}
-                  onClick={() => handleDietClick(dieta.index)} // Evento de clique para selecionar
+                  name={diet?.name}
+                  kcal={diet?.kcal}
+                  diet={diet}
+                  active={selectedDiet === diet?.id}
+                  key={diet.id}
+                  onClick={() => handleDietClick(diet.id)} // Evento de clique para selecionar
                 />
-              );
-            })}
+              ))}
 
-            <Modal.Open opens="new-diet">
-              <button>
-                {/* ainda não sei pq só funciona com o botão */}
-                <AddDiet />
-              </button>
-            </Modal.Open>
+              <Modal.Open opens="new-diet">
+                <button>
+                  <AddDiet />
+                </button>
+              </Modal.Open>
 
-            <Modal.Window name="new-diet">
-              <CreateDiet />
-            </Modal.Window>
+              <Modal.Window name="new-diet">
+                <CreateDiet modalName="new-diet" />
+              </Modal.Window>
+            </div>
           </div>
-        </div>
-      </Menus>
-    </Modal>
+        </Menus>
+      </Modal>
+    </>
   );
 }
+
+// 📌 - DELETAR DIETA
+// 📌 - CRIAR REFEIÇÃO

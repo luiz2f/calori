@@ -1,43 +1,89 @@
+"use client";
+import ConfirmDelete from "@/components/ui/ConfirmDelete";
 import Menus from "@/components/ui/Menu";
+import Modal from "@/components/ui/Modal";
 import {
   HiDotsVertical,
+  HiOutlineDuplicate,
   HiOutlinePencilAlt,
   HiOutlineTrash,
 } from "react-icons/hi";
 
-export default function RefEditVarRow({ refvar }) {
+export default function RefEditVarRow({
+  refvar,
+  onDelete,
+  onSelectVariation,
+  index,
+  onDuplicateVariation,
+}) {
+  const modalName = `deleteMealVar1${refvar.id}`;
+
+  const handleDeleteMeal = () => {
+    onDelete(refvar.id);
+  };
+  const handleClick = (e) => {
+    e.stopPropagation();
+    selectVariation();
+  };
+
+  const selectVariation = () => {
+    onSelectVariation(index);
+  };
   return (
     <div
       key={refvar.name}
-      className="flex gap-2  border-greylight border-b-1 py-1 "
+      className="flex gap-2 cursor-pointer justify-between border-greylight border-b-1 py-1"
+      onClick={handleClick}
     >
-      <div className="underline underline-offset-4 text-darkgreen w-full p-1 pl-2 rounded-lg">
+      <div
+        onClick={(e) => handleClick(e)}
+        className="w-fit underline underline-offset-4 text-darkgreen  p-1 pl-2 rounded-lg"
+      >
         {refvar.name}
       </div>
-      <div className=" w-fit text-center text-darkgreen p-1 rounded-lg font-medium">
-        {refvar.kcal}
+      <div className="flex">
+        <div className="w-fit text-center text-darkgreen p-1 rounded-lg font-medium">
+          {refvar.kcal}
+        </div>
+        <Menus.Menu className="rounded-lg ">
+          <Menus.Toggle
+            id={refvar.name}
+            className="flex items-center justify-center w-8 h-8 rounded-lg p-1"
+          >
+            <HiDotsVertical />
+          </Menus.Toggle>
+
+          <Menus.List id={refvar.name}>
+            <Menus.Button
+              icon={<HiOutlinePencilAlt />}
+              onClick={selectVariation}
+            >
+              Editar variação
+            </Menus.Button>
+            <Menus.Button
+              icon={<HiOutlineDuplicate />}
+              onClick={() => onDuplicateVariation(refvar?.id)}
+            >
+              Duplicar variação
+            </Menus.Button>
+
+            <Modal.Open opens={modalName}>
+              <Menus.Button icon={<HiOutlineTrash />}>
+                Apagar variação
+              </Menus.Button>
+            </Modal.Open>
+          </Menus.List>
+
+          <Modal.Window name={modalName}>
+            <ConfirmDelete
+              resource="Variação de Refeição"
+              resourceName={`${refvar.name}`}
+              onConfirm={handleDeleteMeal}
+              modalName={modalName}
+            />
+          </Modal.Window>
+        </Menus.Menu>
       </div>
-      <Menus.Menu className="rounded-lg align-center">
-        <Menus.Toggle
-          id={refvar.name}
-          className="flex items-center justify-center  w-8 h-8 rounded-lg p-1"
-        >
-          <HiDotsVertical />
-        </Menus.Toggle>
-
-        <Menus.List id={refvar.name}>
-          <Menus.Button icon={<HiOutlinePencilAlt />}>
-            Editar variação
-            {/* modal🐥 */}
-          </Menus.Button>
-
-          <Menus.Button icon={<HiOutlineTrash />}>
-            Apagar variação
-            {/* confirm ⛔ */}
-            {/* action 🐥 */}
-          </Menus.Button>
-        </Menus.List>
-      </Menus.Menu>
     </div>
   );
 }

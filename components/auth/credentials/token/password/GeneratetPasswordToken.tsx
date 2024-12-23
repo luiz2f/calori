@@ -41,7 +41,7 @@ export default function GeneratetPasswordToken() {
       errorMessage = "Um erro inesperado ocorreu 😢";
     }
 
-    if (errorMessage === "Verify your account first") {
+    if (errorMessage === "Verify your account") {
       setAccountNotVerified(true);
       setError("Verifique sua conta primeiro");
     } else if (errorMessage === "User not found") {
@@ -50,7 +50,6 @@ export default function GeneratetPasswordToken() {
       setError(errorMessage);
     }
   };
-
   useEffect(() => {
     if (success) {
       router?.push("/token-sent");
@@ -70,7 +69,13 @@ export default function GeneratetPasswordToken() {
             </h4>
           </div>
 
-          <Input id="email" placeholder="Email" type="email" error={error} />
+          <Input
+            id="email"
+            placeholder="Email"
+            autoComplete="username"
+            type="email"
+            error={error}
+          />
           <AuthButton
             actionText="Recuperar Senha"
             disableAction={accountNotVerified}

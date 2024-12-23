@@ -2,7 +2,6 @@ import { auth } from "@/auth";
 import LoginForm from "@/components/auth/credentials/LoginForm";
 import LoginGoogle from "@/components/auth/LoginGoogle";
 import NavAnchor from "@/components/ui/NavAnchor";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export default async function SignIn() {
