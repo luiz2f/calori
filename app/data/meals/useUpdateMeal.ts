@@ -12,11 +12,10 @@ export function useUpdateMeal() {
     mutationFn: updateMealAPI,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: [`meals-diet-${data}`] });
-      // queryClient.invalidateQueries({
-      //   queryKey: ["diets"],
-      // });
+      queryClient.invalidateQueries({
+        queryKey: ["diets"],
+      });
     },
   });
-
   return { isUpdating, updateMeal, isSuccess };
 }

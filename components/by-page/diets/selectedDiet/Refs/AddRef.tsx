@@ -1,19 +1,13 @@
 "use client";
-
-import { createMeal } from "@/actions/diets/meals";
-import { useDietContext } from "@/app/context/useDietContext";
+import { ModalContext } from "@/components/ui/Modal";
+import { useContext } from "react";
 import { HiPlus } from "react-icons/hi";
 
 export default function AddRef({ dietId }) {
-  const { setSelectedDiet } = useDietContext();
+  const { open } = useContext(ModalContext);
 
   async function handleAddRef() {
-    try {
-      await createMeal(dietId, { name: "Nova refeição", time: "23:00" });
-      setSelectedDiet(dietId);
-    } catch (error) {
-      console.error(error);
-    }
+    open("createNewMeal");
   }
   // 📌🐪 FUNÇÃO
   // 📌🐳 modal

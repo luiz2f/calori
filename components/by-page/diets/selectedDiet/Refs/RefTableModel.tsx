@@ -12,7 +12,7 @@ export default function Table({
 }) {
   return (
     <TableContext.Provider value={{ columns }}>
-      <div role="table" className="flex flex-col w-full p-2 ">
+      <div role="table" className="flex flex-col w-full p-2">
         {children}
       </div>
     </TableContext.Provider>
@@ -46,21 +46,21 @@ function Header({
       <div className="text-left align-bottom text-xl font-normal self-end">
         {name}
       </div>
-      <div className="text-center font-normal align-bottom ">
+      <div className="text-center font-normal align-bottom">
         <div className="grayscale contrast-150 text-xs opacity-50">🍞</div>
-        <div className="">{carbo}</div>
+        <div>{carbo}</div>
       </div>
-      <div className="text-center font-normal align-bottom ">
+      <div className="text-center font-normal align-bottom">
         <div className="grayscale contrast-150 text-xs opacity-50">🥩</div>
-        <div className="">{prot}</div>
+        <div>{prot}</div>
       </div>
-      <div className="text-center font-normal align-bottom ">
+      <div className="text-center font-normal align-bottom">
         <div className="grayscale contrast-150 text-xs opacity-50">🥑</div>
-        <div className="">{fat}</div>
+        <div>{fat}</div>
       </div>
       <div className="text-right font-normal align-bottom">
         <div className="text-xs text-grey50">kcal</div>
-        <div className="">{kcal}</div>
+        <div>{kcal}</div>
       </div>
     </div>
   );
@@ -88,38 +88,46 @@ function Row({
     <div
       role="row"
       style={{ gridTemplateColumns: context.columns }}
-      className="grid border-b-1 border-white text-sm pr-1  [&>div]:py-1 [&>div]:text-center [&>div]:text-blacklight last:text-right last:border-b-0"
+      className="grid border-b-1 border-white text-sm pr-1 [&>div]:py-1 [&>div]:text-center [&>div]:text-blacklight last:text-right last:border-b-0"
     >
-      <div role="cell" className="pl-2 !text-left !text-black  ">
+      <div role="cell" className="pl-2 !text-left !text-black">
         {name}
       </div>
-      {/* MUITO PERTO DA BORDA DA DIREITA */}
-      {/* SLIDER */}
-      <div role="cell ">{carbo}</div>
+      <div role="cell">{carbo}</div>
       <div role="cell">{prot}</div>
       <div role="cell">{fat}</div>
-      <div role="cell" className="!text-right ">
+      <div role="cell" className="!text-right">
         {kcal}
       </div>
     </div>
   );
 }
 
-function Body<T>({
-  data,
-  render,
-}: {
-  data: T[];
-  render: (item: T, index: number) => ReactNode;
-}) {
+function Body({ children }: { children: ReactNode }) {
   return (
     <div role="rowgroup" className="bg-ulgrey border-y-1 border-grey5">
-      {data?.map(render)}
+      {children}
     </div>
   );
 }
 
-// 📌 SLIDER
+function NoFood({ onClick }) {
+  function handleClick(e) {
+    e.stopPropagation();
+    onClick();
+  }
+
+  return (
+    <button
+      onClick={(e) => handleClick(e)}
+      role="contentinfo"
+      className="pl-2 py-1 !text-left !text-black underline cursor-pointer"
+    >
+      + Adicionar alimentos
+    </button>
+  );
+}
+
 function Footer({ children }: { children?: ReactNode }) {
   return (
     <div
@@ -131,8 +139,9 @@ function Footer({ children }: { children?: ReactNode }) {
   );
 }
 
-// Exportando subcomponentes para serem usados como Table.Header, Table.Row etc.
+// Exportando subcomponentes
 Table.Header = Header;
 Table.Row = Row;
 Table.Body = Body;
 Table.Footer = Footer;
+Table.NoFood = NoFood;

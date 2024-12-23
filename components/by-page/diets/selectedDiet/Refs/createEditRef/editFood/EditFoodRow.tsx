@@ -26,8 +26,6 @@ export default function EditFoodRow({
     value: food.food.id,
     label: food.food.name,
   };
-  console.log(food.selectedFood);
-  console.log(food.food.id);
 
   const [selectedFood, setSelectedFood] = useState(foodDefault || null);
   const [selectedUnity, setSelectedUnity] = useState(unityDefault || null);

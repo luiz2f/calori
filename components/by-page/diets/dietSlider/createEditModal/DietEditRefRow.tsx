@@ -88,12 +88,12 @@ export default function DietEditRefRow({
         required
       />
       <input
-        type="hour"
+        type="time"
         name="refTime"
         value={time}
         onChange={handleTimeChange}
         onBlur={handleTimeBlur}
-        className={`border-1 w-14 text-center text-darkgreen p-1 rounded-lg font-medium ${
+        className={`border-1 w-20 text-center bg-white text-darkgreen p-1 rounded-lg font-medium ${
           timeError
             ? "border-darkred bg-lightred text-darkred"
             : "border-grey-50"

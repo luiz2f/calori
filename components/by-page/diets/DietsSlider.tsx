@@ -11,11 +11,9 @@ import { useDiets } from "@/app/data/diets/useDiets";
 
 export default function DietsSlider({ initialDataDiets }) {
   const { data: diets, isLoading } = useDiets(initialDataDiets);
-  const [active, setActive] = useState(0);
-  const { setSelectedDiet } = useDietContext();
+  const { selectedDiet, setSelectedDiet } = useDietContext();
   const handleDietClick = (dietId) => {
     setSelectedDiet(dietId);
-    setActive(dietId);
   };
 
   return (
@@ -30,7 +28,7 @@ export default function DietsSlider({ initialDataDiets }) {
                   name={diet?.name}
                   kcal={diet?.kcal}
                   diet={diet}
-                  active={active === index || active === diet?.id}
+                  active={selectedDiet === diet?.id}
                   key={diet.id}
                   onClick={() => handleDietClick(diet.id)} // Evento de clique para selecionar
                 />

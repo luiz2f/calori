@@ -67,44 +67,21 @@ export async function getDietMeals(dietId: string) {
 }
 
 export async function deleteMeal(mealId: string) {
-  const userId = await getSessionId();
-
-  const meal = await prisma.meal.findUnique({
-    where: { id: mealId },
-    include: { diet: { select: { userId: true } } },
+  const mealToDelete = await prisma.meal.findUnique({
+    where: {
+      id: mealId,
+    },
+    select: {
+      dietId: true, // Seleciona apenas o campo dietId
+    },
   });
 
-  if (meal?.diet.userId !== userId) {
-    return null;
-  }
-
-  const deletedMeal = await prisma.meal.delete({
+  await prisma.meal.delete({
     where: {
       id: mealId,
     },
   });
-
-  // revalidatePath("/diets");
-
-  return;
-}
-
-export async function createMeal(dietId, meal) {
-  try {
-    const newMeal = await prisma.meal.create({
-      data: {
-        name: meal.name,
-        time: meal.time,
-        dietId,
-      },
-    });
-  } catch (error) {
-    console.error("Erro ao criar refeição:", error);
-  } finally {
-    // revalidatePath("/diets");
-  }
-
-  return;
+  return mealToDelete?.dietId;
 }
 
 export async function updateMeal({ mealId, mealName, mealTime, refs }) {
@@ -228,11 +205,13 @@ export async function updateMeal({ mealId, mealName, mealTime, refs }) {
         data: {
           name: list.name,
           mealId: mealId,
+          index: 1,
           mealListItems: {
             create: list.mealListItems?.map((item) => ({
               foodId: item.foodId,
               unityId: item.unityId,
               quantity: toNumber(item.quantity),
+              index: 1,
             })),
           },
         },
@@ -246,6 +225,42 @@ export async function updateMeal({ mealId, mealName, mealTime, refs }) {
   console.log(252);
 
   return mealToUpdate?.dietId;
+}
+
+export async function createMeal({ mealName, mealTime, refs, dietId }) {
+  // Criação básica da refeição
+  const newMeal = await prisma.meal.create({
+    data: {
+      name: mealName,
+      time: mealTime,
+      dietId: dietId,
+    },
+  });
+
+  if (refs) {
+    const createMealLists = refs?.map(async (list) => {
+      await prisma.mealList.create({
+        data: {
+          name: list.name,
+          mealId: newMeal.id,
+          index: 1,
+          mealListItems: {
+            create: list.mealListItems?.map((item) => ({
+              foodId: item.foodId,
+              unityId: item.unityId,
+              quantity: toNumber(item.quantity),
+              index: 1,
+            })),
+          },
+        },
+      });
+    });
+
+    await Promise.all(createMealLists);
+  }
+  // Aguardar todas as operações assíncronas
+
+  return dietId;
 }
 
 function toNumber(number) {

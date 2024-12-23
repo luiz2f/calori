@@ -33,11 +33,15 @@ export default function SelectedDiet({ serverData }) {
 
   return (
     <div className="w-full flex flex-col h-full">
-      <DietName name={name} />
+      <DietName />
       <DietMacros />
-      {!!diet?.meals.length && (
-        <DietMealsPage meals={diet?.meals} dietId={dietId} />
-      )}
+      <DietMealsPage
+        key={dietId}
+        meals={diet?.meals}
+        dietId={dietId}
+        diets={diets}
+        name={name}
+      />
     </div>
   );
 }

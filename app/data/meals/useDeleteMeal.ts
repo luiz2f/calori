@@ -1,24 +1,23 @@
 "use client";
-import { deleteDiet as deleteDietAPI } from "@/actions/diets/diets";
+import { deleteMeal as deleteMealAPI } from "@/actions/diets/meals";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-export function useDeleteDiet() {
+export function useDeleteMeal() {
   const queryClient = useQueryClient();
 
   const {
     isPending: isDeleting,
-    mutate: deleteDiet,
+    mutate: deleteMeal,
     isSuccess,
   } = useMutation({
-    mutationFn: deleteDietAPI,
+    mutationFn: deleteMealAPI,
     onSuccess: (data) => {
-      const queryKey = `meals-diet-${data}`;
-      queryClient.removeQueries({ queryKey, exact: true });
+      queryClient.invalidateQueries({ queryKey: [`meals-diet-${data}`] });
       queryClient.invalidateQueries({
         queryKey: ["diets"],
       });
     },
   });
 
-  return { isDeleting, deleteDiet, isSuccess };
+  return { isDeleting, deleteMeal, isSuccess };
 }

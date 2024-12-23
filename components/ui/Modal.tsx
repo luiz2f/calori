@@ -42,8 +42,7 @@ export const ModalContext = createContext<ModalContextType>({
 
 function Modal({ children }: ModalProps) {
   const [openNames, setOpenNames] = useState<string[]>([]);
-  // console.log(openNames);
-  // console.log(openNames);
+  console.log(openNames);
   const open = (name: string) => setOpenNames((prev) => [...prev, name]);
   const close = (name: string) => {
     // console.log("🐇 fechando especifico");
@@ -73,6 +72,7 @@ function Open({ children, opens }: OpenProps) {
   const { open } = useContext(ModalContext);
   return cloneElement(children, {
     onClick: (e) => {
+      console.log(2);
       e?.stopPropagation();
       e?.preventDefault();
       open(opens);

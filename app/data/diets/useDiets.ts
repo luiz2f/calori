@@ -1,5 +1,6 @@
 "use client";
 import { getUserDiets } from "@/actions/diets/diets";
+import { useDietContext } from "@/app/context/useDietContext";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 

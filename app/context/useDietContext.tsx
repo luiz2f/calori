@@ -7,13 +7,13 @@ import React, {
   ReactNode,
   useEffect,
 } from "react";
+import { useDiets } from "../data/diets/useDiets";
 
 const DietContext = createContext();
 
 export const DietProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [diets, setDiets] = useState([]);
   const [selectedDiet, setSelectedDiet] = useState(null);
   const [meals, setMeals] = useState([]);
 
@@ -24,8 +24,6 @@ export const DietProvider: React.FC<{ children: ReactNode }> = ({
         setSelectedDiet,
         meals,
         setMeals,
-        diets,
-        setDiets,
       }}
     >
       {children}

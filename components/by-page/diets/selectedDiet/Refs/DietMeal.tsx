@@ -11,9 +11,11 @@ import ConfirmDelete from "@/components/ui/ConfirmDelete";
 import EditRef from "./createEditRef/EditRef";
 import { useState } from "react";
 import RefTable from "./RefTable";
+import { useDeleteMeal } from "@/app/data/meals/useDeleteMeal";
 
 export default function DietMeal({ meal }) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const { isDeleting, deleteMeal, isSuccess } = useDeleteMeal();
   const goLeft = () => {
     setCurrentIndex((prevIndex) =>
       prevIndex > 0 ? prevIndex - 1 : meal?.mealList?.length - 1
@@ -25,8 +27,10 @@ export default function DietMeal({ meal }) {
     );
   };
   const handleDeleteMeal = async () => {
-    // await deleteMeal(meal.id);
+    await deleteMeal(meal.id);
   };
+
+  const deleteModalName = `deleteMeal${meal.id}`;
 
   return (
     <div>
@@ -47,7 +51,7 @@ export default function DietMeal({ meal }) {
                 {/* modal🐥 */}
               </Menus.Button>
             </Modal.Open>
-            <Modal.Open opens={`deleteMeal${meal.id}`}>
+            <Modal.Open opens={deleteModalName}>
               <Menus.Button icon={<HiOutlineTrash />}>
                 Apagar refeição
                 {/* confirm ⛔ */}
@@ -58,16 +62,35 @@ export default function DietMeal({ meal }) {
           <Modal.Window name={`editMeal${meal.id}`}>
             <EditRef meal={meal} currentIndex={currentIndex} />
           </Modal.Window>
-          <Modal.Window name={`deleteMeal${meal.id}`}>
+          <Modal.Window name={`editMealAlimento${meal.id}`}>
+            <EditRef
+              createFood={true}
+              meal={meal}
+              currentIndex={currentIndex}
+              typeInput="Alimentos"
+            />
+          </Modal.Window>
+          <Modal.Window name={`editMealVar${meal.id}`}>
+            <EditRef
+              createVariation={true}
+              meal={meal}
+              currentIndex={currentIndex}
+              typeInput="Alimentos"
+            />
+          </Modal.Window>
+          <Modal.Window name={deleteModalName}>
             <ConfirmDelete
+              loading={isDeleting}
+              loaded={!isDeleting && isSuccess}
               resource="Refeição"
               resourceName={`${meal.name} - ${meal.time}`}
               onConfirm={handleDeleteMeal}
-              modalName={`deleteMeal${meal.id}`}
+              modalName={deleteModalName}
             />
           </Modal.Window>
         </Menus.Menu>
         <RefTable
+          mealId={meal?.id}
           currentIndex={currentIndex}
           goLeft={goLeft}
           goRight={goRight}

@@ -36,9 +36,12 @@ function ConfirmDelete({
       }
     }
   }
-  if (loaded) {
-    onCloseModal(modalName);
-  }
+
+  useEffect(() => {
+    if (loaded) {
+      onCloseModal(modalName);
+    }
+  }, [loaded, onCloseModal, modalName]);
 
   return (
     <div className="w-full flex flex-col gap-3 relative">

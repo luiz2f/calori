@@ -159,7 +159,7 @@ export default function EditRefFoods({
                 modalName={modalName}
               />
             </Modal.Window>
-          </div>{" "}
+          </div>
         </>
       ) : (
         <>
