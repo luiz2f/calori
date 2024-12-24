@@ -9,13 +9,16 @@ import {
 import Modal from "@/components/ui/Modal";
 import ConfirmDelete from "@/components/ui/ConfirmDelete";
 import EditRef from "./createEditRef/EditRef";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import RefTable from "./RefTable";
 import { useDeleteMeal } from "@/app/data/meals/useDeleteMeal";
+import { useMacroContext } from "@/app/context/useMacroContext";
 
-export default function DietMeal({ meal }) {
+export default function DietMeal({ meal, macros }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const { isDeleting, deleteMeal, isSuccess } = useDeleteMeal();
+  const { updateMacroForMeal } = useMacroContext();
+
   const goLeft = () => {
     setCurrentIndex((prevIndex) =>
       prevIndex > 0 ? prevIndex - 1 : meal?.mealList?.length - 1
@@ -29,6 +32,28 @@ export default function DietMeal({ meal }) {
   const handleDeleteMeal = async () => {
     await deleteMeal(meal.id);
   };
+
+  useEffect(() => {
+    if (!meal.mealList.length) {
+      return;
+    }
+    const selectedVariation = meal.mealList[currentIndex];
+    const macro = selectedVariation.mealListItems.reduce(
+      (acc, item) => {
+        acc.carbo += item.food.carb * item.quantity * item.unity.unitMultiplier;
+        acc.prot +=
+          item.food.protein * item.quantity * item.unity.unitMultiplier;
+        acc.gord += item.food.fat * item.quantity * item.unity.unitMultiplier;
+        acc.kcal +=
+          item.food.carb * item.quantity * item.unity.unitMultiplier * 4 +
+          item.food.protein * item.quantity * item.unity.unitMultiplier * 4 +
+          item.food.fat * item.quantity * item.unity.unitMultiplier * 9;
+        return acc;
+      },
+      { carbo: 0, prot: 0, gord: 0, kcal: 0 }
+    );
+    updateMacroForMeal(meal.id, macro);
+  }, [currentIndex, meal]);
 
   const deleteModalName = `deleteMeal${meal.id}`;
 
@@ -95,6 +120,7 @@ export default function DietMeal({ meal }) {
           goLeft={goLeft}
           goRight={goRight}
           mealsList={meal?.mealList}
+          macros={macros?.macro}
         />
         {/* 😀 */}
       </div>

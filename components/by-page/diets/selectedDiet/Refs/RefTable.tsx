@@ -3,6 +3,7 @@ import { useContext } from "react";
 import Table from "./RefTableModel";
 import RefSlider from "./RefSlider";
 import { ModalContext } from "@/components/ui/Modal";
+import { useMacroContext } from "@/app/context/useMacroContext";
 
 export default function RefTable({
   mealId,
@@ -11,8 +12,10 @@ export default function RefTable({
   goRight,
   mealsList,
   modalName,
+  macros,
 }) {
   const { open } = useContext(ModalContext);
+  const { columns } = useMacroContext();
 
   if (!mealsList || mealsList.length === 0) {
     return (
@@ -80,10 +83,18 @@ export default function RefTable({
     open(`editMealVar${mealId}`);
   }
 
+  console.log(columns);
+
   const simplifiedData = transformFoodData(meal?.mealListItems);
   return (
-    <Table columns="1fr 32px 32px 32px 32px">
-      <Table.Header name={meal?.name} carbo={58} prot={25} fat={8} kcal={419} />
+    <Table columns={columns}>
+      <Table.Header
+        name={meal?.name}
+        carbo={Math.round(macros?.carbo)}
+        prot={Math.round(macros?.gord)}
+        fat={Math.round(macros?.carbo)}
+        kcal={Math.round(macros?.kcal)}
+      />
       <Table.Body>
         {simplifiedData?.length ? (
           simplifiedData.map((item, index) => (

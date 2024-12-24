@@ -1,13 +1,5 @@
 "use client";
-import { getUserDiets } from "@/actions/diets/diets";
-import React, {
-  createContext,
-  useState,
-  useContext,
-  ReactNode,
-  useEffect,
-} from "react";
-import { useDiets } from "../data/diets/useDiets";
+import React, { createContext, useState, useContext, ReactNode } from "react";
 
 const DietContext = createContext();
 

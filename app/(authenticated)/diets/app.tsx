@@ -1,6 +1,7 @@
 "use client";
 
 import { DietProvider } from "@/app/context/useDietContext";
+import { MacroProvider } from "@/app/context/useMacroContext";
 import DietsSlider from "@/components/by-page/diets/DietsSlider";
 import SelectedDiet from "@/components/by-page/diets/SelectedDiet";
 import Header from "@/components/Header";
@@ -26,9 +27,11 @@ export default function App({ empty, defaultDiet, diets, foods }) {
     <QueryClientProvider client={queryClient}>
       <ReactQueryDevtools initialIsOpen={false} />
       <DietProvider>
-        <Header />
-        <DietsSlider initialDataDiets={diets} />
-        <SelectedDiet serverData={{ empty, defaultDiet, diets }} />
+        <MacroProvider>
+          <Header />
+          <DietsSlider initialDataDiets={diets} />
+          <SelectedDiet serverData={{ empty, defaultDiet, diets }} />
+        </MacroProvider>
       </DietProvider>
     </QueryClientProvider>
   );
