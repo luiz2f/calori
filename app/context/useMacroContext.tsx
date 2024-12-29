@@ -1,6 +1,16 @@
 "use client";
 
-import React, { createContext, useState, useContext, useEffect } from "react";
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  useMemo,
+} from "react";
+import { useDietContext } from "./useDietContext";
+import { useDiets } from "../data/diets/useDiets";
+import { useMeals } from "../data/meals/useMeals";
+import { useQueryClient } from "@tanstack/react-query";
 
 const MacroContext = createContext();
 
@@ -10,12 +20,28 @@ export const MacroProvider: React.FC<{ children: React.ReactNode }> = ({
   const [macros, setMacros] = useState([]);
   const [totalMacros, setTotalMacros] = useState({
     carb: 0,
-    protein: 0,
+    prot: 0,
     fat: 0,
+    kcal: 0,
   });
 
-  const updateMacroForMeal = (mealId, macro) => {
-    console.log("Updating macros for meal:", mealId, macro);
+  console.log(macros);
+
+  const setDefaultMacro = (data) => {
+    const newData = data.meals;
+    console.log("newData", newData);
+    setMacros([]);
+    newData.forEach((meal) => {
+      if (!meal?.mealList.length) {
+        return;
+      }
+      updateMacroForMeal(meal?.id, meal?.mealList[0]?.macro, "default");
+    });
+  };
+
+  console.log(macros);
+
+  const updateMacroForMeal = (mealId, macro, way) => {
     setMacros((prevMacros) => {
       const updatedMacros = [...prevMacros];
       const index = updatedMacros.findIndex((m) => m.mealId === mealId);
@@ -24,77 +50,101 @@ export const MacroProvider: React.FC<{ children: React.ReactNode }> = ({
       } else {
         updatedMacros.push({ mealId, macro });
       }
-      console.log("Updated Macros:", updatedMacros);
       return updatedMacros;
     });
+    // console.log(2, way);
   };
 
   useEffect(() => {
-    console.log("Macros State Before Reducing:", macros);
     const newTotalMacros = macros.reduce(
       (totals, { macro }) => {
-        console.log("Current Macro in Reduction:", macro);
-        totals.carb += Math.round(macro?.carbo || 0);
-        totals.protein += Math.round(macro?.prot || 0);
-        totals.fat += Math.round(macro?.gord || 0);
-        console.log("Intermediate Totals:", totals);
+        totals.carb += Math.round(macro?.carb || 0);
+        totals.prot += Math.round(macro?.prot || 0);
+        totals.fat += Math.round(macro?.fat || 0);
         return totals;
       },
-      { carb: 0, protein: 0, fat: 0 }
+      { carb: 0, prot: 0, fat: 0, kcal: 0 }
     );
-    console.log("New Total Macros:", newTotalMacros);
-    setTotalMacros(newTotalMacros);
+    const kcal = Math.round(
+      newTotalMacros?.carb * 4 +
+        newTotalMacros?.prot * 4 +
+        newTotalMacros?.fat * 9
+    );
+    setTotalMacros({ ...newTotalMacros, kcal });
   }, [macros]);
 
-  const calculateColumns = (macros: { [key: string]: number }[]) => {
-    const sizePadrao = 24;
-    const sizeBase = 12;
-    const sizeExtra = 1.4;
-
+  const calculateColumns = (data: { [key: string]: number }[]) => {
+    console.log("calculatecolumn", data);
+    const sizePadrao = 32;
+    const sizeBase = sizePadrao;
+    const sizeExtra = 2;
+    console.log("column", data);
     const getMaxDigitsForMacroGroup = () => {
       const maxCarbDigits = Math.max(
-        ...macros.map((m) => m.macro.carbo?.toString().length || 0)
+        ...data.map((m) =>
+          m.macro.carb != null ? m.macro.carb.toString().length : 0
+        )
       );
       const maxProtDigits = Math.max(
-        ...macros.map((m) => m.macro.prot?.toString().length || 0)
+        ...data.map((m) =>
+          m.macro.prot != null ? m.macro.prot.toString().length : 0
+        )
       );
       const maxFatDigits = Math.max(
-        ...macros.map((m) => m.macro.gord?.toString().length || 0)
+        ...data.map((m) =>
+          m.macro.fat != null ? m.macro.fat.toString().length : 0
+        )
       );
 
-      // Encontrar o maior número de dígitos entre carbo, proteína e gordura
       const maxMacroDigits = Math.max(
         maxCarbDigits,
         maxProtDigits,
         maxFatDigits
       );
+
       return maxMacroDigits;
     };
+
+    if (data.length === 0) {
+      return null;
+    }
+    console.log("22", 22);
+
     const maxDigits = getMaxDigitsForMacroGroup();
 
-    // Função para calcular o tamanho da coluna baseado no número de dígitos
     const calculateColumnSize = (maxDigits: number) => {
       if (maxDigits === 1) return sizePadrao;
       return sizeBase + sizeExtra * (maxDigits - 1);
     };
 
-    // Calculando o tamanho da coluna baseado no maior valor de dígitos entre carbo, proteína e gordura
-    const macroColumnSize = calculateColumnSize(maxDigits);
-    const kcalColumnSize = calculateColumnSize(
-      Math.max(...macros.map((m) => m.macro.kcal?.toString().length || 0))
-    ); // Coluna de calorias
+    // 🐫🐪 Bug éo seguinte, ta tentando ler mas é udnefined,p orque essa praga pora lgum motivo ta dando undefined?
 
-    // Gerando a string para o estilo de colunas
-    return `1fr ${macroColumnSize}px ${macroColumnSize}px ${macroColumnSize}px ${
-      kcalColumnSize + 4
-    }px `;
+    const macroColumnSize = calculateColumnSize(maxDigits);
+
+    const kcalColumnSize = macros.some((m) => m.macro.kcal != null)
+      ? calculateColumnSize(
+          Math.max(
+            ...macros.map((m) =>
+              m.macro.kcal != null ? m.macro.kcal.toString().length : 0
+            )
+          )
+        )
+      : sizePadrao;
+
+    return `1fr ${macroColumnSize}px ${macroColumnSize}px ${macroColumnSize}px ${kcalColumnSize}px`;
   };
   // Calculando a string de colunas
-  const columns = calculateColumns(macros);
+  const columns = useMemo(() => calculateColumns(macros), [macros]);
 
   return (
     <MacroContext.Provider
-      value={{ macros, updateMacroForMeal, totalMacros, columns }}
+      value={{
+        macros,
+        updateMacroForMeal,
+        setDefaultMacro,
+        totalMacros,
+        columns,
+      }}
     >
       {children}
     </MacroContext.Provider>

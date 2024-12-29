@@ -6,11 +6,9 @@ import Modal from "@/components/ui/Modal";
 import EditRef from "./createEditRef/EditRef";
 import { useDeleteDiet } from "@/app/data/diets/useDeleteDiet";
 import ConfirmDelete from "@/components/ui/ConfirmDelete";
-import { useMacroContext } from "@/app/context/useMacroContext";
 
-export default function DietMealsPage({ meals, dietId, diets, name }) {
+export default function DietMealsPage({ meals, dietId, name }) {
   const { isDeleting, deleteDiet, isSuccess } = useDeleteDiet();
-  const { macros } = useMacroContext();
   const handleDeleteDiet = async () => {
     await deleteDiet(dietId);
   };
@@ -20,12 +18,7 @@ export default function DietMealsPage({ meals, dietId, diets, name }) {
       <Menus>
         <div className="flex flex-col w-full p-4 gap-12 mt-6 ">
           {meals?.map((meal, index) => (
-            <DietMeal
-              key={meal.id}
-              meal={meal}
-              index={index}
-              macros={macros.filter((obj) => obj.mealId === meal.id)[0]}
-            />
+            <DietMeal key={meal.id} meal={meal} index={index} />
           ))}
           <AddRef dietId={dietId} />
         </div>

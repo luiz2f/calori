@@ -62,7 +62,7 @@ export async function getDietMeals(dietId: string) {
       },
     },
   });
-
+  console.log("fetch");
   return dietMeals;
 }
 

@@ -1,57 +1,64 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Toogle from "@/components/ui/Toogle";
 import { useMacroContext } from "@/app/context/useMacroContext";
 
 export default function DietMacros() {
-  const { totalMacros } = useMacroContext();
-  const weight = 78;
-  const data = {
-    "g/KG": {
-      carbo: (totalMacros.carb / weight).toFixed(1),
-      prot: (totalMacros.protein / weight).toFixed(1),
-      gord: (totalMacros.fat / weight).toFixed(1),
-    },
-    kcal: {
-      carbo: (totalMacros.carb * 4).toFixed(0),
-      prot: (totalMacros.protein * 4).toFixed(0),
-      gord: (totalMacros.fat * 9).toFixed(0),
-    },
-    "% kcal": {
-      carbo: `${(
-        ((totalMacros.carb * 4) /
-          (totalMacros.carb * 4 +
-            totalMacros.protein * 4 +
-            totalMacros.fat * 9)) *
-        100
-      ).toFixed(0)}%`,
-      prot: `${(
-        ((totalMacros.protein * 4) /
-          (totalMacros.carb * 4 +
-            totalMacros.protein * 4 +
-            totalMacros.fat * 9)) *
-        100
-      ).toFixed(0)}%`,
-      gord: `${(
-        ((totalMacros.fat * 9) /
-          (totalMacros.carb * 4 +
-            totalMacros.protein * 4 +
-            totalMacros.fat * 9)) *
-        100
-      ).toFixed(0)}%`,
-    },
-  };
-  const kcal = Math.round(
-    (totalMacros.carb + totalMacros.protein) * 4 + totalMacros.fat * 9
-  );
-
   const [currentMetric, setCurrentMetric] = useState<
     "g/KG" | "kcal" | "% kcal"
   >("kcal");
+  const [data, setData] = useState({
+    "g/KG": {
+      carb: 0,
+      prot: 0,
+      fat: 0,
+    },
+    kcal: {
+      carb: 0,
+      prot: 0,
+      fat: 0,
+    },
+    "% kcal": {
+      carb: 0,
+      prot: 0,
+      fat: 0,
+    },
+    totalKcal: 0,
+  });
 
-  const buttonStyle =
-    "flex gap-1 items-center text-sm text-blackmed w-fit content-end";
-  const iconStyle = "w-5 h-5 text-blacklight";
+  const { totalMacros } = useMacroContext();
+  const weight = 78;
+
+  useEffect(() => {
+    const totalKcal =
+      totalMacros.carb * 4 + totalMacros.prot * 4 + totalMacros.fat * 9;
+    const newData = {
+      "g/KG": {
+        carb: (totalMacros.carb / weight).toFixed(1),
+        prot: (totalMacros.prot / weight).toFixed(1),
+        fat: (totalMacros.fat / weight).toFixed(1),
+      },
+      kcal: {
+        carb: (totalMacros.carb * 4).toFixed(0),
+        prot: (totalMacros.prot * 4).toFixed(0),
+        fat: (totalMacros.fat * 9).toFixed(0),
+      },
+      "% kcal": {
+        carb: !isNaN(((totalMacros.carb * 4) / totalKcal) * 100)
+          ? `${(((totalMacros.carb * 4) / totalKcal) * 100).toFixed(0)}%`
+          : "0%",
+        prot: !isNaN(((totalMacros.prot * 4) / totalKcal) * 100)
+          ? `${(((totalMacros.prot * 4) / totalKcal) * 100).toFixed(0)}%`
+          : "0%",
+        fat: !isNaN(((totalMacros.fat * 9) / totalKcal) * 100)
+          ? `${(((totalMacros.fat * 9) / totalKcal) * 100).toFixed(0)}%`
+          : "0%",
+      },
+      totalKcal: totalKcal,
+    };
+
+    setData(newData);
+  }, [totalMacros, weight]); // Remove `newData` and include `totalMacros` and `weight`
 
   return (
     <div className="flex flex-col w-full p-4">
@@ -69,9 +76,9 @@ export default function DietMacros() {
         <div className="grid grid-cols-3 max-w-64 m-auto">
           <div className="flex flex-col align-middle text-center">
             <div className="text-2xl mb-1">🍞</div>
-            <div>Carbo</div>
+            <div>carb</div>
             <div className="text-2xl text-darkgreen">
-              {data[currentMetric].carbo}
+              {data[currentMetric].carb}
             </div>
           </div>
           <div className="flex flex-col align-middle text-center">
@@ -83,9 +90,9 @@ export default function DietMacros() {
           </div>
           <div className="flex flex-col align-middle text-center">
             <div className="text-2xl mb-1">🥑</div>
-            <div>Gord</div>
+            <div>fat</div>
             <div className="text-2xl text-darkgreen">
-              {data[currentMetric].gord}
+              {data[currentMetric].fat}
             </div>
           </div>
         </div>
@@ -95,7 +102,7 @@ export default function DietMacros() {
 
         <div className=" w-full flex justify-between flex-col text-center">
           <div className="leading-[8px]">Total</div>
-          <div className="font-black text-4xl">{kcal}</div>
+          <div className="font-black text-4xl">{data.totalKcal}</div>
           <div className="leading-[8px]">kcal</div>
         </div>
         <div className="flex w-full bg-grey10 h-[1px]"></div>

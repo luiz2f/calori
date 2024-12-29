@@ -6,10 +6,13 @@ import DietMealsPage from "./selectedDiet/Refs/DietMealsPage";
 import { useDietContext } from "@/app/context/useDietContext";
 import { useMeals } from "@/app/data/meals/useMeals";
 import { useDiets } from "@/app/data/diets/useDiets";
+import { useMacroContext } from "@/app/context/useMacroContext";
+import { useEffect } from "react";
 
 export default function SelectedDiet({ serverData }) {
-  const { diets, defaultDiet, empty } = serverData;
+  const { defaultDiet, empty } = serverData;
   const { selectedDiet: selectedDietContext } = useDietContext();
+  const { setDefaultMacro } = useMacroContext();
   const selectedDietServer = defaultDiet?.id;
   const dietId = selectedDietContext || selectedDietServer;
 
@@ -21,8 +24,13 @@ export default function SelectedDiet({ serverData }) {
   } = useMeals(serverData?.defaultDiet, dietId);
   const selectedDietName = dietsSlider.filter((obj) => obj.id === dietId)[0]
     ?.name;
-
   const name = selectedDietName || diet?.name;
+
+  useEffect(() => {
+    if (diet) {
+      setDefaultMacro(diet);
+    }
+  }, [diet]);
   if (dietsSlider?.length === 0) {
     return (
       <div className="w-full flex flex-col h-full text-center">
@@ -39,7 +47,6 @@ export default function SelectedDiet({ serverData }) {
         key={dietId}
         meals={diet?.meals}
         dietId={dietId}
-        diets={diets}
         name={name}
       />
     </div>

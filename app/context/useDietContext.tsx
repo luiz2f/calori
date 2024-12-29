@@ -1,13 +1,24 @@
 "use client";
 import React, { createContext, useState, useContext, ReactNode } from "react";
 
-const DietContext = createContext();
+interface DietProviderProps {
+  children: ReactNode;
+  initialDiet: string;
+}
 
-export const DietProvider: React.FC<{ children: ReactNode }> = ({
+const DietContext = createContext<{
+  selectedDiet: string;
+  setSelectedDiet: React.Dispatch<React.SetStateAction<string>>;
+  meals: any[];
+  setMeals: React.Dispatch<React.SetStateAction<any[]>>;
+} | null>(null);
+
+export const DietProvider: React.FC<DietProviderProps> = ({
   children,
+  initialDiet,
 }) => {
-  const [selectedDiet, setSelectedDiet] = useState(null);
-  const [meals, setMeals] = useState([]);
+  const [selectedDiet, setSelectedDiet] = useState(initialDiet);
+  const [meals, setMeals] = useState<any[]>([]);
 
   return (
     <DietContext.Provider

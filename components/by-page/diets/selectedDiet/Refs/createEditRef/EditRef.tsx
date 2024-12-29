@@ -11,6 +11,7 @@ import { v4 as uuidv4 } from "uuid";
 import { useUpdateMeal } from "@/app/data/meals/useUpdateMeal";
 import { useCreateMeal } from "@/app/data/meals/useCreateMeal";
 import Spinner from "@/components/ui/Spinner";
+import { useFoods } from "@/app/data/foods/useFoods";
 
 export default function EditRef({
   creating = false,
@@ -35,6 +36,7 @@ export default function EditRef({
 }) {
   const [isCreating, setIsCreating] = useState(creating);
   const { data: diets } = useDiets();
+
   const [type, setType] = useState<"Lista" | "Alimentos">(typeInput);
   const [selectedVariation, setSelectedVariation] = useState(currentIndex);
   const { closeLast } = useContext(ModalContext);
@@ -222,6 +224,43 @@ export default function EditRef({
       )
     );
   };
+  const handleDuplicateFood = (mealId, foodId) => {
+    // Encontre a refeição que contém o alimento a ser duplicado
+    const mealToUpdate = mealList.find((meal) => meal.id === mealId);
+    if (!mealToUpdate) {
+      console.error("Refeição não encontrada");
+      return;
+    }
+
+    // Encontre o alimento dentro da refeição
+    const foodToDuplicate = mealToUpdate.mealListItems.find(
+      (item) => item.id === foodId
+    );
+    if (!foodToDuplicate) {
+      console.error("Alimento não encontrado");
+      return;
+    }
+
+    // Criação da cópia do alimento
+    const duplicatedFood = {
+      ...foodToDuplicate,
+      id: uuidv4(),
+      food: { ...foodToDuplicate.food },
+      unity: { ...foodToDuplicate.unity },
+    };
+
+    // Atualiza a refeição com o novo alimento duplicado
+    setMealList((prevMealList) =>
+      prevMealList.map((meal) =>
+        meal.id === mealId
+          ? {
+              ...meal,
+              mealListItems: [...meal.mealListItems, duplicatedFood], // Adiciona o novo alimento duplicado
+            }
+          : meal
+      )
+    );
+  };
 
   useEffect(() => {
     if (createVariation) {
@@ -387,6 +426,7 @@ export default function EditRef({
             handleAddVariation={handleAddVariation}
             handleAddFood={handleAddFood}
             deleteFoodFromMeal={deleteFoodFromMeal}
+            handleDuplicateFood={handleDuplicateFood}
           />
         )}
 

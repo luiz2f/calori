@@ -26,7 +26,7 @@ export default function App({ empty, defaultDiet, diets, foods }) {
   return (
     <QueryClientProvider client={queryClient}>
       <ReactQueryDevtools initialIsOpen={false} />
-      <DietProvider>
+      <DietProvider initialDiet={id}>
         <MacroProvider>
           <Header />
           <DietsSlider initialDataDiets={diets} />

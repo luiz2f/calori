@@ -6,7 +6,6 @@ import { ModalContext } from "@/components/ui/Modal";
 import DietEditRefRow from "./DietEditRefRow";
 import { v4 as uuidv4 } from "uuid";
 import Spinner from "@/components/ui/Spinner";
-import { useMeals } from "@/app/data/meals/useMeals";
 import { useUpdateDiet } from "@/app/data/diets/useUpdateDiet";
 
 export default function EditDiet({ diet }) {

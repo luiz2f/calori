@@ -4,6 +4,7 @@ import Table from "./RefTableModel";
 import RefSlider from "./RefSlider";
 import { ModalContext } from "@/components/ui/Modal";
 import { useMacroContext } from "@/app/context/useMacroContext";
+import macro from "styled-jsx/macro";
 
 export default function RefTable({
   mealId,
@@ -13,6 +14,7 @@ export default function RefTable({
   mealsList,
   modalName,
   macros,
+  selectedMeal,
 }) {
   const { open } = useContext(ModalContext);
   const { columns } = useMacroContext();
@@ -51,22 +53,23 @@ export default function RefTable({
     );
   }
   const meal = mealsList[currentIndex];
+  const macro = selectedMeal?.macro;
+  // console.log("selectedMeal", selectedMeal);
+  // console.log("macro", macro);
 
   function transformFoodData(foodData) {
     return foodData?.map((item) => {
       const { food, unity, quantity } = item;
 
       const carb = Math.round(food.carb * (quantity * unity.unitMultiplier));
-      const protein = Math.round(
-        food.protein * (quantity * unity.unitMultiplier)
-      );
+      const prot = Math.round(food.protein * (quantity * unity.unitMultiplier));
       const fat = Math.round(food.fat * (quantity * unity.unitMultiplier));
-      const kcal = Math.round((carb + protein) * 4 + fat * 9);
+      const kcal = Math.round((carb + prot) * 4 + fat * 9);
 
       return {
         name: food.name,
         carb: carb,
-        protein: protein,
+        prot: prot,
         fat: fat,
         kcal: kcal,
         quantity: quantity,
@@ -82,18 +85,17 @@ export default function RefTable({
   function handleClickNoVar() {
     open(`editMealVar${mealId}`);
   }
-
-  console.log(columns);
-
   const simplifiedData = transformFoodData(meal?.mealListItems);
+  const defaultColumns = "1fr 32px 32px 32px 32px";
+  const gridColumn = columns || defaultColumns;
   return (
-    <Table columns={columns}>
+    <Table columns={gridColumn}>
       <Table.Header
         name={meal?.name}
-        carbo={Math.round(macros?.carbo)}
-        prot={Math.round(macros?.gord)}
-        fat={Math.round(macros?.carbo)}
-        kcal={Math.round(macros?.kcal)}
+        carbo={Math.round(macro?.carb)}
+        prot={Math.round(macro?.prot)}
+        fat={Math.round(macro?.fat)}
+        kcal={Math.round(macro?.kcal)}
       />
       <Table.Body>
         {simplifiedData?.length ? (
@@ -102,7 +104,7 @@ export default function RefTable({
               key={index}
               name={item.name}
               carbo={item.carb}
-              prot={item.protein}
+              prot={item.prot}
               fat={item.fat}
               kcal={item.kcal}
             />

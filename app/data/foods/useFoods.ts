@@ -8,5 +8,7 @@ export function useFoods() {
     queryFn: getFoods,
   });
 
+  console.log("usefoods", data);
+
   return { data, isLoading };
 }

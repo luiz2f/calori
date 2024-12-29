@@ -14,10 +14,11 @@ import Select from "react-select";
 export default function EditFoodRow({
   mealId,
   food,
+  foods,
   onFoodChange,
   onDeleteFood,
+  duplicateFood,
 }) {
-  const { data: foods } = useFoods();
   const unityDefault = {
     value: food.unity.id,
     label: food.unity.un,
@@ -163,7 +164,7 @@ export default function EditFoodRow({
         </Menus.Toggle>
 
         <Menus.List id={`editreffood${food?.id}`}>
-          <Menus.Button icon={<HiOutlineDuplicate />}>
+          <Menus.Button icon={<HiOutlineDuplicate />} onClick={duplicateFood}>
             Duplicar alimento
           </Menus.Button>
           <Modal.Open opens={modalName}>

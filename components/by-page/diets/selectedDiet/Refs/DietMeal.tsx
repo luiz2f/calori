@@ -14,10 +14,12 @@ import RefTable from "./RefTable";
 import { useDeleteMeal } from "@/app/data/meals/useDeleteMeal";
 import { useMacroContext } from "@/app/context/useMacroContext";
 
-export default function DietMeal({ meal, macros }) {
+export default function DietMeal({ meal }) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [defaultIndex, setDefaultIndex] = useState(true);
   const { isDeleting, deleteMeal, isSuccess } = useDeleteMeal();
   const { updateMacroForMeal } = useMacroContext();
+  const selectedMeal = meal.mealList[currentIndex];
 
   const goLeft = () => {
     setCurrentIndex((prevIndex) =>
@@ -34,27 +36,15 @@ export default function DietMeal({ meal, macros }) {
   };
 
   useEffect(() => {
-    if (!meal.mealList.length) {
+    if (currentIndex === 0 && defaultIndex) {
       return;
     }
-    const selectedVariation = meal.mealList[currentIndex];
-    const macro = selectedVariation.mealListItems.reduce(
-      (acc, item) => {
-        acc.carbo += item.food.carb * item.quantity * item.unity.unitMultiplier;
-        acc.prot +=
-          item.food.protein * item.quantity * item.unity.unitMultiplier;
-        acc.gord += item.food.fat * item.quantity * item.unity.unitMultiplier;
-        acc.kcal +=
-          item.food.carb * item.quantity * item.unity.unitMultiplier * 4 +
-          item.food.protein * item.quantity * item.unity.unitMultiplier * 4 +
-          item.food.fat * item.quantity * item.unity.unitMultiplier * 9;
-        return acc;
-      },
-      { carbo: 0, prot: 0, gord: 0, kcal: 0 }
-    );
-    updateMacroForMeal(meal.id, macro);
-  }, [currentIndex, meal]);
+    setDefaultIndex(false);
+    const macro = selectedMeal?.macro;
+    updateMacroForMeal(meal.id, macro, "dietMeal");
+  }, [currentIndex, meal, defaultIndex]); // Agora depende de `isFirstLoad`
 
+  // console.log(meal);
   const deleteModalName = `deleteMeal${meal.id}`;
 
   return (
@@ -120,7 +110,7 @@ export default function DietMeal({ meal, macros }) {
           goLeft={goLeft}
           goRight={goRight}
           mealsList={meal?.mealList}
-          macros={macros?.macro}
+          selectedMeal={selectedMeal}
         />
         {/* 😀 */}
       </div>

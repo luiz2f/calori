@@ -3,6 +3,7 @@ import RefSlider from "../RefSlider";
 import EditFoodRow from "./editFood/EditFoodRow";
 import Modal from "@/components/ui/Modal";
 import ConfirmDelete from "@/components/ui/ConfirmDelete";
+import { useFoods } from "@/app/data/foods/useFoods";
 
 export default function EditRefFoods({
   mealsList,
@@ -14,9 +15,11 @@ export default function EditRefFoods({
   handleAddVariation,
   handleAddFood,
   deleteFoodFromMeal,
+  handleDuplicateFood,
 }) {
   const currentMeal = mealsList[currentIndex];
   const [variationName, setVariationName] = useState(currentMeal?.name || "");
+  const { data: foods } = useFoods();
 
   const modalName = `deleteMeal${currentMeal?.id}`;
   function handleDeleteMeal() {
@@ -48,7 +51,7 @@ export default function EditRefFoods({
     setVariationName(newName);
     onNameChange(currentMeal?.id, newName);
   };
-  const foods = currentMeal?.mealListItems || [];
+  const refFoods = currentMeal?.mealListItems || [];
   const handleFoodChangeWrapper = (foodId, data) => {
     onFoodChange(currentMeal?.id, foodId, data);
   };
@@ -111,7 +114,7 @@ export default function EditRefFoods({
               </div>
             </div>
           </div>
-          {foods.length > 0 ? (
+          {refFoods.length > 0 ? (
             <>
               <div className="grid grid-cols-edref gap-2 text-center text-sm text-grey30 mb-1">
                 <div>Quant.</div>
@@ -120,13 +123,17 @@ export default function EditRefFoods({
                 <div></div>
               </div>
               <div className="grid grid-cols-edref gap-2 w-full border-y-1 border-lightgreen py-3 text-sm mb-2">
-                {foods?.map((food, index) => (
+                {refFoods?.map((food, index) => (
                   <EditFoodRow
                     mealId={currentMeal?.id}
                     onDeleteFood={deleteFoodFromMeal}
                     key={`${food.id}-${index}-${currentMeal?.id}`}
                     food={food}
                     onFoodChange={handleFoodChangeWrapper}
+                    duplicateFood={() =>
+                      handleDuplicateFood(currentMeal?.id, food.id)
+                    }
+                    foods={foods}
                   />
                 ))}
               </div>
@@ -138,10 +145,10 @@ export default function EditRefFoods({
             <div
               onClick={() => handleAddFood(currentMeal?.id)}
               className={`text-darkgreen text-sm cursor-pointer ml-2 ${
-                !foods.length && "underline underline-offset-4"
+                !refFoods.length && "underline underline-offset-4"
               }`}
             >
-              {!foods.length
+              {!refFoods.length
                 ? "+ Adicionar primeiro alimento"
                 : "+ Adicionar Alimento"}
             </div>
