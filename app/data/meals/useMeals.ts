@@ -42,9 +42,9 @@ export function useMeals(initialData, dietId) {
     if (data?.meals) {
       return {
         ...data,
-        meals: data.meals.map((meal) => ({
+        meals: data?.meals?.map((meal) => ({
           ...meal,
-          mealList: meal.mealList.map((variation) => ({
+          mealList: meal?.mealList?.map((variation) => ({
             ...variation,
             macro: calculateMacros(variation),
           })),

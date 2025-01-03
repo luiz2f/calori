@@ -5,6 +5,8 @@ import { MacroProvider } from "@/app/context/useMacroContext";
 import DietsSlider from "@/components/by-page/diets/DietsSlider";
 import SelectedDiet from "@/components/by-page/diets/SelectedDiet";
 import Header from "@/components/Header";
+import Menus from "@/components/ui/Menu";
+import Modal from "@/components/ui/Modal";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useEffect } from "react";
@@ -32,9 +34,13 @@ export default function App({ empty, defaultDiet, diets, foods }) {
       <ReactQueryDevtools initialIsOpen={false} />
       <DietProvider initialDiet={id}>
         <MacroProvider>
-          <Header />
-          <DietsSlider initialDataDiets={diets} />
-          <SelectedDiet serverData={{ empty, defaultDiet, diets }} />
+          <Modal>
+            <Menus>
+              <Header />
+              <DietsSlider initialDataDiets={diets} />
+              <SelectedDiet serverData={{ empty, defaultDiet, diets }} />
+            </Menus>
+          </Modal>
         </MacroProvider>
       </DietProvider>
     </QueryClientProvider>

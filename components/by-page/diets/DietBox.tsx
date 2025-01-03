@@ -96,7 +96,7 @@ export default function DietBox({
           />
         </Modal.Window>
         <Modal.Window name={`editDiet${diet.id}`}>
-          <EditDiet diet={diet} />
+          <EditDiet diet={diet} modalName={`editDiet${diet.id}`} />
         </Modal.Window>
       </div>
       <div className="font-bold pr-3 w-full align-bottom text-right">

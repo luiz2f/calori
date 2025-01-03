@@ -9,16 +9,7 @@ import Spinner from "@/components/ui/Spinner";
 import { useSession } from "next-auth/react";
 import { useCreateDiet } from "@/app/data/diets/useCreateDiet";
 
-const BaseRefs = [
-  { id: "1", name: "Café da Manhã", time: "09:00" },
-  { id: "2", name: "Almoço", time: "12:00" },
-  { id: "3", name: "Lanche", time: "17:00" },
-  { id: "4", name: "Jantar", time: "20:00" },
-  { id: "5", name: "Ceia", time: "22:00" },
-];
-
 export default function CreateDiet({ modalName }) {
-  const { isCreating, createDiet, isSuccess } = useCreateDiet();
   const { close } = useContext(ModalContext);
   const [dietName, setDietName] = useState("Nova Dieta");
   const [refs, setRefs] = useState(BaseRefs);
@@ -26,11 +17,6 @@ export default function CreateDiet({ modalName }) {
   const [isFormValid, setIsFormValid] = useState(true);
   const { data } = useSession();
   const userId = data?.userId;
-  useEffect(() => {
-    if (!isCreating && isSuccess) {
-      close(modalName);
-    }
-  }, [isCreating, isSuccess, close, modalName]);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();

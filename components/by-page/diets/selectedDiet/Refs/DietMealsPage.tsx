@@ -1,11 +1,11 @@
 "use client";
-import Menus from "@/components/ui/Menu";
 import AddRef from "./AddRef";
 import DietMeal from "./DietMeal";
 import Modal from "@/components/ui/Modal";
 import EditRef from "./createEditRef/EditRef";
 import { useDeleteDiet } from "@/app/data/diets/useDeleteDiet";
 import ConfirmDelete from "@/components/ui/ConfirmDelete";
+import UnsavedChanges from "@/components/ui/UnsavedChanges";
 
 export default function DietMealsPage({ meals, dietId, name }) {
   const { isDeleting, deleteDiet, isSuccess } = useDeleteDiet();
@@ -14,21 +14,21 @@ export default function DietMealsPage({ meals, dietId, name }) {
   };
 
   return (
-    <Modal>
-      <Menus>
-        <div className="flex flex-col w-full p-4 gap-12 mt-6 ">
-          {meals?.map((meal, index) => (
-            <DietMeal key={meal.id} meal={meal} index={index} />
-          ))}
-          <AddRef dietId={dietId} />
-        </div>
-      </Menus>
+    <>
+      <div className="flex flex-col w-full p-4 gap-12 mt-6 ">
+        {meals?.map((meal, index) => (
+          <DietMeal key={meal.id} meal={meal} index={index} />
+        ))}
+        <AddRef dietId={dietId} />
+      </div>
       <Modal.Open opens={`deleteDietG${dietId}`}>
         <div className="text-center mt-4 mb-4 underline-offset-2 underline cursor-pointer text-darkred">
           Apagar Dieta
         </div>
       </Modal.Open>
-
+      <Modal.Window name="unsavedChanges">
+        <UnsavedChanges />
+      </Modal.Window>
       <Modal.Window name={`deleteDietG${dietId}`}>
         <ConfirmDelete
           loading={isDeleting}
@@ -47,8 +47,9 @@ export default function DietMealsPage({ meals, dietId, name }) {
           meal={null}
           currentIndex={0}
           typeInput="Alimentos"
+          modalName="createNewMeal"
         />
       </Modal.Window>
-    </Modal>
+    </>
   );
 }

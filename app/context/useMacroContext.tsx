@@ -7,10 +7,6 @@ import React, {
   useEffect,
   useMemo,
 } from "react";
-import { useDietContext } from "./useDietContext";
-import { useDiets } from "../data/diets/useDiets";
-import { useMeals } from "../data/meals/useMeals";
-import { useQueryClient } from "@tanstack/react-query";
 
 const MacroContext = createContext();
 

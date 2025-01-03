@@ -15,7 +15,9 @@ interface ModalContextType {
   open: (name: string) => void;
   openNames: string[];
   close: (name: string) => void;
-  closeLast: () => void;
+  closeLast: (force?: boolean) => void;
+  unsavedChanges: (name: string) => void;
+  closeUnsaved: () => void;
 }
 
 interface ModalProps {
@@ -39,27 +41,72 @@ export const ModalContext = createContext<ModalContextType>({
   open: () => {},
   openNames: [],
   close: () => {},
+  closeLast: () => {},
+  unsavedChanges: () => {},
+  closeUnsaved: () => {},
 });
 
 function Modal({ children }: ModalProps) {
   const [openNames, setOpenNames] = useState<string[]>([]);
-  console.log(openNames);
+  const [modified, setModified] = useState<string>("");
+
+  console.log(modified, openNames);
+  const canClose = new Map(
+    openNames.map((name) => [name, !modified?.includes(name)])
+  );
+
+  const unsavedChanges = (name: string) => setModified(name);
   const open = (name: string) => setOpenNames((prev) => [...prev, name]);
   const close = (name: string) => {
-    // console.log("🐇 fechando especifico");
-    // console.log(name, openNames);
-    setOpenNames((prev) => prev.filter((openName) => openName !== name));
+    const canCloseModal = canClose.get(name);
+    if (canCloseModal) {
+      setOpenNames((prev) => prev.filter((n) => n !== name));
+    } else {
+      openUnsaved();
+    }
   };
-  const closeLast = () => {
-    // console.log("🐢 fechando ultimo");
-    setOpenNames((prev) => prev.slice(0, prev.length - 1));
-  }; // Fecha o modal mais recente
-
+  const closeLast = (force = false) => {
+    setOpenNames((prev) => {
+      const lastName = prev.at(-1);
+      if (lastName) {
+        const canCloseLast = canClose.get(lastName);
+        if (canCloseLast || force) {
+          return prev.slice(0, prev.length - 1);
+        } else {
+          openUnsaved();
+        }
+      }
+      return prev;
+    });
+  };
+  const closeUnsaved = () => {
+    setModified("");
+    close("unsavedChanges");
+    closeLast(true);
+  };
+  const openUnsaved = () => {
+    setOpenNames((prev) => {
+      if (!prev.includes("unsavedChanges")) {
+        return [...prev, "unsavedChanges"];
+      }
+      return prev;
+    });
+  };
   useEffect(() => {
-    setTimeout(() => {
-      open("create-food");
-    }, 1000);
-  }, []);
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (modified) {
+        e.preventDefault();
+        e.returnValue = ""; // Show the default browser alert
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [modified]);
+
   // useEffect(() => {
   //   console.log(`Modal mounted: ${name}`);
   //   return () => {
@@ -68,7 +115,16 @@ function Modal({ children }: ModalProps) {
   // });
 
   return (
-    <ModalContext.Provider value={{ open, close, closeLast, openNames }}>
+    <ModalContext.Provider
+      value={{
+        open,
+        close,
+        closeLast,
+        openNames,
+        unsavedChanges,
+        closeUnsaved,
+      }}
+    >
       {children}
     </ModalContext.Provider>
   );
@@ -82,7 +138,7 @@ function Open({ children, opens }: OpenProps) {
       e?.preventDefault();
       open(opens);
       if (children.props.onClick) {
-        children.props.onClick(e); // Chama a função onClick original se existir
+        children.props.onClick(e);
       }
     },
   });
@@ -120,7 +176,7 @@ function Window({ children, name }: WindowProps) {
         }`}
       />
       <div
-        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-4 w-11/12 flex flex-col max-h-[90vh] bg-white rounded-lg"
+        className="fixed overflow-y-auto top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-4 w-11/12 flex flex-col max-h-[90vh] bg-white rounded-lg"
         data-name={name}
         ref={ref}
       >
@@ -133,7 +189,7 @@ function Window({ children, name }: WindowProps) {
         >
           <HiXMark className="w-4 h-4 text-gray-500" />
         </button>
-        <div className="flex flex-col h-full overflow-y-auto ">
+        <div className="flex flex-col h-full  ">
           {cloneElement(children, { onCloseModal: close })}
         </div>
       </div>

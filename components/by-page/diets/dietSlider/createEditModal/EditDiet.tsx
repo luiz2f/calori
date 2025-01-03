@@ -7,22 +7,61 @@ import DietEditRefRow from "./DietEditRefRow";
 import { v4 as uuidv4 } from "uuid";
 import Spinner from "@/components/ui/Spinner";
 import { useUpdateDiet } from "@/app/data/diets/useUpdateDiet";
+import { useCreateDiet } from "@/app/data/diets/useCreateDiet";
+import { useSession } from "next-auth/react";
 
-export default function EditDiet({ diet }) {
-  const { closeLast } = useContext(ModalContext);
+const BaseRefs = [
+  { id: "1", name: "Café da Manhã", time: "09:00" },
+  { id: "2", name: "Almoço", time: "12:00" },
+  { id: "3", name: "Lanche", time: "17:00" },
+  { id: "4", name: "Jantar", time: "20:00" },
+  { id: "5", name: "Ceia", time: "22:00" },
+];
 
-  const meals = diet?.meals;
-  const [dietName, setDietName] = useState(diet.name);
-  const [refs, setRefs] = useState(meals || []);
-  const [originalRefs, setOriginalRefs] = useState(meals || []);
+export default function EditDiet({ diet, modalName, creating = false }) {
+  const { close, unsavedChanges } = useContext(ModalContext);
+
+  const meals = creating ? BaseRefs : diet?.meals;
+  const name = creating ? "Nova Dieta" : diet?.name;
+  const modifiedDefault = creating ? true : false;
+  const [dietName, setDietName] = useState(name);
+  const [refs, setRefs] = useState(meals);
+  const [originalRefs, setOriginalRefs] = useState(meals);
   const [errors, setErrors] = useState({});
   const [isFormValid, setIsFormValid] = useState(true);
-  const [isModified, setIsModified] = useState(false);
-  const [updated, setUpdated] = useState(false);
+  const [isModified, setIsModified] = useState(modifiedDefault);
+  const { data } = useSession();
+  const userId = data?.userId;
 
-  const { isUpdating, isSuccess, updateDiet } = useUpdateDiet();
+  const { isUpdating, updateDiet, isSuccess: isSuccessU } = useUpdateDiet();
+  const { isCreating, createDiet, isSuccess: isSuccessC } = useCreateDiet();
 
+  const isLoading = creating ? isCreating : isUpdating;
+  const isSuccess = creating ? isSuccessC : isSuccessU;
   const isDisabled = !isFormValid || !isModified || isUpdating;
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (creating) {
+      try {
+        await createDiet({
+          userId,
+          dietName: dietName,
+          refs: refs,
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    } else {
+      updateDiet({ dietName, dietId: diet?.id, refs });
+    }
+  };
+
+  useEffect(() => {
+    if (!isCreating && isSuccess && creating) {
+      close(modalName);
+    }
+  }, [isCreating, isSuccess, close, modalName, creating]);
 
   useEffect(() => {
     if (meals) {
@@ -32,12 +71,24 @@ export default function EditDiet({ diet }) {
   }, [meals]);
 
   useEffect(() => {
+    if (!creating) {
+      if (isModified) {
+        unsavedChanges(modalName);
+      } else {
+        unsavedChanges("");
+      }
+    }
+  }, [unsavedChanges, modalName, isModified]);
+
+  useEffect(() => {
     // Verifica se houve alterações em relação aos dados originais
-    const isModified =
-      JSON.stringify(refs) !== JSON.stringify(originalRefs) ||
-      dietName !== diet.name;
-    setIsModified(isModified);
-  }, [refs, dietName, originalRefs, diet.name]);
+    if (!creating) {
+      const isModified =
+        JSON.stringify(refs) !== JSON.stringify(originalRefs) ||
+        dietName !== name;
+      setIsModified(isModified);
+    }
+  }, [refs, dietName, originalRefs, name, creating]);
 
   useEffect(() => {
     const hasError = Object.values(errors).some(Boolean);
@@ -94,11 +145,6 @@ export default function EditDiet({ diet }) {
     setRefs((prevRefs) => prevRefs.filter((ref) => ref.id !== id));
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    updateDiet({ dietName, dietId: diet?.id, refs });
-  };
-
   return (
     <Menus>
       <form onSubmit={handleSubmit} className="relative">
@@ -142,7 +188,14 @@ export default function EditDiet({ diet }) {
           </button>
         )}
         <div className="flex gap-4 px-1 mt-6">
-          <Button size="small" cw="lightred" onClick={() => closeLast()}>
+          <Button
+            size="small"
+            cw="lightred"
+            onClick={(e) => {
+              e.stopPropagation();
+              close(modalName);
+            }}
+          >
             Cancelar
           </Button>
           <Button size="small" type="submit" disabled={isDisabled}>
@@ -150,7 +203,7 @@ export default function EditDiet({ diet }) {
           </Button>
         </div>
       </form>
-      {isUpdating && (
+      {isLoading && (
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex justify-center items-center bg-white w-full h-full bg-opacity-80">
           <Spinner />
         </div>

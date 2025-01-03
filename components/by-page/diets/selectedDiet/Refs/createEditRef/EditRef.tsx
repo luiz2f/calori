@@ -2,7 +2,7 @@
 import { useState, useContext, useEffect, use } from "react";
 import Button from "@/components/ui/Button";
 import Menus from "@/components/ui/Menu";
-import { ModalContext } from "@/components/ui/Modal";
+import Modal, { ModalContext } from "@/components/ui/Modal";
 import EditRefList from "./EditRefList";
 import EditRefFoods from "./EditRefFoods";
 import Toogle from "@/components/ui/Toogle";
@@ -23,6 +23,7 @@ export default function EditRef({
   goLeft,
   goRight,
   dietFromId,
+  modalName,
 }: {
   dietFromId?: string;
   creating: boolean;
@@ -33,13 +34,12 @@ export default function EditRef({
   currentIndex: number;
   goLeft: () => void;
   goRight: () => void;
+  modalName: string;
 }) {
-  const [isCreating, setIsCreating] = useState(creating);
   const { data: diets } = useDiets();
-
   const [type, setType] = useState<"Lista" | "Alimentos">(typeInput);
   const [selectedVariation, setSelectedVariation] = useState(currentIndex);
-  const { closeLast } = useContext(ModalContext);
+  const { close, unsavedChanges } = useContext(ModalContext);
   const [mealName, setMealName] = useState(
     creating ? "Nova Refeição" : meal?.name
   );
@@ -53,18 +53,20 @@ export default function EditRef({
   const disabled = !!errors.name || !!errors.time;
   const dietId = dietFromId || meal?.dietId;
   const diet = diets.filter((obj) => obj.id === dietId)[0];
-  const {
-    isUpdating: isUpdatingU,
-    updateMeal,
-    isSuccess: isSuccessU,
-  } = useUpdateMeal();
-  const {
-    isUpdating: isUpdatingC,
-    createMeal,
-    isSuccess: isSuccessC,
-  } = useCreateMeal();
-  const isUpdating = creating ? isUpdatingC : isUpdatingU;
+
+  const { isUpdating, updateMeal, isSuccess: isSuccessU } = useUpdateMeal();
+  const { isCreating, createMeal, isSuccess: isSuccessC } = useCreateMeal();
+
+  const isLoading = creating ? isCreating : isUpdating;
   const isSuccess = creating ? isSuccessC : isSuccessU;
+
+  useEffect(() => {
+    if (isModified) {
+      unsavedChanges(modalName);
+    } else {
+      unsavedChanges(null);
+    }
+  }, [unsavedChanges, modalName, isModified]);
   useEffect(() => {
     if (meal?.mealList) {
       setMealList(meal?.mealList);
@@ -363,7 +365,7 @@ export default function EditRef({
     <Menus>
       <div id="editref" className="relative flex flex-col h-full">
         <div className="font-bold text-xl text-center">
-          {isCreating ? "Criar Refeição" : "Editar Refeição"}
+          {creating ? "Criar Refeição" : "Editar Refeição"}
         </div>
         <div className="text-base mb-3 text-grey50 text-center">
           Dieta - {diet?.name}
@@ -440,7 +442,14 @@ export default function EditRef({
         )}
 
         <div className="flex gap-4 px-1">
-          <Button size="small" cw="lightred" onClick={() => closeLast()}>
+          <Button
+            size="small"
+            cw="lightred"
+            onClick={(e) => {
+              e.stopPropagation();
+              close(modalName);
+            }}
+          >
             Cancelar
           </Button>
           <Button
@@ -451,7 +460,7 @@ export default function EditRef({
             Salvar
           </Button>
         </div>
-        {isUpdating && (
+        {isLoading && (
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex justify-center items-center bg-white w-full h-full bg-opacity-80">
             <Spinner />
           </div>

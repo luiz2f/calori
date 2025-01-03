@@ -11,7 +11,7 @@ export function useCreateDiet() {
   } = useMutation({
     mutationFn: createDietAPI,
     onSuccess: (data) => {
-      queryClient.setQueryData([`meals-diet-${data?.id}`], data);
+      // queryClient.setQueryData([`meals-diet-${data?.id}`], data);
       queryClient.invalidateQueries({
         queryKey: ["diets"],
       });

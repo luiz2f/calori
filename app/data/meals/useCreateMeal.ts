@@ -8,7 +8,7 @@ export function useCreateMeal() {
   const { close } = useContext(ModalContext);
   const queryClient = useQueryClient();
   const {
-    isPending: isUpdating,
+    isPending: isCreating,
     isSuccess,
     mutate: createMeal,
   } = useMutation({
@@ -22,10 +22,10 @@ export function useCreateMeal() {
   });
 
   useEffect(() => {
-    if (!isUpdating && isSuccess) {
+    if (!isCreating && isSuccess) {
       close("createNewMeal");
     }
-  }, [isUpdating, isSuccess, close]);
+  }, [isCreating, isSuccess, close]);
 
-  return { isUpdating, createMeal, isSuccess };
+  return { isCreating, createMeal, isSuccess };
 }
