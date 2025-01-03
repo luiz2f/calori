@@ -61,7 +61,6 @@ export default function LoginForm() {
       });
     }
   };
-  console.log(errors);
   function handleBlur(type: string) {
     setErrors((prevErrors) => ({ ...prevErrors, [type]: undefined }));
   }

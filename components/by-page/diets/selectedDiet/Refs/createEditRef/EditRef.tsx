@@ -244,19 +244,28 @@ export default function EditRef({
     // Criação da cópia do alimento
     const duplicatedFood = {
       ...foodToDuplicate,
-      id: uuidv4(),
+      id: uuidv4(), // Novo id para o alimento duplicado
       food: { ...foodToDuplicate.food },
       unity: { ...foodToDuplicate.unity },
     };
 
-    // Atualiza a refeição com o novo alimento duplicado
+    // Encontre o índice do alimento original
+    const foodIndex = mealToUpdate.mealListItems.findIndex(
+      (item) => item.id === foodId
+    );
+
+    // Crie uma nova lista de mealListItems, inserindo a cópia logo após o original
+    const updatedMealListItems = [
+      ...mealToUpdate.mealListItems.slice(0, foodIndex + 1), // Todos os itens até o original
+      duplicatedFood, // O alimento duplicado
+      ...mealToUpdate.mealListItems.slice(foodIndex + 1), // Todos os itens depois do original
+    ];
+
+    // Atualiza a refeição com o novo alimento duplicado na posição correta
     setMealList((prevMealList) =>
       prevMealList.map((meal) =>
         meal.id === mealId
-          ? {
-              ...meal,
-              mealListItems: [...meal.mealListItems, duplicatedFood], // Adiciona o novo alimento duplicado
-            }
+          ? { ...meal, mealListItems: updatedMealListItems } // Atualiza a refeição com a nova lista
           : meal
       )
     );
@@ -352,7 +361,7 @@ export default function EditRef({
 
   return (
     <Menus>
-      <div className="relative">
+      <div id="editref" className="relative flex flex-col h-full">
         <div className="font-bold text-xl text-center">
           {isCreating ? "Criar Refeição" : "Editar Refeição"}
         </div>

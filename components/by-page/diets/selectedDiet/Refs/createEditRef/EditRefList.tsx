@@ -9,6 +9,7 @@ export default function EditRefList({
   onAddVariation,
   onDuplicateVariation,
 }) {
+  const isFull = mealsList?.length <= 7;
   return (
     <>
       <div className="text-grey50 text-sm mb-1 pl-2">Variações</div>
@@ -21,21 +22,24 @@ export default function EditRefList({
             onSelectVariation={onSelectVariation}
             onDelete={onDeleteVariation}
             onDuplicateVariation={onDuplicateVariation}
+            canDuplicate={isFull}
           />
         ))}
       </div>
-      <button
-        onClick={(e) => onAddVariation(e)}
-        className={`text-blacklight pl-2 mb-6 ${
-          !mealsList.length
-            ? "cursor-pointer text-xl text-center pl-2 mt-1 underline  underline-offset-4 text-darkgreen"
-            : ""
-        }`}
-      >
-        {!mealsList.length
-          ? "+ Adicionar Variação de Refeição"
-          : "+ Adicionar Nova"}
-      </button>
+      {isFull && (
+        <button
+          onClick={(e) => onAddVariation(e)}
+          className={`text-blacklight pl-2 mb-6 ${
+            !mealsList.length
+              ? "cursor-pointer text-xl text-center pl-2 mt-1 underline  underline-offset-4 text-darkgreen"
+              : ""
+          }`}
+        >
+          {!mealsList.length
+            ? "+ Adicionar Variação de Refeição"
+            : "+ Adicionar Nova"}
+        </button>
+      )}
     </>
   );
 }

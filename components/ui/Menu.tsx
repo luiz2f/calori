@@ -67,7 +67,6 @@ function Toggle({ id, children, className }: ToggleProps) {
   if (!context) throw new Error("Toggle must be used within a Menus component");
 
   const { openId, close, open, setPosition } = context;
-
   function handleClick(e: MouseEvent<HTMLButtonElement>) {
     e.stopPropagation();
     e.preventDefault(); // Adicionado para prevenir navegação indesejada
@@ -115,7 +114,7 @@ function List({ id, children }: ListProps) {
     >
       {children}
     </ul>,
-    document.body
+    document?.body
   );
 }
 
@@ -169,7 +168,7 @@ function useMenuOutsideClick<T extends HTMLElement>(
     function handleClick(e: MouseEvent) {
       if (!mounted) return;
       const target = e.target as Node;
-      const menu = document.getElementById("menu-container");
+      const menu = document?.getElementById("menu-container");
       if (
         ref.current &&
         !ref.current.contains(target) &&
@@ -179,10 +178,10 @@ function useMenuOutsideClick<T extends HTMLElement>(
       }
     }
 
-    document.addEventListener("click", handleClick, listenCapturing);
+    document?.addEventListener("click", handleClick, listenCapturing);
 
     return () => {
-      document.removeEventListener("click", handleClick);
+      document?.removeEventListener("click", handleClick);
     };
   }, [handler, listenCapturing]);
 

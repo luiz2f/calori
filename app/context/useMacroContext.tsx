@@ -25,11 +25,8 @@ export const MacroProvider: React.FC<{ children: React.ReactNode }> = ({
     kcal: 0,
   });
 
-  console.log(macros);
-
   const setDefaultMacro = (data) => {
     const newData = data.meals;
-    console.log("newData", newData);
     setMacros([]);
     newData.forEach((meal) => {
       if (!meal?.mealList.length) {
@@ -38,8 +35,6 @@ export const MacroProvider: React.FC<{ children: React.ReactNode }> = ({
       updateMacroForMeal(meal?.id, meal?.mealList[0]?.macro, "default");
     });
   };
-
-  console.log(macros);
 
   const updateMacroForMeal = (mealId, macro, way) => {
     setMacros((prevMacros) => {
@@ -52,7 +47,6 @@ export const MacroProvider: React.FC<{ children: React.ReactNode }> = ({
       }
       return updatedMacros;
     });
-    // console.log(2, way);
   };
 
   useEffect(() => {
@@ -74,11 +68,9 @@ export const MacroProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [macros]);
 
   const calculateColumns = (data: { [key: string]: number }[]) => {
-    console.log("calculatecolumn", data);
     const sizePadrao = 32;
     const sizeBase = sizePadrao;
     const sizeExtra = 2;
-    console.log("column", data);
     const getMaxDigitsForMacroGroup = () => {
       const maxCarbDigits = Math.max(
         ...data.map((m) =>
@@ -108,7 +100,6 @@ export const MacroProvider: React.FC<{ children: React.ReactNode }> = ({
     if (data.length === 0) {
       return null;
     }
-    console.log("22", 22);
 
     const maxDigits = getMaxDigitsForMacroGroup();
 

@@ -16,7 +16,7 @@ export function useOutsideClick<T extends HTMLElement>(
     function handleClick(e: MouseEvent) {
       if (!mounted || !isLast) return; // Cancel the handler if the component is not mounted
       const target = e.target as Element;
-      const menu = document.getElementById("menu-container");
+      const menu = document?.getElementById("menu-container");
       // const lastOpenName = openNames[openNames.length - 1];
       const isSelectMenu = target.role === "option";
       if (
@@ -33,10 +33,10 @@ export function useOutsideClick<T extends HTMLElement>(
     }
 
     if (mounted) {
-      document.addEventListener("click", handleClick);
+      document?.addEventListener("click", handleClick);
     }
     return () => {
-      document.removeEventListener("click", handleClick);
+      document?.removeEventListener("click", handleClick);
     };
   }, [handler, openNames]);
   return ref;

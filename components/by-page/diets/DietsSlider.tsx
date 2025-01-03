@@ -8,6 +8,7 @@ import Menus from "@/components/ui/Menu";
 import CreateDiet from "./dietSlider/createEditModal/CreateDiet";
 import { useDietContext } from "@/app/context/useDietContext";
 import { useDiets } from "@/app/data/diets/useDiets";
+import CreateFood from "../food/CreateFood";
 
 export default function DietsSlider({ initialDataDiets }) {
   const { data: diets, isLoading } = useDiets(initialDataDiets);
@@ -33,15 +34,16 @@ export default function DietsSlider({ initialDataDiets }) {
                   onClick={() => handleDietClick(diet.id)} // Evento de clique para selecionar
                 />
               ))}
-
               <Modal.Open opens="new-diet">
                 <button>
                   <AddDiet />
                 </button>
               </Modal.Open>
-
               <Modal.Window name="new-diet">
                 <CreateDiet modalName="new-diet" />
+              </Modal.Window>
+              <Modal.Window name="create-food">
+                <CreateFood />
               </Modal.Window>
             </div>
           </div>

@@ -62,7 +62,6 @@ export async function getDietMeals(dietId: string) {
       },
     },
   });
-  console.log("fetch");
   return dietMeals;
 }
 
@@ -86,7 +85,6 @@ export async function deleteMeal(mealId: string) {
 
 export async function updateMeal({ mealId, mealName, mealTime, refs }) {
   // Busca os dados existentes da refeição e suas listas
-  console.log(1);
   const mealToUpdate = await prisma.meal.findUnique({
     where: { id: mealId },
     select: {
@@ -112,7 +110,6 @@ export async function updateMeal({ mealId, mealName, mealTime, refs }) {
     },
   });
 
-  console.log(2);
   // básico da refeição
   await prisma.meal.update({
     where: { id: mealId },
@@ -122,7 +119,6 @@ export async function updateMeal({ mealId, mealName, mealTime, refs }) {
     },
   });
 
-  console.log(3);
   const originalMealLists = mealToUpdate?.mealList.map((list) => list.id);
   const currentMealLists = refs.map((list) => list.id);
 
@@ -130,7 +126,6 @@ export async function updateMeal({ mealId, mealName, mealTime, refs }) {
   const listsToDelete = originalMealLists?.filter(
     (id) => !currentMealLists?.includes(id)
   );
-  console.log(4);
 
   const deleteMealLists = listsToDelete?.map(async (listId) => {
     await prisma.mealList.delete({
@@ -138,7 +133,6 @@ export async function updateMeal({ mealId, mealName, mealTime, refs }) {
     });
   });
 
-  console.log(5);
   const updateOrCreateMealLists = refs?.map(async (list) => {
     if (!list.id?.includes("-")) {
       // Atualiza lista existente
@@ -148,7 +142,6 @@ export async function updateMeal({ mealId, mealName, mealTime, refs }) {
           name: list.name,
         },
       });
-      console.log(223);
 
       // Atualiza ou cria itens da lista
       const originalItemIds =
@@ -160,7 +153,6 @@ export async function updateMeal({ mealId, mealName, mealTime, refs }) {
       const itemsToDelete = originalItemIds?.filter(
         (id) => !currentItemIds.includes(id)
       );
-      console.log(323);
 
       // Deleta itens não mais presentes
       const deleteItems = itemsToDelete?.map(async (itemId) => {
@@ -168,12 +160,10 @@ export async function updateMeal({ mealId, mealName, mealTime, refs }) {
           where: { id: itemId },
         });
       });
-      console.log(7);
 
       // Atualiza ou cria itens
       const updateOrCreateItems = list.mealListItems?.map(async (item) => {
         if (!item.id.includes("-")) {
-          console.log(2112);
           await prisma.mealListItem.update({
             where: { id: item.id },
             data: {
@@ -183,7 +173,6 @@ export async function updateMeal({ mealId, mealName, mealTime, refs }) {
             },
           });
         } else {
-          console.log(22422222243);
           await prisma.mealListItem.create({
             data: {
               foodId: item.foodId,
@@ -200,7 +189,6 @@ export async function updateMeal({ mealId, mealName, mealTime, refs }) {
       await Promise.all(updateOrCreateItems);
       await Promise.all(deleteItems);
     } else {
-      console.log(224443);
       await prisma.mealList.create({
         data: {
           name: list.name,
@@ -222,7 +210,6 @@ export async function updateMeal({ mealId, mealName, mealTime, refs }) {
   // Aguardar todas as operações assíncronas
   await Promise.all([...updateOrCreateMealLists, ...deleteMealLists]);
 
-  console.log(252);
 
   return mealToUpdate?.dietId;
 }

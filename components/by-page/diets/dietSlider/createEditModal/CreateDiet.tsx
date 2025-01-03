@@ -88,7 +88,9 @@ export default function CreateDiet({ modalName }) {
     }));
   };
 
-  const handleAddRef = () => {
+  const handleAddRef = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
     setRefs([...refs, { id: uuidv4(), name: "Nova Refeição", time: "23:00" }]);
   };
 
@@ -168,14 +170,16 @@ export default function CreateDiet({ modalName }) {
             />
           ))}
         </div>
-        <button
-          type="button"
-          className="text-darkgreen pl-2 mb-6"
-          onClick={handleAddRef}
-        >
-          + Adicionar refeição
-        </button>
-        <div className="flex gap-4 px-1">
+        {refs?.length <= 7 && (
+          <button
+            type="button"
+            className="text-darkgreen pl-2"
+            onClick={handleAddRef}
+          >
+            + Adicionar refeição
+          </button>
+        )}
+        <div className="flex gap-4 px-1 mt-6">
           <Button size="small" cw="lightred" onClick={() => close(modalName)}>
             Cancelar
           </Button>

@@ -25,25 +25,38 @@ function Header({
   prot,
   fat,
   kcal,
+  onClick,
 }: {
   name: string;
   carbo: number;
   prot: number;
   fat: number;
   kcal: number;
+  onClick?: () => void;
 }) {
   const context = useContext(TableContext);
   if (!context) {
     throw new Error("Header must be used within a Table");
   }
 
+  function handleClick(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    if (!onClick) return;
+    onClick();
+  }
   return (
     <div
       role="row"
       style={{ gridTemplateColumns: context.columns }}
       className="grid mt-4 pr-1 text-darkgreen"
     >
-      <div className="text-left align-bottom text-xl font-normal self-end">
+      <div
+        className={`text-left align-bottom text-xl font-normal self-end ${
+          onClick ? "cursor-pointer" : ""
+        }`}
+        onClick={(e) => handleClick(e)}
+      >
         {name}
       </div>
       <div className="text-center font-normal align-bottom">
@@ -88,7 +101,7 @@ function Row({
     <div
       role="row"
       style={{ gridTemplateColumns: context.columns }}
-      className="grid border-b-1 border-white text-sm pr-1 [&>div]:py-1 [&>div]:text-center [&>div]:text-blacklight last:text-right last:border-b-0"
+      className="grid border-b-1 border-white text-sm pr-1 [&>div]:py-1 [&>div]:text-center [&>div]:text-blacklight last:text-right last:border-b-0 odd:bg-neutralgreen"
     >
       <div role="cell" className="pl-2 !text-left !text-black">
         {name}
@@ -105,7 +118,7 @@ function Row({
 
 function Body({ children }: { children: ReactNode }) {
   return (
-    <div role="rowgroup" className="bg-ulgrey border-y-1 border-grey5">
+    <div role="rowgroup" className="border-y-1 border-grey5">
       {children}
     </div>
   );

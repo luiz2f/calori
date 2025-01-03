@@ -40,7 +40,6 @@ export function useMeals(initialData, dietId) {
 
   const mealsWithMacros = useMemo(() => {
     if (data?.meals) {
-      console.log("HERE");
       return {
         ...data,
         meals: data.meals.map((meal) => ({

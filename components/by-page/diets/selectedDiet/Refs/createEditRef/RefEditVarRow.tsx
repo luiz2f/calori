@@ -10,6 +10,7 @@ import {
 } from "react-icons/hi";
 
 export default function RefEditVarRow({
+  canDuplicate,
   refvar,
   onDelete,
   onSelectVariation,
@@ -29,6 +30,8 @@ export default function RefEditVarRow({
   const selectVariation = () => {
     onSelectVariation(index);
   };
+
+  console.log(refvar);
   return (
     <div
       key={refvar.name}
@@ -45,27 +48,29 @@ export default function RefEditVarRow({
         <div className="w-fit text-center text-darkgreen p-1 rounded-lg font-medium">
           {refvar.kcal}
         </div>
-        <Menus.Menu className="rounded-lg ">
+        <Menus.Menu className="rounded-lg">
           <Menus.Toggle
-            id={refvar.name}
+            id={refvar.id}
             className="flex items-center justify-center w-8 h-8 rounded-lg p-1"
           >
             <HiDotsVertical />
           </Menus.Toggle>
 
-          <Menus.List id={refvar.name}>
+          <Menus.List id={refvar.id}>
             <Menus.Button
               icon={<HiOutlinePencilAlt />}
               onClick={selectVariation}
             >
               Editar variação
             </Menus.Button>
-            <Menus.Button
-              icon={<HiOutlineDuplicate />}
-              onClick={() => onDuplicateVariation(refvar?.id)}
-            >
-              Duplicar variação
-            </Menus.Button>
+            {canDuplicate && (
+              <Menus.Button
+                icon={<HiOutlineDuplicate />}
+                onClick={() => onDuplicateVariation(refvar?.id)}
+              >
+                Duplicar variação
+              </Menus.Button>
+            )}
 
             <Modal.Open opens={modalName}>
               <Menus.Button icon={<HiOutlineTrash />}>

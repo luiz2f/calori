@@ -28,6 +28,7 @@ export default {
         medred: "#FF6969",
         lightred: "#FFEDED",
         darkred: "#7B3232",
+        neutralgreen: "#f2f9f2",
       },
       borderRadius: {
         lg: "0.5rem",
@@ -57,7 +58,7 @@ export default {
       },
       gridTemplateColumns: {
         frq: "repeat(4,  1fr)",
-        edref: "56px 56px 1fr 25px",
+        edref: "56px 56px 1fr 15px",
       },
       backgroundImage: {
         "half-lightred-transparent":

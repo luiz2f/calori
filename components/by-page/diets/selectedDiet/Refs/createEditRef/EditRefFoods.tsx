@@ -122,20 +122,24 @@ export default function EditRefFoods({
                 <div>Alimento</div>
                 <div></div>
               </div>
-              <div className="grid grid-cols-edref gap-2 w-full border-y-1 border-lightgreen py-3 text-sm mb-2">
-                {refFoods?.map((food, index) => (
-                  <EditFoodRow
-                    mealId={currentMeal?.id}
-                    onDeleteFood={deleteFoodFromMeal}
-                    key={`${food.id}-${index}-${currentMeal?.id}`}
-                    food={food}
-                    onFoodChange={handleFoodChangeWrapper}
-                    duplicateFood={() =>
-                      handleDuplicateFood(currentMeal?.id, food.id)
-                    }
-                    foods={foods}
-                  />
-                ))}
+              <div
+                className={`w-full border-y-1 border-lightgreen text-sm mb-2 flex-1 `}
+              >
+                <div className="h-[inherit]  w-full py-3 grid grid-cols-edref gap-2">
+                  {refFoods?.map((food, index) => (
+                    <EditFoodRow
+                      mealId={currentMeal?.id}
+                      onDeleteFood={deleteFoodFromMeal}
+                      key={`${food.id}-${index}-${currentMeal?.id}`}
+                      food={food}
+                      onFoodChange={handleFoodChangeWrapper}
+                      duplicateFood={() =>
+                        handleDuplicateFood(currentMeal?.id, food.id)
+                      }
+                      foods={foods}
+                    />
+                  ))}
+                </div>
               </div>
             </>
           ) : (

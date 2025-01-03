@@ -67,7 +67,7 @@ export default function RefTable({
       const kcal = Math.round((carb + prot) * 4 + fat * 9);
 
       return {
-        name: food.name,
+        name: quantity + " " + unity.un + " - " + food.name,
         carb: carb,
         prot: prot,
         fat: fat,
@@ -78,12 +78,16 @@ export default function RefTable({
     });
   }
 
-  function handleClickNoFood() {
+  function handleOpenVar() {
     open(`editMealAlimento${mealId}`);
   }
 
+  function handleClickNoFood() {
+    open(`editMealAlimentoCreate${mealId}`);
+  }
+
   function handleClickNoVar() {
-    open(`editMealVar${mealId}`);
+    open(`editMealVarCreate${mealId}`);
   }
   const simplifiedData = transformFoodData(meal?.mealListItems);
   const defaultColumns = "1fr 32px 32px 32px 32px";
@@ -91,6 +95,7 @@ export default function RefTable({
   return (
     <Table columns={gridColumn}>
       <Table.Header
+        onClick={handleOpenVar}
         name={meal?.name}
         carbo={Math.round(macro?.carb)}
         prot={Math.round(macro?.prot)}

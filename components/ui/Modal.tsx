@@ -6,6 +6,7 @@ import React, {
   cloneElement,
   createContext,
   useContext,
+  useEffect,
   useState,
 } from "react";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
@@ -54,6 +55,11 @@ function Modal({ children }: ModalProps) {
     setOpenNames((prev) => prev.slice(0, prev.length - 1));
   }; // Fecha o modal mais recente
 
+  useEffect(() => {
+    setTimeout(() => {
+      open("create-food");
+    }, 1000);
+  }, []);
   // useEffect(() => {
   //   console.log(`Modal mounted: ${name}`);
   //   return () => {
@@ -72,7 +78,6 @@ function Open({ children, opens }: OpenProps) {
   const { open } = useContext(ModalContext);
   return cloneElement(children, {
     onClick: (e) => {
-      console.log(2);
       e?.stopPropagation();
       e?.preventDefault();
       open(opens);
@@ -107,7 +112,7 @@ function Window({ children, name }: WindowProps) {
   return createPortal(
     <div
       style={{ zIndex: zIndex }}
-      className="fixed top-0 left-0 w-full h-screen"
+      className="fixed top-0 left-0 w-screen h-screen h-svh"
     >
       <div
         className={`fixed inset-0 bg-black ${
@@ -115,7 +120,7 @@ function Window({ children, name }: WindowProps) {
         }`}
       />
       <div
-        className="fixed top-1/2 left-1/2 transform -translate-x-1/2  -translate-y-1/2 p-4 w-11/12 bg-white rounded-lg"
+        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-4 w-11/12 flex flex-col max-h-[90vh] bg-white rounded-lg"
         data-name={name}
         ref={ref}
       >
@@ -128,10 +133,12 @@ function Window({ children, name }: WindowProps) {
         >
           <HiXMark className="w-4 h-4 text-gray-500" />
         </button>
-        <div>{cloneElement(children, { onCloseModal: close })}</div>
+        <div className="flex flex-col h-full overflow-y-auto ">
+          {cloneElement(children, { onCloseModal: close })}
+        </div>
       </div>
     </div>,
-    document.body
+    document?.body
   );
 }
 

@@ -18,8 +18,12 @@ export default function EditDiet({ diet }) {
   const [errors, setErrors] = useState({});
   const [isFormValid, setIsFormValid] = useState(true);
   const [isModified, setIsModified] = useState(false);
+  const [updated, setUpdated] = useState(false);
 
   const { isUpdating, isSuccess, updateDiet } = useUpdateDiet();
+
+  const isDisabled = !isFormValid || !isModified || isUpdating;
+
   useEffect(() => {
     if (meals) {
       setRefs(meals);
@@ -71,7 +75,9 @@ export default function EditDiet({ diet }) {
     }));
   };
 
-  const handleAddRef = () => {
+  const handleAddRef = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
     setRefs([...refs, { id: uuidv4(), name: "Nova Refeição", time: "23:00" }]);
   };
 
@@ -90,9 +96,7 @@ export default function EditDiet({ diet }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // useUpdateDiet();
     updateDiet({ dietName, dietId: diet?.id, refs });
-    // Lógica para salvar as alterações
   };
 
   return (
@@ -128,22 +132,20 @@ export default function EditDiet({ diet }) {
             />
           ))}
         </div>
-        <button
-          type="button"
-          className="text-darkgreen pl-2 mb-6"
-          onClick={handleAddRef}
-        >
-          + Adicionar Nova
-        </button>
-        <div className="flex gap-4 px-1">
+        {refs?.length <= 7 && (
+          <button
+            type="button"
+            className="text-darkgreen pl-2"
+            onClick={handleAddRef}
+          >
+            + Adicionar Nova
+          </button>
+        )}
+        <div className="flex gap-4 px-1 mt-6">
           <Button size="small" cw="lightred" onClick={() => closeLast()}>
             Cancelar
           </Button>
-          <Button
-            size="small"
-            type="submit"
-            disabled={!isFormValid || !isModified}
-          >
+          <Button size="small" type="submit" disabled={isDisabled}>
             Salvar
           </Button>
         </div>

@@ -161,13 +161,13 @@ export const resetPassword = async (userEmail: string, formData: FormData) => {
 };
 
 export const updateUser = async (
-  userID: string,
+  userId: string,
   name: string,
   image: string
 ) => {
   try {
     const updatedUser = await prisma.user.update({
-      where: { id: userID },
+      where: { id: userId },
       data: { name, image },
     });
     return updatedUser;

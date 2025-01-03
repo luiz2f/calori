@@ -51,8 +51,12 @@ export default function DietMeal({ meal }) {
     <div>
       <div className="border-grey10 border-1 rounded-lg flex flex-col w-full relative">
         <div className="flex items-baseline  gap-1 absolute top-[-16px] bg-white px-1 left-0 ">
-          <div className="font-medium text-2xl">{meal.name}</div>
-          <div className=" text-darkgreen">{meal.time}</div>
+          <Modal.Open opens={`editMeal${meal.id}`}>
+            <button className="font-medium text-2xl cursor-pointer">
+              {meal.name}
+            </button>
+          </Modal.Open>
+          <div className="text-darkgreen">{meal.time}</div>
         </div>
         <Menus.Menu className="bg-white p-1 rounded-lg border-grey10 border-1  absolute top-[-12px] right-1 text-grey50">
           <Menus.Toggle id={`MealToogle${meal.id}`}>
@@ -79,13 +83,20 @@ export default function DietMeal({ meal }) {
           </Modal.Window>
           <Modal.Window name={`editMealAlimento${meal.id}`}>
             <EditRef
+              meal={meal}
+              currentIndex={currentIndex}
+              typeInput="Alimentos"
+            />
+          </Modal.Window>
+          <Modal.Window name={`editMealAlimentoCreate${meal.id}`}>
+            <EditRef
               createFood={true}
               meal={meal}
               currentIndex={currentIndex}
               typeInput="Alimentos"
             />
           </Modal.Window>
-          <Modal.Window name={`editMealVar${meal.id}`}>
+          <Modal.Window name={`editMealVarCreate${meal.id}`}>
             <EditRef
               createVariation={true}
               meal={meal}

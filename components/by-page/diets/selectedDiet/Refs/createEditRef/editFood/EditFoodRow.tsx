@@ -3,6 +3,7 @@ import { useFoods } from "@/app/data/foods/useFoods";
 import ConfirmDelete from "@/components/ui/ConfirmDelete";
 import Menus from "@/components/ui/Menu";
 import Modal from "@/components/ui/Modal";
+import { transform } from "next/dist/build/swc/generated-native";
 import { useState, useEffect } from "react";
 import {
   HiDotsVertical,
@@ -81,7 +82,6 @@ export default function EditFoodRow({
       borderColor: "#d1d1d1",
       borderWidth: "1px",
       padding: "0",
-      borderRadius: "8px",
       textAlign: "center",
       minHeight: "25px",
       width: "100%",
@@ -90,7 +90,18 @@ export default function EditFoodRow({
       ...base,
       textAlign: "center",
     }),
-    menu: (base) => ({ ...base, borderRadius: "8px", borderColor: "#d1d1d1" }),
+    menu: (base) => ({
+      ...base,
+      borderRadius: "8px",
+      borderColor: "#d1d1d1",
+      top: "auto",
+      bottom: "100%",
+    }),
+    menuPortal: (base) => ({
+      ...base,
+      zIndex: 6000,
+      transform: "translateX(-4vw)",
+    }),
     option: (base, state) => ({
       ...base,
       borderRadius: state.isSelected ? "4px" : "0",
@@ -114,7 +125,7 @@ export default function EditFoodRow({
         type="number"
         value={quantity}
         onChange={(e) => handleQuantityChange(e)}
-        className={`border-1 py-[2px] text-center rounded-lg pl-4 ${
+        className={`border-1 py-[2px] text-center rounded-lg  ${
           quantity === ""
             ? "bg-lightred border-darkred text-darkred"
             : "border-grey10"
@@ -127,6 +138,9 @@ export default function EditFoodRow({
         onChange={handleUnityChange}
         placeholder=""
         isDisabled={!selectedFood}
+        // menuPortalTarget={document.querySelector("#editref")}
+        // menuPosition="fixed"
+        // menuPlacement="auto"
         styles={{
           ...selectStyle,
           control: (base, state) => ({
@@ -135,6 +149,7 @@ export default function EditFoodRow({
             borderColor: error?.unity ? "#7B3232" : "#d1d1d1",
             backgroundColor: error?.unity ? "#FFEDED" : "white",
             color: error?.unity ? "#7B3232" : "inherit",
+            borderRadius: "8px",
           }),
         }}
       />
@@ -143,6 +158,9 @@ export default function EditFoodRow({
         value={selectedFood}
         placeholder="Selecionar Alimento"
         onChange={handleFoodChange}
+        // menuPortalTarget={document.querySelector("#editref")}
+        // menuPosition="fixed"
+        // menuPlacement="auto"
         styles={{
           ...selectStyle,
           control: (base, state) => ({
@@ -150,6 +168,7 @@ export default function EditFoodRow({
             borderColor: error?.food ? "#7B3232" : "#d1d1d1",
             backgroundColor: error?.food ? "#FFEDED" : "white",
             color: error?.food ? "#7B3232" : "inherit",
+            borderRadius: "8px",
           }),
         }}
         noOptionsMessage={() => "Nenhum alimento encontrado"}
@@ -158,7 +177,7 @@ export default function EditFoodRow({
       <Menus.Menu>
         <Menus.Toggle
           id={`editreffood${food?.id}`}
-          className="p-1 rounded-lg items-center"
+          className="rounded-lg items-center"
         >
           <HiDotsVertical />
         </Menus.Toggle>

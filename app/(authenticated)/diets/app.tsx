@@ -21,6 +21,10 @@ export default function App({ empty, defaultDiet, diets, foods }) {
       queryClient.setQueryData(["diets"], diets);
       queryClient.setQueryData([`meals-diet-${id}`], defaultDiet);
       queryClient.setQueryData(["foods"], foods);
+      queryClient.setQueryData(
+        ["userFoods"],
+        foods.filter((food) => food?.userFood === true)
+      );
     }
   }, []);
   return (
