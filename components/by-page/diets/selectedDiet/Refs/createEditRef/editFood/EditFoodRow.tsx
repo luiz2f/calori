@@ -4,7 +4,7 @@ import ConfirmDelete from "@/components/ui/ConfirmDelete";
 import Menus from "@/components/ui/Menu";
 import Modal from "@/components/ui/Modal";
 import { transform } from "next/dist/build/swc/generated-native";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   HiDotsVertical,
   HiOutlineDuplicate,
@@ -13,12 +13,17 @@ import {
 import Select from "react-select";
 
 export default function EditFoodRow({
+  createFood,
+  createReturn,
+  cleanReturn,
   mealId,
   food,
   foods,
   onFoodChange,
   onDeleteFood,
   duplicateFood,
+  foodReturned,
+  foodOptions,
 }) {
   const unityDefault = {
     value: food.unity.id,
@@ -31,27 +36,32 @@ export default function EditFoodRow({
 
   const [selectedFood, setSelectedFood] = useState(foodDefault || null);
   const [selectedUnity, setSelectedUnity] = useState(unityDefault || null);
+  const foodInfo = foods.find((obj) => obj?.id === selectedFood?.value);
+  const unityInfo =
+    foodInfo?.unities?.find((unity) => unity?.foodId === selectedFood?.value) ||
+    {};
   const [quantity, setQuantity] = useState(food.quantity || 0);
-  const foodOptions = foods?.map((obj) => ({
-    value: obj.id,
-    label: obj.name,
-    unities: obj.unities.map((unit) => ({
-      value: unit.id,
-      label: unit.un,
-    })),
-  }));
   const unityOptions =
     foodOptions?.find((obj) => obj.value === selectedFood?.value)?.unities ||
     [];
-
   useEffect(() => {
-    onFoodChange(food.id, { selectedFood, selectedUnity, quantity });
+    if (selectedFood.value) {
+      onFoodChange(food.id, { foodInfo, unityInfo, quantity });
+    }
   }, [selectedFood, selectedUnity, quantity, food.id]);
 
-  const handleFoodChange = (selected) => {
-    setSelectedFood(selected);
-    setSelectedUnity(selected.unities[0]);
-  };
+  const handleFoodChange = useCallback(
+    (selected) => {
+      if (selected.value === "create-food") {
+        createFood();
+        createReturn();
+      } else {
+        setSelectedFood(selected);
+        setSelectedUnity(selected.unities[0]);
+      }
+    },
+    [createFood, createReturn, setSelectedFood, setSelectedUnity]
+  );
 
   const handleUnityChange = (selected) => {
     setSelectedUnity(selected);
@@ -63,6 +73,14 @@ export default function EditFoodRow({
       setQuantity(value);
     }
   };
+
+  useEffect(() => {
+    if (foodReturned) {
+      const created = foodOptions.find((obj) => obj.value === foodReturned);
+      handleFoodChange(created);
+      cleanReturn();
+    }
+  }, [foodReturned, handleFoodChange, foodOptions, cleanReturn]);
 
   const selectStyle = {
     indicatorsContainer: (base) => ({
@@ -96,6 +114,7 @@ export default function EditFoodRow({
       borderColor: "#d1d1d1",
       top: "auto",
       bottom: "100%",
+      zIndex: 6000,
     }),
     menuPortal: (base) => ({
       ...base,

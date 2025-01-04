@@ -39,7 +39,7 @@ export default function EditRef({
   const { data: diets } = useDiets();
   const [type, setType] = useState<"Lista" | "Alimentos">(typeInput);
   const [selectedVariation, setSelectedVariation] = useState(currentIndex);
-  const { close, unsavedChanges } = useContext(ModalContext);
+  const { close, unsavedChanges, open } = useContext(ModalContext);
   const [mealName, setMealName] = useState(
     creating ? "Nova Refeição" : meal?.name
   );
@@ -272,6 +272,9 @@ export default function EditRef({
       )
     );
   };
+  const createUserFood = () => {
+    open("create-food");
+  };
 
   useEffect(() => {
     if (createVariation) {
@@ -327,6 +330,8 @@ export default function EditRef({
   };
 
   const handleFoodChange = (variationId, foodId, data) => {
+    const { foodInfo, unityInfo, quantity } = data;
+
     setMealList((prevMealList) =>
       prevMealList.map((variation) =>
         variation.id === variationId
@@ -336,21 +341,21 @@ export default function EditRef({
                 item.id === foodId
                   ? {
                       ...item,
-                      foodId: data.selectedFood.value,
-                      unityId: data.selectedUnity.value,
-                      quantity: data.quantity,
+                      foodId: foodInfo.id,
+                      unityId: unityInfo.id,
+                      quantity,
                       food: {
-                        id: data.selectedFood.value,
-                        name: data.selectedFood.label,
-                        carb: item.food.carb,
-                        protein: item.food.protein,
-                        fat: item.food.fat,
+                        id: foodInfo.id,
+                        name: foodInfo.name,
+                        carb: foodInfo.carb,
+                        protein: foodInfo.protein,
+                        fat: foodInfo.fat,
                       },
                       unity: {
-                        id: data.selectedUnity.value,
-                        foodId: data.selectedFood.value,
-                        un: data.selectedUnity.label,
-                        unitMultiplier: item.unity.unitMultiplier,
+                        id: unityInfo.id,
+                        foodId: foodInfo.id,
+                        un: unityInfo.un,
+                        unitMultiplier: unityInfo.unitMultiplier,
                       },
                     }
                   : item
@@ -360,6 +365,10 @@ export default function EditRef({
       )
     );
   };
+
+  useEffect(() => {
+    //newmacro
+  }, []);
 
   return (
     <Menus>
@@ -438,6 +447,7 @@ export default function EditRef({
             handleAddFood={handleAddFood}
             deleteFoodFromMeal={deleteFoodFromMeal}
             handleDuplicateFood={handleDuplicateFood}
+            createFood={createUserFood}
           />
         )}
 

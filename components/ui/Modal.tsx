@@ -50,7 +50,6 @@ function Modal({ children }: ModalProps) {
   const [openNames, setOpenNames] = useState<string[]>([]);
   const [modified, setModified] = useState<string>("");
 
-  console.log(modified, openNames);
   const canClose = new Map(
     openNames.map((name) => [name, !modified?.includes(name)])
   );

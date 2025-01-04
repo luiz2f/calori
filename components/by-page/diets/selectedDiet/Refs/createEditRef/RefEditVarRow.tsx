@@ -31,7 +31,6 @@ export default function RefEditVarRow({
     onSelectVariation(index);
   };
 
-  console.log(refvar);
   return (
     <div
       key={refvar.name}

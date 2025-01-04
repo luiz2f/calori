@@ -20,19 +20,22 @@ export function useCreateFood() {
       queryClient.setQueryData(["foods"], (oldFoods) => {
         return [...oldFoods, data];
       });
-
-      // Atualiza a query de 'userFoods' caso o alimento seja do usuário
       queryClient.setQueryData(["userFoods"], (oldUserFoods) => {
         return [...oldUserFoods, data];
       });
+      const returnFood = queryClient.getQueryData(["createFoodReturn"]);
+      if (returnFood && returnFood?.foodRowId) {
+        const newReturnFood = { ...returnFood, foodId: data.id };
+        queryClient.setQueryData(["createFoodReturn"], newReturnFood);
+      }
     },
   });
 
-  // useEffect(() => {
-  //   if (!isCreating && isSuccess) {
-  //     close("create-food");
-  //   }
-  // }, [isCreating, isSuccess, close]);
+  useEffect(() => {
+    if (!isCreating && isSuccess) {
+      close("create-food");
+    }
+  }, [isCreating, isSuccess, close]);
 
   return { isCreating, createFood, isSuccess };
 }

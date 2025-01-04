@@ -30,9 +30,7 @@ export default function CreateFood() {
 
   const handleChange = (e) => {
     const { id, value } = e.target;
-    const newValue = parseFloat(value);
-    console.log(value);
-    console.log(newValue);
+    const newValue = id === "name" ? value : parseFloat(value);
     setInputs((prev) => ({ ...prev, [id]: newValue }));
     if (value === "") {
       setErrors((prev) => ({ ...prev, [id]: true }));
@@ -210,7 +208,10 @@ export default function CreateFood() {
               <Button
                 size="small"
                 cw="lightred"
-                onClick={() => close("create-food")}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  close("create-food");
+                }}
               >
                 Cancelar
               </Button>
@@ -222,7 +223,10 @@ export default function CreateFood() {
             <Button
               size="small"
               cw="light"
-              onClick={() => close("create-food")}
+              onClick={(e) => {
+                e.stopPropagation();
+                close("create-food");
+              }}
             >
               Fechar
             </Button>

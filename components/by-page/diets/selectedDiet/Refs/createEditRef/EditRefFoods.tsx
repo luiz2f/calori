@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import RefSlider from "../RefSlider";
 import EditFoodRow from "./editFood/EditFoodRow";
 import Modal from "@/components/ui/Modal";
 import ConfirmDelete from "@/components/ui/ConfirmDelete";
 import { useFoods } from "@/app/data/foods/useFoods";
+import { calculateMacros } from "@/app/data/meals/useMeals";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function EditRefFoods({
   mealsList,
@@ -16,12 +18,31 @@ export default function EditRefFoods({
   handleAddFood,
   deleteFoodFromMeal,
   handleDuplicateFood,
+  createFood,
 }) {
+  const queryClient = useQueryClient();
   const currentMeal = mealsList[currentIndex];
   const [variationName, setVariationName] = useState(currentMeal?.name || "");
   const { data: foods } = useFoods();
-
   const modalName = `deleteMeal${currentMeal?.id}`;
+  const foodOptions = useMemo(
+    () => [
+      {
+        value: "create-food",
+        label: "Criar Alimento",
+      },
+      ...foods?.map((obj) => ({
+        value: obj.id,
+        label: obj.name,
+        unities: obj?.unities?.map((unit) => ({
+          value: unit.id,
+          label: unit.un,
+        })),
+      })),
+    ],
+    [foods]
+  );
+  console.log(foodOptions);
   function handleDeleteMeal() {
     onDeleteVariation(currentMeal?.id);
   }
@@ -51,11 +72,42 @@ export default function EditRefFoods({
     setVariationName(newName);
     onNameChange(currentMeal?.id, newName);
   };
+  const setCreateReturn = (id) => {
+    queryClient.setQueryData(["createFoodReturn"], {
+      foodId: null,
+      foodRowId: id,
+    });
+  };
+  const cleanReturn = () => {
+    queryClient.setQueryData(["createFoodReturn"], null);
+  };
+  const createFoodReturn = queryClient.getQueryData(["createFoodReturn"]);
+
+  const handleReturnFood = useMemo(() => {
+    return (id) => {
+      if (
+        !createFoodReturn ||
+        !createFoodReturn?.foodId ||
+        id !== createFoodReturn?.foodRowId
+      ) {
+        return null;
+      } else {
+        return createFoodReturn?.foodId;
+      }
+    };
+  }, [createFoodReturn]);
+
   const refFoods = currentMeal?.mealListItems || [];
   const handleFoodChangeWrapper = (foodId, data) => {
     onFoodChange(currentMeal?.id, foodId, data);
   };
 
+  const carb = currentMeal?.macro?.carb || 0;
+  const prot = currentMeal?.macro?.prot || 0;
+  const fat = currentMeal?.macro?.fat || 0;
+  const kcal = currentMeal?.macro?.kcal || 0;
+
+  const newMacros = calculateMacros(currentMeal);
   return (
     <>
       {!!mealsList.length ? (
@@ -82,35 +134,51 @@ export default function EditRefFoods({
                 <div className="grayscale contrast-150 text-xs opacity-50">
                   🍞
                 </div>
-                <div>48</div>
-                <div className="absolute top-[-18px] left-0 right-0 text-xs text-grey50">
-                  +13
-                </div>
+                <div>{newMacros?.carb}</div>
+                {newMacros?.carb - carb !== 0 && (
+                  <div className="absolute top-[-18px] left-0 right-0 text-xs text-grey50">
+                    {newMacros?.carb - carb > 0
+                      ? `+${newMacros?.carb - carb}`
+                      : newMacros?.carb - carb}
+                  </div>
+                )}
               </div>
               <div className="flex flex-col justify-end align-bottom relative">
                 <div className="grayscale contrast-150 text-xs opacity-50">
                   🥩
                 </div>
-                <div>28</div>
-                <div className="absolute top-[-18px] left-0 right-0 text-xs text-grey50">
-                  +8
-                </div>
+                <div>{newMacros?.prot}</div>
+                {newMacros?.prot - prot !== 0 && (
+                  <div className="absolute top-[-18px] left-0 right-0 text-xs text-grey50">
+                    {newMacros?.prot - prot > 0
+                      ? `+${newMacros?.prot - prot}`
+                      : newMacros?.prot - prot}
+                  </div>
+                )}
               </div>
               <div className="flex flex-col justify-end align-bottom relative">
                 <div className="grayscale contrast-150 text-xs opacity-50">
                   🥑
                 </div>
-                <div>7</div>
-                <div className="absolute top-[-18px] left-0 right-0 text-xs text-grey50">
-                  +1
-                </div>
+                <div>{newMacros?.fat}</div>
+                {newMacros?.fat - fat !== 0 && (
+                  <div className="absolute top-[-18px] left-0 right-0 text-xs text-grey50">
+                    {newMacros?.fat - fat > 0
+                      ? `+${newMacros?.fat - fat}`
+                      : newMacros?.fat - fat}
+                  </div>
+                )}
               </div>
               <div className="flex flex-col justify-end align-bottom relative">
                 <div className="text-xs text-grey50">kcal</div>
-                <div>315</div>
-                <div className="absolute top-[-18px] left-0 right-0 text-xs text-grey50">
-                  +13
-                </div>
+                <div>{newMacros?.kcal}</div>
+                {newMacros?.kcal - kcal !== 0 && (
+                  <div className="absolute top-[-18px] left-0 right-0 text-xs text-grey50">
+                    {newMacros?.kcal - kcal > 0
+                      ? `+${newMacros?.kcal - kcal}`
+                      : newMacros?.kcal - kcal}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -128,15 +196,20 @@ export default function EditRefFoods({
                 <div className="h-[inherit]  w-full py-3 grid grid-cols-edref gap-2">
                   {refFoods?.map((food, index) => (
                     <EditFoodRow
+                      createFood={createFood}
                       mealId={currentMeal?.id}
                       onDeleteFood={deleteFoodFromMeal}
                       key={`${food.id}-${index}-${currentMeal?.id}`}
                       food={food}
+                      foods={foods}
+                      foodOptions={foodOptions}
                       onFoodChange={handleFoodChangeWrapper}
                       duplicateFood={() =>
                         handleDuplicateFood(currentMeal?.id, food.id)
                       }
-                      foods={foods}
+                      createReturn={() => setCreateReturn(food.id)}
+                      foodReturned={handleReturnFood(food?.id)}
+                      cleanReturn={cleanReturn}
                     />
                   ))}
                 </div>

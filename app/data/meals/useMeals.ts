@@ -2,13 +2,16 @@
 import { getDietMeals } from "@/actions/diets/meals";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-const calculateMacros = (variation) => {
+export const calculateMacros = (variation) => {
   let carb = 0;
   let prot = 0;
   let fat = 0;
   let kcal = 0;
   if (!!variation?.mealListItems?.length) {
     variation.mealListItems.forEach((item) => {
+      if (!item.unity.id) {
+        return;
+      }
       carb += item.food.carb * item.quantity * item.unity.unitMultiplier;
       prot += item.food.protein * item.quantity * item.unity.unitMultiplier;
       fat += item.food.fat * item.quantity * item.unity.unitMultiplier;
