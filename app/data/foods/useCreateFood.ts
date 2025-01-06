@@ -1,14 +1,14 @@
 "use client";
 import { createFood as createFoodAPI } from "@/actions/foods";
-import { ModalContext } from "@/components/ui/Modal";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useContext, useEffect } from "react";
 
-export function useCreateFood() {
-  const { close } = useContext(ModalContext);
+export function useCreateFood({
+  shouldReturn = false,
+}: {
+  shouldReturn: boolean;
+}) {
   const queryClient = useQueryClient();
   const userId = queryClient.getQueryData(["diets"])[0].userId || null;
-  const foods = queryClient.getQueryData(["foods"]);
 
   const {
     isPending: isCreating,
@@ -23,19 +23,16 @@ export function useCreateFood() {
       queryClient.setQueryData(["userFoods"], (oldUserFoods) => {
         return [...oldUserFoods, data];
       });
-      const returnFood = queryClient.getQueryData(["createFoodReturn"]);
-      if (returnFood && returnFood?.foodRowId) {
-        const newReturnFood = { ...returnFood, foodId: data.id };
-        queryClient.setQueryData(["createFoodReturn"], newReturnFood);
+      // creating from select
+      if (shouldReturn) {
+        const returnFood = queryClient.getQueryData(["createFoodReturn"]);
+        if (returnFood && returnFood?.foodRowId) {
+          const newReturnFood = { ...returnFood, foodId: data.id };
+          queryClient.setQueryData(["createFoodReturn"], newReturnFood);
+        }
       }
     },
   });
-
-  useEffect(() => {
-    if (!isCreating && isSuccess) {
-      close("create-food");
-    }
-  }, [isCreating, isSuccess, close]);
 
   return { isCreating, createFood, isSuccess };
 }

@@ -3,10 +3,8 @@
 import DietBox from "./DietBox";
 import AddDiet from "./dietSlider/AddDiet";
 import Modal from "@/components/ui/Modal";
-import CreateDiet from "./dietSlider/createEditModal/CreateDiet";
 import { useDietContext } from "@/app/context/useDietContext";
 import { useDiets } from "@/app/data/diets/useDiets";
-import CreateFood from "../food/CreateFood";
 import EditDiet from "./dietSlider/createEditModal/EditDiet";
 
 export default function DietsSlider({ initialDataDiets }) {
@@ -38,9 +36,6 @@ export default function DietsSlider({ initialDataDiets }) {
           </Modal.Open>
           <Modal.Window name="new-diet">
             <EditDiet modalName="new-diet" creating={true} />
-          </Modal.Window>
-          <Modal.Window name="create-food">
-            <CreateFood />
           </Modal.Window>
         </div>
       </div>

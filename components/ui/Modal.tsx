@@ -9,7 +9,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { useOutsideClick } from "@/hooks/useOutsideClick";
+import { useOutsideClickModal } from "@/hooks/useOutsideClickModal";
 
 interface ModalContextType {
   open: (name: string) => void;
@@ -49,7 +49,7 @@ export const ModalContext = createContext<ModalContextType>({
 function Modal({ children }: ModalProps) {
   const [openNames, setOpenNames] = useState<string[]>([]);
   const [modified, setModified] = useState<string>("");
-
+  console.log(openNames);
   const canClose = new Map(
     openNames.map((name) => [name, !modified?.includes(name)])
   );
@@ -57,6 +57,7 @@ function Modal({ children }: ModalProps) {
   const unsavedChanges = (name: string) => setModified(name);
   const open = (name: string) => setOpenNames((prev) => [...prev, name]);
   const close = (name: string) => {
+    // console.log("🐢", name);
     const canCloseModal = canClose.get(name);
     if (canCloseModal) {
       setOpenNames((prev) => prev.filter((n) => n !== name));
@@ -67,8 +68,12 @@ function Modal({ children }: ModalProps) {
   const closeLast = (force = false) => {
     setOpenNames((prev) => {
       const lastName = prev.at(-1);
+      // console.log("🐢", lastName);
+
       if (lastName) {
         const canCloseLast = canClose.get(lastName);
+        // console.log("🐢🐢", lastName);
+
         if (canCloseLast || force) {
           return prev.slice(0, prev.length - 1);
         } else {
@@ -146,7 +151,7 @@ function Open({ children, opens }: OpenProps) {
 function Window({ children, name }: WindowProps) {
   const { openNames, close, closeLast } = useContext(ModalContext);
   const mounted = openNames.includes(name) && React.isValidElement(children);
-  const ref = useOutsideClick<HTMLDivElement>(closeLast, mounted, name);
+  const ref = useOutsideClickModal<HTMLDivElement>(closeLast, mounted, name);
 
   // useEffect(() => {
   //   console.log(`Window mounted: ${name}`);
@@ -161,9 +166,15 @@ function Window({ children, name }: WindowProps) {
     console.error("`children` must be a valid React element");
     return null;
   }
+  console.log(name);
+  const closeModal = () => {
+    console.log(2);
+    close(name);
+  };
 
   const zIndex = openNames.indexOf(name) + 2000;
   const message = "window" + name;
+
   return createPortal(
     <div
       style={{ zIndex: zIndex }}
@@ -189,7 +200,7 @@ function Window({ children, name }: WindowProps) {
           <HiXMark className="w-4 h-4 text-gray-500" />
         </button>
         <div className="flex flex-col h-full  ">
-          {cloneElement(children, { onCloseModal: close })}
+          {cloneElement(children, { onCloseModal: closeModal })}
         </div>
       </div>
     </div>,

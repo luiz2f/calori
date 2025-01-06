@@ -1,21 +1,46 @@
-import { useContext, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import Button from "@/components/ui/Button";
 import { useCreateFood } from "@/app/data/foods/useCreateFood";
 import { ModalContext } from "@/components/ui/Modal";
 import Spinner from "@/components/ui/Spinner";
+import { useUpdateFood } from "@/app/data/foods/useUpdateFood";
 
-export default function CreateFood() {
-  const { close } = useContext(ModalContext);
-  const { isCreating, createFood, isSuccess } = useCreateFood();
-  const created = !isCreating && isSuccess;
-  const [inputs, setInputs] = useState({
+export default function CreateEditFood({
+  shouldReturn = false,
+  editing = false,
+  foodInfo,
+  modalName,
+}) {
+  const editInput = {
+    name: foodInfo?.name,
+    quantity: 1 / foodInfo?.unities[0]?.unitMultiplier,
+    unity: foodInfo?.unities[0]?.un,
+    carb: foodInfo?.carb,
+    prot: foodInfo?.protein,
+    fat: foodInfo?.fat,
+  };
+  const defaultInputs = {
     name: "Peito de Frango Cru",
     quantity: 100,
-    unity: "gr",
+    unity: "g",
     carb: 0,
     prot: 21.1,
     fat: 2.29,
+  };
+  const stateDefault = editing ? editInput : defaultInputs;
+  const { close } = useContext(ModalContext);
+  const {
+    isCreating,
+    createFood,
+    isSuccess: isSuccessC,
+  } = useCreateFood({
+    shouldReturn,
   });
+  const { isUpdating, updateFood, isSuccess: isSuccessU } = useUpdateFood();
+  const [inputs, setInputs] = useState(stateDefault);
+
+  const isLoading = editing ? isUpdating : isCreating;
+  const isSuccess = editing ? isSuccessU : isSuccessC;
 
   const kcal = Math.round((inputs.carb + inputs.prot) * 4 + inputs.fat * 9);
   const [errors, setErrors] = useState({
@@ -26,11 +51,25 @@ export default function CreateFood() {
     prot: false,
     fat: false,
   });
-  const disabled = Object.values(errors).some((error) => error);
+  const disabled = Object.values(errors).some((error) => error) || isLoading;
+
+  const handleClose = useCallback(() => {
+    close(modalName);
+  }, [close, modalName]);
+
+  useEffect(() => {
+    console.log(editing, isLoading, isSuccess);
+    if (!editing) {
+      if (!isLoading && isSuccess) {
+        handleClose();
+      }
+    }
+  }, [editing, isLoading, isSuccess, handleClose]);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
-    const newValue = id === "name" ? value : parseFloat(value);
+    const isText = id === "unity" || id === "name";
+    const newValue = isText || value === "" ? value : parseFloat(value);
     setInputs((prev) => ({ ...prev, [id]: newValue }));
     if (value === "") {
       setErrors((prev) => ({ ...prev, [id]: true }));
@@ -43,7 +82,15 @@ export default function CreateFood() {
     e.stopPropagation();
     e.preventDefault();
     if (!disabled) {
-      createFood(inputs);
+      if (editing) {
+        updateFood({
+          inputs,
+          foodId: foodInfo?.id,
+          unityId: foodInfo?.unities[0]?.id,
+        });
+      } else {
+        createFood(inputs);
+      }
     }
   };
 
@@ -51,7 +98,11 @@ export default function CreateFood() {
     <>
       <form className="relative" onSubmit={handleSubmit}>
         <div className="font-bold text-xl mb-10 text-center">
-          {created ? "Alimento Criado" : "Criar Alimento"}
+          {editing
+            ? "Editar Alimento"
+            : isSuccess
+            ? "Alimento Criado"
+            : "Criar Alimento"}
         </div>
         <div className="flex gap-2 mb-8">
           <div className="relative w-full">
@@ -64,7 +115,7 @@ export default function CreateFood() {
               Food Name
             </label>
             <input
-              disabled={created}
+              disabled={isLoading}
               type="text"
               id="name"
               value={inputs.name}
@@ -87,10 +138,10 @@ export default function CreateFood() {
                   : ""
               }`}
             >
-              Quantity
+              Quantidade
             </label>
             <input
-              disabled={created}
+              disabled={isLoading}
               type="number"
               id="quantity"
               value={inputs.quantity}
@@ -111,10 +162,10 @@ export default function CreateFood() {
                   : ""
               }`}
             >
-              Unity
+              Unidade
             </label>
             <input
-              disabled={created}
+              disabled={isLoading}
               type="text"
               id="unity"
               value={inputs.unity}
@@ -138,7 +189,7 @@ export default function CreateFood() {
               Carboidrato
             </label>
             <input
-              disabled={created}
+              disabled={isLoading}
               type="number"
               id="carb"
               value={inputs.carb}
@@ -160,7 +211,7 @@ export default function CreateFood() {
               Proteína
             </label>
             <input
-              disabled={created}
+              disabled={isLoading}
               type="number"
               id="prot"
               value={inputs.prot}
@@ -182,7 +233,7 @@ export default function CreateFood() {
               Gordura
             </label>
             <input
-              disabled={created}
+              disabled={isLoading}
               type="number"
               id="fat"
               value={inputs.fat}
@@ -203,37 +254,23 @@ export default function CreateFood() {
         </div>
 
         <div className="flex gap-4 px-1">
-          {!created ? (
+          {editing || !isSuccess ? (
             <>
-              <Button
-                size="small"
-                cw="lightred"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  close("create-food");
-                }}
-              >
+              <Button size="small" cw="lightred" onClick={handleClose}>
                 Cancelar
               </Button>
               <Button size="small" type="submit" disabled={disabled}>
-                Criar Alimento
+                {editing ? "Salvar" : "Criar Alimento"}
               </Button>
             </>
           ) : (
-            <Button
-              size="small"
-              cw="light"
-              onClick={(e) => {
-                e.stopPropagation();
-                close("create-food");
-              }}
-            >
+            <Button size="small" cw="light" onClick={handleClose}>
               Fechar
             </Button>
           )}
         </div>
       </form>
-      {isCreating && (
+      {isLoading && (
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex justify-center items-center bg-white w-full h-full bg-opacity-80">
           <Spinner />
         </div>

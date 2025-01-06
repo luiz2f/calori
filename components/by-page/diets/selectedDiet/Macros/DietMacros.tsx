@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Toogle from "@/components/ui/Toogle";
 import { useMacroContext } from "@/app/context/useMacroContext";
+import { useWeight } from "@/app/data/user/useWeight";
 
 export default function DietMacros() {
   const [currentMetric, setCurrentMetric] = useState<
@@ -27,7 +28,7 @@ export default function DietMacros() {
   });
 
   const { totalMacros } = useMacroContext();
-  const weight = 78;
+  const { data: weight } = useWeight();
 
   useEffect(() => {
     const totalKcal =
@@ -76,21 +77,21 @@ export default function DietMacros() {
         <div className="grid grid-cols-3 max-w-64 m-auto">
           <div className="flex flex-col align-middle text-center">
             <div className="text-2xl mb-1">🍞</div>
-            <div>carb</div>
+            <div>Carboitrado</div>
             <div className="text-2xl text-darkgreen">
               {data[currentMetric].carb}
             </div>
           </div>
           <div className="flex flex-col align-middle text-center">
             <div className="text-2xl mb-1">🥩</div>
-            <div>Proto</div>
+            <div>Proteína</div>
             <div className="text-2xl text-darkgreen border-x-1 border-grey10">
               {data[currentMetric].prot}
             </div>
           </div>
           <div className="flex flex-col align-middle text-center">
             <div className="text-2xl mb-1">🥑</div>
-            <div>fat</div>
+            <div>Gordura</div>
             <div className="text-2xl text-darkgreen">
               {data[currentMetric].fat}
             </div>

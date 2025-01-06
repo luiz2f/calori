@@ -64,6 +64,38 @@ export async function getFoods() {
   return foods;
 }
 
+export async function getUserFoods() {
+  const session = await auth();
+  const userId = session.userId;
+
+  const userFoods = await prisma.food.findMany({
+    select: {
+      id: true,
+      name: true,
+      carb: true,
+      protein: true,
+      fat: true,
+      satFat: true,
+      fiber: true,
+      userFood: true,
+      unities: {
+        select: {
+          id: true,
+          foodId: true,
+          un: true,
+          unitMultiplier: true,
+        },
+      },
+    },
+    where: {
+      userFood: true,
+      userId: userId,
+    },
+  });
+
+  return userFoods;
+}
+
 export async function createFood(data, userId) {
   let { name, quantity, unity, carb, prot, fat } = data;
 
@@ -97,7 +129,7 @@ export async function createFood(data, userId) {
   const unityRecord = await prisma.unity.create({
     data: {
       foodId: food.id,
-      un: "gr",
+      un: unity,
       unitMultiplier,
     },
   });
@@ -106,4 +138,49 @@ export async function createFood(data, userId) {
   const newFood = { ...food, unities: [unityRecord] };
 
   return newFood;
+}
+
+export async function deleteFood(foodId) {
+  const session = await auth();
+  const userId = session.userId;
+
+  const deletedFood = await prisma.food.delete({
+    where: {
+      id: foodId,
+      userFood: true,
+      userId: userId,
+    },
+  });
+
+  return deletedFood;
+}
+
+export async function updateFood({ inputs, foodId, unityId }) {
+  const unitMultiplier = 1 / inputs.quantity;
+  const updatedFood = await prisma.food.update({
+    where: {
+      id: foodId,
+    },
+    data: {
+      name: inputs.name,
+      carb: inputs.carb,
+      protein: inputs.prot,
+      fat: inputs.fat,
+      unities: {
+        update: {
+          where: {
+            id: unityId,
+          },
+          data: {
+            un: inputs.unity,
+            unitMultiplier,
+          },
+        },
+      },
+    },
+    include: {
+      unities: true, // Inclui as unities atualizadas no retorno
+    },
+  });
+  return updatedFood;
 }

@@ -33,10 +33,18 @@ export default function Button({
     "!text-base !h-fit !py-2": size === "small",
   });
 
+  function handleClick(e: React.MouseEvent<HTMLButtonElement>) {
+    e.stopPropagation();
+    if (type !== "submit") {
+      e.preventDefault();
+    }
+    onClick?.();
+  }
+
   return (
     <button
       className={buttonClass}
-      onClick={onClick}
+      onClick={(e) => handleClick(e)}
       disabled={disabled}
       type={type}
       {...props}

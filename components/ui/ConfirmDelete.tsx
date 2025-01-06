@@ -23,23 +23,22 @@ function ConfirmDelete({
   onCloseModal,
   modalName,
 }: ConfirmDeleteProps) {
-  async function handleConfirm(e) {
-    e.stopPropagation();
+  async function handleConfirm() {
     try {
       await onConfirm();
     } catch (error) {
       console.error(error);
     } finally {
       if (loaded === undefined) {
-        // caso não seja passada a condição de loaded, o modal é fechado automaticamente no fim do Confirm
-        onCloseModal(modalName);
+        onCloseModal();
       }
     }
   }
 
   useEffect(() => {
+    console.log(7);
     if (loaded) {
-      onCloseModal(modalName);
+      onCloseModal();
     }
   }, [loaded, onCloseModal, modalName]);
 
@@ -59,10 +58,7 @@ function ConfirmDelete({
           cw="grey"
           size="small"
           disabled={disabled || loading}
-          onClick={(e) => {
-            e.stopPropagation();
-            onCloseModal(modalName);
-          }}
+          onClick={() => onCloseModal()}
         >
           Cancelar
         </Button>
@@ -70,7 +66,7 @@ function ConfirmDelete({
           cw="red"
           size="small"
           disabled={disabled || loading}
-          onClick={(e) => handleConfirm(e)}
+          onClick={() => handleConfirm()}
         >
           Apagar
         </Button>

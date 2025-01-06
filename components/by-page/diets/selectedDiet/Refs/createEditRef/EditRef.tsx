@@ -273,7 +273,7 @@ export default function EditRef({
     );
   };
   const createUserFood = () => {
-    open("create-food");
+    open("create-food-return");
   };
 
   useEffect(() => {
@@ -371,7 +371,7 @@ export default function EditRef({
   }, []);
 
   return (
-    <Menus>
+    <>
       <div id="editref" className="relative flex flex-col h-full">
         <div className="font-bold text-xl text-center">
           {creating ? "Criar Refeição" : "Editar Refeição"}
@@ -452,14 +452,7 @@ export default function EditRef({
         )}
 
         <div className="flex gap-4 px-1">
-          <Button
-            size="small"
-            cw="lightred"
-            onClick={(e) => {
-              e.stopPropagation();
-              close(modalName);
-            }}
-          >
+          <Button size="small" cw="lightred" onClick={() => close(modalName)}>
             Cancelar
           </Button>
           <Button
@@ -476,6 +469,6 @@ export default function EditRef({
           </div>
         )}
       </div>
-    </Menus>
+    </>
   );
 }

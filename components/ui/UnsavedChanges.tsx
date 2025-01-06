@@ -5,11 +5,6 @@ import { ModalContext } from "./Modal";
 function UnsavedChanges() {
   const { close, closeUnsaved } = useContext(ModalContext);
 
-  async function handleConfirm(e) {
-    e.stopPropagation();
-    closeUnsaved();
-  }
-
   return (
     <div className="w-full flex flex-col gap-3 relative">
       <div className="font-bold text-xl mb-6 text-center">
@@ -21,17 +16,10 @@ function UnsavedChanges() {
       </p>
 
       <div className="flex justify-end gap-3 items-center">
-        <Button
-          cw="grey"
-          size="small"
-          onClick={(e) => {
-            e.stopPropagation();
-            close("unsavedChanges");
-          }}
-        >
+        <Button cw="grey" size="small" onClick={() => close("unsavedChanges")}>
           Cancelar
         </Button>
-        <Button cw="red" size="small" onClick={(e) => handleConfirm(e)}>
+        <Button cw="red" size="small" onClick={() => closeUnsaved()}>
           Descartar
         </Button>
       </div>

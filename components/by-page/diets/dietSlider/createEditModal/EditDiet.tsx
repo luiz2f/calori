@@ -146,7 +146,7 @@ export default function EditDiet({ diet, modalName, creating = false }) {
   };
 
   return (
-    <Menus>
+    <>
       <form onSubmit={handleSubmit} className="relative">
         <div className="font-bold text-xl mb-10 text-center">Editar Dieta</div>
         <div className="relative">
@@ -188,14 +188,7 @@ export default function EditDiet({ diet, modalName, creating = false }) {
           </button>
         )}
         <div className="flex gap-4 px-1 mt-6">
-          <Button
-            size="small"
-            cw="lightred"
-            onClick={(e) => {
-              e.stopPropagation();
-              close(modalName);
-            }}
-          >
+          <Button size="small" cw="lightred" onClick={() => close(modalName)}>
             Cancelar
           </Button>
           <Button size="small" type="submit" disabled={isDisabled}>
@@ -208,6 +201,6 @@ export default function EditDiet({ diet, modalName, creating = false }) {
           <Spinner />
         </div>
       )}
-    </Menus>
+    </>
   );
 }

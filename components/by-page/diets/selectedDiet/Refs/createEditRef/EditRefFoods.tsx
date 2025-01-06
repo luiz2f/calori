@@ -23,26 +23,27 @@ export default function EditRefFoods({
   const queryClient = useQueryClient();
   const currentMeal = mealsList[currentIndex];
   const [variationName, setVariationName] = useState(currentMeal?.name || "");
-  const { data: foods } = useFoods();
+  const { data: foods, isLoading } = useFoods();
   const modalName = `deleteMeal${currentMeal?.id}`;
+
   const foodOptions = useMemo(
     () => [
       {
         value: "create-food",
         label: "Criar Alimento",
       },
-      ...foods?.map((obj) => ({
+      ...(foods?.map((obj) => ({
         value: obj.id,
         label: obj.name,
-        unities: obj?.unities?.map((unit) => ({
+        unities: obj.unities?.map((unit) => ({
           value: unit.id,
           label: unit.un,
         })),
-      })),
+      })) || []),
     ],
-    [foods]
+    [foods, isLoading]
   );
-  console.log(foodOptions);
+
   function handleDeleteMeal() {
     onDeleteVariation(currentMeal?.id);
   }

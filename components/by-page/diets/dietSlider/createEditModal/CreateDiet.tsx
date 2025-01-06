@@ -124,7 +124,7 @@ export default function CreateDiet({ modalName }) {
   };
 
   return (
-    <Menus>
+    <>
       <form onSubmit={handleSubmit} className="relative">
         <div className="font-bold text-xl mb-10 text-center">Criar Dieta</div>
         <div className="relative">
@@ -160,7 +160,7 @@ export default function CreateDiet({ modalName }) {
           <button
             type="button"
             className="text-darkgreen pl-2"
-            onClick={handleAddRef}
+            onClick={(e) => handleAddRef(e)}
           >
             + Adicionar refeição
           </button>
@@ -183,6 +183,6 @@ export default function CreateDiet({ modalName }) {
           <Spinner />
         </div>
       )}
-    </Menus>
+    </>
   );
 }
