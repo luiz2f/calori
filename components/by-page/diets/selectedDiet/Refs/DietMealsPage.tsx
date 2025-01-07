@@ -6,8 +6,9 @@ import EditRef from "./createEditRef/EditRef";
 import { useDeleteDiet } from "@/app/data/diets/useDeleteDiet";
 import ConfirmDelete from "@/components/ui/ConfirmDelete";
 import UnsavedChanges from "@/components/ui/UnsavedChanges";
+import Spinner from "@/components/ui/Spinner";
 
-export default function DietMealsPage({ meals, dietId, name }) {
+export default function DietMealsPage({ meals, dietId, name, isLoading }) {
   const { isDeleting, deleteDiet, isSuccess } = useDeleteDiet();
   const handleDeleteDiet = async () => {
     await deleteDiet(dietId);
@@ -15,41 +16,49 @@ export default function DietMealsPage({ meals, dietId, name }) {
 
   return (
     <>
-      <div className="flex flex-col w-full p-4 gap-12 mt-6 ">
-        {meals?.map((meal, index) => (
-          <DietMeal key={meal.id} meal={meal} index={index} />
-        ))}
-        <AddRef dietId={dietId} />
-      </div>
-      <Modal.Open opens={`deleteDietG${dietId}`}>
-        <div className="text-center mt-4 mb-4 underline-offset-2 underline cursor-pointer text-darkred">
-          Apagar Dieta
+      {isLoading ? (
+        <div className="my-8">
+          <Spinner />
         </div>
-      </Modal.Open>
-      <Modal.Window name="unsavedChanges">
-        <UnsavedChanges />
-      </Modal.Window>
-      <Modal.Window name={`deleteDietG${dietId}`}>
-        <ConfirmDelete
-          loading={isDeleting}
-          loaded={!isDeleting && isSuccess}
-          resource="Dieta"
-          resourceName={`${name}`}
-          onConfirm={handleDeleteDiet}
-          modalName={`deleteDietG${dietId}`}
-        />
-      </Modal.Window>
-      <Modal.Window name={"createNewMeal"}>
-        <EditRef
-          dietFromId={dietId}
-          creating={true}
-          createVariation={true}
-          meal={null}
-          currentIndex={0}
-          typeInput="Alimentos"
-          modalName="createNewMeal"
-        />
-      </Modal.Window>
+      ) : (
+        <>
+          <div className="flex flex-col w-full p-4 gap-12 mt-6 ">
+            {meals?.map((meal, index) => (
+              <DietMeal key={meal.id} meal={meal} index={index} />
+            ))}
+            <AddRef dietId={dietId} />
+          </div>
+          <Modal.Open opens={`deleteDietG${dietId}`}>
+            <div className="text-center mt-4 mb-4 underline-offset-2 underline cursor-pointer text-darkred">
+              Apagar Dieta
+            </div>
+          </Modal.Open>
+          <Modal.Window name="unsavedChanges">
+            <UnsavedChanges />
+          </Modal.Window>
+          <Modal.Window name={`deleteDietG${dietId}`}>
+            <ConfirmDelete
+              loading={isDeleting}
+              loaded={!isDeleting && isSuccess}
+              resource="Dieta"
+              resourceName={`${name}`}
+              onConfirm={handleDeleteDiet}
+              modalName={`deleteDietG${dietId}`}
+            />
+          </Modal.Window>
+          <Modal.Window name={"createNewMeal"}>
+            <EditRef
+              dietFromId={dietId}
+              creating={true}
+              createVariation={true}
+              meal={null}
+              currentIndex={0}
+              typeInput="Alimentos"
+              modalName="createNewMeal"
+            />
+          </Modal.Window>
+        </>
+      )}
     </>
   );
 }

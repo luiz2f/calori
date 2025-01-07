@@ -22,7 +22,7 @@ export default function SelectedDiet({ serverData }) {
     isLoading,
     isSuccess,
   } = useMeals(serverData?.defaultDiet, dietId);
-  const selectedDietName = dietsSlider.filter((obj) => obj.id === dietId)[0]
+  const selectedDietName = dietsSlider?.filter((obj) => obj.id === dietId)[0]
     ?.name;
   const name = selectedDietName || diet?.name;
 
@@ -31,7 +31,7 @@ export default function SelectedDiet({ serverData }) {
       setDefaultMacro(diet);
     }
   }, [diet]);
-  
+
   if (dietsSlider?.length === 0) {
     return (
       <div className="w-full flex flex-col h-full text-center">
@@ -42,9 +42,10 @@ export default function SelectedDiet({ serverData }) {
 
   return (
     <div className="w-full flex flex-col h-full">
-      <DietName />
+      <DietName name={name} />
       <DietMacros />
       <DietMealsPage
+        isLoading={isLoading}
         key={dietId}
         meals={diet?.meals}
         dietId={dietId}

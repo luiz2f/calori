@@ -18,8 +18,6 @@ export default function App({ empty, defaultDiet, diets, foods, children }) {
   const { id } = defaultDiet || {};
 
   useEffect(() => {
-    console.log("effect");
-
     if (diets) {
       queryClient.setQueryData(["diets"], diets);
       queryClient.setQueryData([`meals-diet-${id}`], defaultDiet);

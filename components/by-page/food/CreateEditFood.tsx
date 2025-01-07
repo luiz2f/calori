@@ -28,7 +28,7 @@ export default function CreateEditFood({
     fat: 2.29,
   };
   const stateDefault = editing ? editInput : defaultInputs;
-  const { close } = useContext(ModalContext);
+  const { close, unsavedChanges } = useContext(ModalContext);
   const {
     isCreating,
     createFood,
@@ -64,6 +64,16 @@ export default function CreateEditFood({
   const handleClose = useCallback(() => {
     close(modalName);
   }, [close, modalName]);
+
+  useEffect(() => {
+    if (editing) {
+      if (isModified) {
+        unsavedChanges(modalName);
+      } else {
+        unsavedChanges("");
+      }
+    }
+  }, [unsavedChanges, modalName, isModified, editing]);
 
   useEffect(() => {
     if (editing) {

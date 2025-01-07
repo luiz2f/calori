@@ -42,23 +42,21 @@ export const loginWithCredentials = async (formData: FormData) => {
     redirect: true,
     redirectTo: "/diets",
   };
-
   try {
     await signIn("credentials", rawFormData);
   } catch (error: any) {
+    console.log(error);
     if (error instanceof AuthError) {
       switch (error.type) {
-        case "CallbackRouteError" || "CredentialsSignin":
+        case "CallbackRouteError":
+        case "CredentialsSignin":
           return { error: error.message };
         default:
           return { error: error.message };
       }
     }
-
     throw error;
   }
-  //📌 sera que da bom se logar com conta existente normal?
-  revalidatePath("/");
 };
 
 export const registerWithCredentials = async (formData: FormData) => {
@@ -73,15 +71,16 @@ export const registerWithCredentials = async (formData: FormData) => {
   try {
     await signIn("credentials", rawFormData);
   } catch (error: any) {
+    console.log(error);
     if (error instanceof AuthError) {
       switch (error.type) {
-        case "CallbackRouteError" || "CredentialsSignin":
+        case "CallbackRouteError":
+        case "CredentialsSignin":
           return { error: error.message };
         default:
           return { error: error.message };
       }
     }
-
     throw error;
   }
   revalidatePath("/");

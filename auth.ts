@@ -129,19 +129,3 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
 });
-
-// if (!user) {
-//   user = await prisma.user.create({
-//     data: {
-//       email,
-//       hashedPassword: hash,
-//     },
-//   });
-// } else if (!user.hashedPassword) {
-//   user = await prisma.user.update({
-//     where: { email },
-//     data: { hashedPassword: hash },
-//   });
-// } else {
-//   throw new Error("User already exists");
-// }

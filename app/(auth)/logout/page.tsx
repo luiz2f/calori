@@ -1,9 +1,9 @@
 "use client";
 
-import { signOut } from "next-auth/react"; // Import correto para signOut do next-auth
+import { signOut } from "next-auth/react";
 import Spinner from "@/components/ui/Spinner";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation"; // API de navegação atualizada
+import { useRouter } from "next/navigation";
 
 export default function Logout() {
   const router = useRouter();
@@ -11,14 +11,14 @@ export default function Logout() {
   useEffect(() => {
     const handleLogout = async () => {
       try {
-        await signOut({ callbackUrl: "/" }); // Redireciona automaticamente após o logout
+        await signOut({ callbackUrl: "/" });
       } catch (error) {
         console.error("Erro ao realizar logout:", error);
-        router.push("/"); // Garante redirecionamento mesmo se algo falhar
+        router.push("/");
       }
     };
 
-    handleLogout(); // Executa o logout assim que o componente é montado
+    handleLogout();
   }, [router]);
 
   return <Spinner />;

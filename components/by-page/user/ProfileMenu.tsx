@@ -6,7 +6,6 @@ import { IoScale } from "react-icons/io5";
 import { TbSoupFilled } from "react-icons/tb";
 import Modal from "../../ui/Modal";
 import Link from "next/link";
-import MyWeight from "./MyWeight";
 
 export default function ProfileMenu({ username, handler }) {
   const ref = useOutsideClick(handler, false);
@@ -22,8 +21,14 @@ export default function ProfileMenu({ username, handler }) {
       >
         <div className="flex flex-col py-2">
           <div className="px-4 p-2">
-            <span className="text-lightblack">Olá, {username}</span>
+            <span className="text-lightblack text-xl">Olá, {username}</span>
+            <Link href="/logout">
+              <div className="underline text-sm text-blacklight">
+                Sair da conta
+              </div>
+            </Link>
           </div>
+
           <Link href="/change-password">
             <div className={buttonStyle}>
               <HiMiniLockClosed />

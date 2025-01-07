@@ -1,15 +1,8 @@
-import { auth } from "@/auth";
 import LoginForm from "@/components/auth/credentials/LoginForm";
 import LoginGoogle from "@/components/auth/LoginGoogle";
 import NavAnchor from "@/components/ui/NavAnchor";
-import { redirect } from "next/navigation";
 
 export default async function SignIn() {
-  const session = await auth();
-  if (session?.user) {
-    redirect("/");
-  }
-
   return (
     <div className="w-full h-full flex pt-6 pb-3">
       <section className="flex flex-col w-full h-full justify-between ">
