@@ -13,7 +13,7 @@ export default function CreateEditFood({
 }) {
   const editInput = {
     name: foodInfo?.name,
-    quantity: 1 / foodInfo?.unities[0]?.unitMultiplier,
+    quantity: parseFloat((1 / foodInfo?.unities[0]?.unitMultiplier).toFixed(2)),
     unity: foodInfo?.unities[0]?.un,
     carb: foodInfo?.carb,
     prot: foodInfo?.protein,
@@ -36,8 +36,15 @@ export default function CreateEditFood({
   } = useCreateFood({
     shouldReturn,
   });
-  const { isUpdating, updateFood, isSuccess: isSuccessU } = useUpdateFood();
+  const {
+    isUpdating,
+    updateFood,
+    isSuccess: isSuccessU,
+    reset,
+  } = useUpdateFood();
   const [inputs, setInputs] = useState(stateDefault);
+  const [originalInputs, setOriginalInputs] = useState(stateDefault);
+  const [isModified, setIsModified] = useState(editing ? false : true);
 
   const isLoading = editing ? isUpdating : isCreating;
   const isSuccess = editing ? isSuccessU : isSuccessC;
@@ -51,20 +58,34 @@ export default function CreateEditFood({
     prot: false,
     fat: false,
   });
-  const disabled = Object.values(errors).some((error) => error) || isLoading;
+  const disabled =
+    Object.values(errors).some((error) => error) || isLoading || !isModified;
 
   const handleClose = useCallback(() => {
     close(modalName);
   }, [close, modalName]);
 
   useEffect(() => {
-    console.log(editing, isLoading, isSuccess);
-    if (!editing) {
-      if (!isLoading && isSuccess) {
-        handleClose();
+    if (editing) {
+      if (JSON.stringify(inputs) !== JSON.stringify(originalInputs)) {
+        setIsModified(true);
+      } else if (isModified) {
+        setIsModified(false);
       }
     }
-  }, [editing, isLoading, isSuccess, handleClose]);
+  }, [editing, inputs, originalInputs]);
+
+  useEffect(() => {
+    if (!isLoading && isSuccess) {
+      if (!editing) {
+        handleClose();
+      } else {
+        setOriginalInputs(inputs);
+        setIsModified(false);
+        reset();
+      }
+    }
+  }, [editing, isLoading, isSuccess, handleClose, inputs, reset]);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -77,7 +98,6 @@ export default function CreateEditFood({
       setErrors((prev) => ({ ...prev, [id]: false }));
     }
   };
-
   const handleSubmit = (e) => {
     e.stopPropagation();
     e.preventDefault();

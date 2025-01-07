@@ -97,47 +97,48 @@ export async function getUserFoods() {
 }
 
 export async function createFood(data, userId) {
-  let { name, quantity, unity, carb, prot, fat } = data;
+  {
+    let { name, quantity, unity, carb, prot, fat } = data;
+    let idUser = userId;
+    carb = parseFloat(carb.toFixed(4));
+    prot = parseFloat(prot.toFixed(4));
+    fat = parseFloat(fat.toFixed(4));
+    quantity = parseFloat(quantity.toFixed(4));
 
-  carb = parseFloat(carb.toFixed(4));
-  prot = parseFloat(prot.toFixed(4));
-  fat = parseFloat(fat.toFixed(4));
-  quantity = parseFloat(quantity.toFixed(4));
+    if (!idUser) {
+      const session = await auth();
+      idUser = session.userId;
+    }
+    const foodData = {
+      name,
+      carb: parseFloat(carb),
+      protein: parseFloat(prot),
+      fat: parseFloat(fat),
+      satFat: 0.0,
+      fiber: 0.0,
+      userFood: true,
+      userId: idUser,
+    };
+    const food = await prisma.food.create({ data: foodData });
 
-  if (!userId) {
-    const session = await auth();
-    userId = session.userId;
+    if (!food) {
+      return { error: "Error returning food" };
+    }
+
+    const unitMultiplier = parseFloat((1 / quantity).toFixed(6));
+
+    const unityRecord = await prisma.unity.create({
+      data: {
+        foodId: food.id,
+        un: unity,
+        unitMultiplier,
+      },
+    });
+
+    const newFood = { ...food, unities: [unityRecord] };
+
+    return newFood;
   }
-  const foodData = {
-    name,
-    carb: parseFloat(carb),
-    protein: parseFloat(prot),
-    fat: parseFloat(fat),
-    satFat: 0.0,
-    fiber: 0.0,
-    userFood: true,
-    userId,
-  };
-  const food = await prisma.food.create({ data: foodData });
-
-  if (!food) {
-    return { error: "Error returning food" };
-  }
-
-  const unitMultiplier = parseFloat((1 / quantity).toFixed(6));
-
-  const unityRecord = await prisma.unity.create({
-    data: {
-      foodId: food.id,
-      un: unity,
-      unitMultiplier,
-    },
-  });
-
-  const response = { food, unityRecord };
-  const newFood = { ...food, unities: [unityRecord] };
-
-  return newFood;
 }
 
 export async function deleteFood(foodId) {
@@ -182,5 +183,6 @@ export async function updateFood({ inputs, foodId, unityId }) {
       unities: true, // Inclui as unities atualizadas no retorno
     },
   });
+
   return updatedFood;
 }

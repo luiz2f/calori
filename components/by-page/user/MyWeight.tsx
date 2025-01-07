@@ -5,14 +5,29 @@ import Spinner from "@/components/ui/Spinner";
 import Toogle from "@/components/ui/Toogle";
 import React, { useEffect, useState } from "react";
 
-export default function MyWeight({ userId, userWeight }) {
+export default function MyWeight({
+  userId,
+  userWeight,
+  closeAfter = false,
+  onCloseModal,
+}) {
   const defaultWeight = userWeight;
   const defaultWeightlb = parseFloat((userWeight * 2.20462).toFixed(2));
   const [weight, setWeight] = useState(userWeight);
   const [unity, setUnity] = useState<"kg" | "lb">("kg");
   const [error, setError] = useState(false);
-  const { isPending, updateWeight, isError } = useUpdateWeight();
+  const { isPending, updateWeight, isSuccess, reset, isError } =
+    useUpdateWeight();
   const isEqual = weight === defaultWeight || defaultWeightlb === weight;
+  useEffect(() => {
+    if (!isPending && isSuccess) {
+      if (closeAfter) {
+        onCloseModal();
+      } else {
+        setWeight(parseFloat(defaultWeight));
+      }
+    }
+  }, [closeAfter, isPending, isSuccess, onCloseModal]);
 
   useEffect(() => {
     if (isError) {
@@ -62,7 +77,9 @@ export default function MyWeight({ userId, userWeight }) {
   return (
     <>
       <form onSubmit={handleSubmit} className="relative">
-        <div className="font-bold text-xl mb-8 text-center">Meu Peso</div>
+        <div className="font-bold text-xl mb-8 text-center">
+          {defaultWeight ? "Meu Peso" : "Insira seu Peso"}
+        </div>
         <Toogle
           options={["kg", "lb"]}
           value={unity}
@@ -91,8 +108,12 @@ export default function MyWeight({ userId, userWeight }) {
         </div>
 
         <div className="flex gap-4 px-1 mt-6">
-          <Button size="small" type="submit" disabled={error || isEqual}>
-            Atualizar Peso
+          <Button
+            size="small"
+            type="submit"
+            disabled={error || isEqual || isPending}
+          >
+            {defaultWeight ? "Atualizar Peso" : "Salvar Peso"}
           </Button>
         </div>
         {isPending && (

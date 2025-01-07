@@ -1,8 +1,9 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Toogle from "@/components/ui/Toogle";
 import { useMacroContext } from "@/app/context/useMacroContext";
 import { useWeight } from "@/app/data/user/useWeight";
+import { ModalContext } from "@/components/ui/Modal";
 
 export default function DietMacros() {
   const [currentMetric, setCurrentMetric] = useState<
@@ -26,9 +27,16 @@ export default function DietMacros() {
     },
     totalKcal: 0,
   });
-
+  const { open } = useContext(ModalContext);
   const { totalMacros } = useMacroContext();
-  const { data: weight } = useWeight();
+  const { data: wg } = useWeight();
+  const weight = wg || 1;
+  const noWeight = !wg && currentMetric === "g/KG";
+
+  const openSetWeight = (e) => {
+    e.stopPropagation();
+    open("my-weight-false");
+  };
 
   useEffect(() => {
     const totalKcal =
@@ -63,7 +71,7 @@ export default function DietMacros() {
 
   return (
     <div className="flex flex-col w-full p-4">
-      <div className="flex w-full justify-between ">
+      <div className="flex w-full justify-between">
         <div className="flex items-center w-fit mx-auto ">
           <Toogle
             options={["g/KG", "kcal", "% kcal"]}
@@ -85,8 +93,18 @@ export default function DietMacros() {
           <div className="flex flex-col align-middle text-center">
             <div className="text-2xl mb-1">🥩</div>
             <div>Proteína</div>
-            <div className="text-2xl text-darkgreen border-x-1 border-grey10">
+            <div className="text-2xl text-darkgreen border-x-1 border-grey10 relative">
               {data[currentMetric].prot}
+              {noWeight ? (
+                <div
+                  onClick={(e) => openSetWeight(e)}
+                  className="absolute pb-1 top-0 left-1/2 right-0 text-xl -translate-x-1/2 text-center w-max bg-white underline cursor-pointer underline-offset-2"
+                >
+                  Informe seu peso para visualizar
+                </div>
+              ) : (
+                ""
+              )}
             </div>
           </div>
           <div className="flex flex-col align-middle text-center">

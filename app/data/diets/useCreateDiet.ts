@@ -16,6 +16,9 @@ export function useCreateDiet() {
         queryKey: ["diets"],
       });
     },
+    onError: (error) => {
+      console.log("useCreateDiet", error);
+    },
   });
 
   return { isCreating, createDiet, isSuccess };

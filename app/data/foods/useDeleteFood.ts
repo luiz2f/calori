@@ -23,6 +23,9 @@ export function useDeleteFood() {
         setDeletedId(id);
       }
     },
+    onError: (error) => {
+      console.log("useDeleteFood", error);
+    },
   });
 
   // manual delete from cache

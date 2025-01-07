@@ -31,6 +31,7 @@ export default function SelectedDiet({ serverData }) {
       setDefaultMacro(diet);
     }
   }, [diet]);
+  
   if (dietsSlider?.length === 0) {
     return (
       <div className="w-full flex flex-col h-full text-center">

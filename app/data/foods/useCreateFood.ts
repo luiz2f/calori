@@ -18,12 +18,11 @@ export function useCreateFood({
     mutationFn: (data) => createFoodAPI(data, userId),
     onSuccess: (data) => {
       queryClient.setQueryData(["foods"], (oldFoods) => {
-        return [...oldFoods, data];
+        return [...(Array.isArray(oldFoods) ? oldFoods : []), data];
       });
       queryClient.setQueryData(["userFoods"], (oldUserFoods) => {
-        return [...oldUserFoods, data];
+        return [...(Array.isArray(oldUserFoods) ? oldUserFoods : []), data];
       });
-      // creating from select
       if (shouldReturn) {
         const returnFood = queryClient.getQueryData(["createFoodReturn"]);
         if (returnFood && returnFood?.foodRowId) {
@@ -31,6 +30,10 @@ export function useCreateFood({
           queryClient.setQueryData(["createFoodReturn"], newReturnFood);
         }
       }
+    },
+
+    onError: (error) => {
+      console.log("useCreateFood", error);
     },
   });
 

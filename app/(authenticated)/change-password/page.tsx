@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import ChangePasswordForm from "@/components/auth/credentials/ChangePasswordForm";
+import Header from "@/components/Header";
 import { redirect } from "next/navigation";
 
 export default async function ChangePassword() {
@@ -11,6 +12,11 @@ export default async function ChangePassword() {
 
   const userEmail = session.user.email;
   if (userEmail) {
-    return <ChangePasswordForm userEmail={userEmail} />;
+    return (
+      <>
+        <Header home={true} />
+        <ChangePasswordForm userEmail={userEmail} />
+      </>
+    );
   }
 }

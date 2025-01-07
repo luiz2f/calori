@@ -16,6 +16,9 @@ export function useUpdateMeal() {
         queryKey: ["diets"],
       });
     },
+    onError: (error) => {
+      console.log("useUpdateMeal", error);
+    },
   });
   return { isUpdating, updateMeal, isSuccess };
 }

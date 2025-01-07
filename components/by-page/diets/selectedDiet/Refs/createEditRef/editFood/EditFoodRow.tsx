@@ -36,7 +36,7 @@ export default function EditFoodRow({
 
   const [selectedFood, setSelectedFood] = useState(foodDefault || null);
   const [selectedUnity, setSelectedUnity] = useState(unityDefault || null);
-  const foodInfo = foods.find((obj) => obj?.id === selectedFood?.value);
+  const foodInfo = foods?.find((obj) => obj?.id === selectedFood?.value);
   const unityInfo =
     foodInfo?.unities?.find((unity) => unity?.foodId === selectedFood?.value) ||
     {};
@@ -76,7 +76,7 @@ export default function EditFoodRow({
 
   useEffect(() => {
     if (foodReturned) {
-      const created = foodOptions.find((obj) => obj.value === foodReturned);
+      const created = foodOptions?.find((obj) => obj.value === foodReturned);
       handleFoodChange(created);
       cleanReturn();
     }

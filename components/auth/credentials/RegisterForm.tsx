@@ -105,14 +105,12 @@ export default function RegisterForm({ setExistentUser }: RegisterFormProps) {
           placeholder="Password"
           error={errors?.password}
           newPassword={true}
-          // função pra caso senha menor que 8 erro senha muito curta
         />
         <PasswordInput
           id="confirmPassword"
           placeholder="Confirm Password"
           error={errors.confirmPassword}
           newPassword={true}
-          // função pra caso senha menor que 8 erro senha muito curta
         />
 
         <AuthButton actionText="Sign Up" className="mt-2" />

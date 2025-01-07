@@ -1,10 +1,9 @@
 "use client";
 import { getUserDiets } from "@/actions/diets/diets";
-import { useDietContext } from "@/app/context/useDietContext";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
-export function useDiets(initialDataDiets) {
+export function useDiets(initialDataDiets = null) {
   const [initialUsed, setInitialUsed] = useState(false);
 
   useEffect(() => {

@@ -8,6 +8,8 @@ export function useUpdateWeight() {
   const {
     isPending,
     mutate: updateWeight,
+    isSuccess,
+    reset,
     isError,
   } = useMutation({
     mutationFn: updateWeightAPI,
@@ -15,7 +17,10 @@ export function useUpdateWeight() {
     onSuccess: (data) => {
       queryClient.setQueryData(["userWeight"], data);
     },
+    onError: (error) => {
+      console.log("useUpdateWeight", error);
+    },
   });
 
-  return { isPending, updateWeight, isError };
+  return { isPending, updateWeight, isSuccess, reset, isError };
 }

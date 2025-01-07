@@ -13,6 +13,9 @@ export function useDuplicateDiet() {
         queryKey: ["diets"],
       });
     },
+    onError: (error) => {
+      console.log("useDuplicateDiet", error);
+    },
   });
 
   return { isDuplicating, duplicateDiet };

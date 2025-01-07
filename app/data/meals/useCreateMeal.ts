@@ -19,6 +19,9 @@ export function useCreateMeal() {
       //   queryKey: ["diets"],
       // });
     },
+    onError: (error) => {
+      console.log("useCreateMeal", error);
+    },
   });
 
   useEffect(() => {

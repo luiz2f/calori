@@ -1,7 +1,6 @@
 "use server";
 
 import prisma from "@/prisma";
-import { getSessionId } from "../session";
 
 export async function getDietMeals(dietId: string) {
   if (!dietId) {
@@ -62,6 +61,7 @@ export async function getDietMeals(dietId: string) {
       },
     },
   });
+
   return dietMeals;
 }
 
@@ -146,7 +146,7 @@ export async function updateMeal({ mealId, mealName, mealTime, refs }) {
       // Atualiza ou cria itens da lista
       const originalItemIds =
         mealToUpdate?.mealList
-          .find((ml) => ml.id === list.id)
+          ?.find((ml) => ml.id === list.id)
           ?.mealListItems?.map((item) => item.id) || [];
 
       const currentItemIds = list.mealListItems?.map((item) => item.id);
@@ -209,7 +209,6 @@ export async function updateMeal({ mealId, mealName, mealTime, refs }) {
 
   // Aguardar todas as operações assíncronas
   await Promise.all([...updateOrCreateMealLists, ...deleteMealLists]);
-
 
   return mealToUpdate?.dietId;
 }

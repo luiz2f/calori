@@ -32,6 +32,15 @@ export const MacroProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   };
 
+  const updateMacros = () => {
+    console.time(`updateMacros`);
+    console.log(macros);
+    macros.forEach((macro) => {
+      updateMacroForMeal(macro.mealId, macro.macro, "default");
+    });
+    console.timeEnd(`updateMacros`);
+  };
+
   const updateMacroForMeal = (mealId, macro, way) => {
     setMacros((prevMacros) => {
       const updatedMacros = [...prevMacros];
@@ -70,17 +79,17 @@ export const MacroProvider: React.FC<{ children: React.ReactNode }> = ({
     const getMaxDigitsForMacroGroup = () => {
       const maxCarbDigits = Math.max(
         ...data.map((m) =>
-          m.macro.carb != null ? m.macro.carb.toString().length : 0
+          m?.macro?.carb != null ? m?.macro?.carb.toString().length : 0
         )
       );
       const maxProtDigits = Math.max(
         ...data.map((m) =>
-          m.macro.prot != null ? m.macro.prot.toString().length : 0
+          m?.macro?.prot != null ? m?.macro?.prot.toString().length : 0
         )
       );
       const maxFatDigits = Math.max(
         ...data.map((m) =>
-          m.macro.fat != null ? m.macro.fat.toString().length : 0
+          m?.macro?.fat != null ? m?.macro?.fat.toString().length : 0
         )
       );
 
@@ -108,11 +117,11 @@ export const MacroProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const macroColumnSize = calculateColumnSize(maxDigits);
 
-    const kcalColumnSize = macros.some((m) => m.macro.kcal != null)
+    const kcalColumnSize = macros.some((m) => m?.macro?.kcal != null)
       ? calculateColumnSize(
           Math.max(
             ...macros.map((m) =>
-              m.macro.kcal != null ? m.macro.kcal.toString().length : 0
+              m?.macro?.kcal != null ? m?.macro?.kcal.toString().length : 0
             )
           )
         )
@@ -131,6 +140,7 @@ export const MacroProvider: React.FC<{ children: React.ReactNode }> = ({
         setDefaultMacro,
         totalMacros,
         columns,
+        updateMacros,
       }}
     >
       {children}

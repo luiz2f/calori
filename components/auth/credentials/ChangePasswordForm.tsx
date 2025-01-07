@@ -1,6 +1,8 @@
 "use client";
 import { changePasswordByEmail } from "@/actions/auth";
 import AuthButton from "@/components/auth/AuthButton";
+import NavAnchor from "@/components/ui/NavAnchor";
+import PasswordInput from "@/components/ui/PasswordInput";
 import { useState } from "react";
 
 interface ResetPasswordFormProps {
@@ -43,54 +45,43 @@ export default function ChangePasswordForm({
     }
   };
   return (
-    <div>
+    <div className="flex flex-col w-full p-4  mt-20 ">
       {!success ? (
-        <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
-          <div>
-            <label>Current password</label>
-            <input
-              type="password"
-              autoComplete="current-password"
-              id="currentPassword"
-              name="currentPassword"
-              placeholder="Current password"
-              className={`mt-1 w-full px-4 p-2 h-10 rounded-md border ${
-                error ? "border-red-500" : "border-gray-200"
-              } bg-white text-sm text-gray-700`}
-            />
-          </div>
-          <div>
-            <label>New password</label>
-            <input
-              type="password"
-              autoComplete="new-password"
-              id="newPassword"
-              name="newPassword"
-              placeholder="New password"
-              className={`mt-1 w-full px-4 p-2 h-10 rounded-md border ${
-                error ? "border-red-500" : "border-gray-200"
-              } bg-white text-sm text-gray-700`}
-            />
-          </div>
-          <div>
-            <label>Confirm new password</label>
-            <input
-              type="password"
-              autoComplete="new-password"
-              id="confirmNewPassword"
-              name="confirmNewPassword"
-              placeholder="Confirm new password"
-              className={`mt-1 w-full px-4 p-2 h-10 rounded-md border ${
-                error ? "border-red-500" : "border-gray-200"
-              } bg-white text-sm text-gray-700`}
-            />
-            {error && <span className="text-darkred">{error}</span>}
-          </div>
+        <form
+          onSubmit={handleSubmit}
+          className="w-full flex flex-col gap-4 w-11/12"
+        >
+          <h1 className="text-2xl w-full text-center font-bold mb-2">
+            Alterar Senha
+          </h1>
+
+          <PasswordInput
+            id="currentPassword"
+            placeholder="Senha Atual"
+            error={error}
+            errorText={true}
+          />
+          <PasswordInput
+            id="newPassword"
+            placeholder="Nova Senha"
+            error={error}
+            newPassword={true}
+          />
+          <PasswordInput
+            id="confirmNewPassword"
+            placeholder="Confirmar Nova Senha"
+            error={error}
+            newPassword={true}
+          />
+
           <AuthButton actionText="Alterar senha" />
         </form>
       ) : (
         <>
-          <p>Senha alterada com sucesso!</p>
+          <h1 className="text-2xl w-full text-center font-bold mt-4 mb-2">
+            Senha Alterada com Sucesso!
+          </h1>
+          <NavAnchor href="/diets">&lt; Voltar para Login</NavAnchor>
         </>
       )}
     </div>

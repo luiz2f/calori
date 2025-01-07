@@ -52,7 +52,7 @@ export default function EditRef({
   const [errors, setErrors] = useState({ name: "", time: "", food: false });
   const disabled = !!errors.name || !!errors.time;
   const dietId = dietFromId || meal?.dietId;
-  const diet = diets.filter((obj) => obj.id === dietId)[0];
+  const diet = diets?.filter((obj) => obj?.id === dietId)[0];
 
   const { isUpdating, updateMeal, isSuccess: isSuccessU } = useUpdateMeal();
   const { isCreating, createMeal, isSuccess: isSuccessC } = useCreateMeal();
@@ -153,7 +153,7 @@ export default function EditRef({
   };
 
   const handleDuplicateVariation = (id) => {
-    const variationToDuplicate = mealList.find((meal) => meal?.id === id);
+    const variationToDuplicate = mealList?.find((meal) => meal?.id === id);
     if (!variationToDuplicate) {
       console.error("Variação não encontrada");
       return;
@@ -228,14 +228,14 @@ export default function EditRef({
   };
   const handleDuplicateFood = (mealId, foodId) => {
     // Encontre a refeição que contém o alimento a ser duplicado
-    const mealToUpdate = mealList.find((meal) => meal.id === mealId);
+    const mealToUpdate = mealList?.find((meal) => meal.id === mealId);
     if (!mealToUpdate) {
       console.error("Refeição não encontrada");
       return;
     }
 
     // Encontre o alimento dentro da refeição
-    const foodToDuplicate = mealToUpdate.mealListItems.find(
+    const foodToDuplicate = mealToUpdate.mealListItems?.find(
       (item) => item.id === foodId
     );
     if (!foodToDuplicate) {

@@ -1,17 +1,18 @@
 import { getUserDiets } from "@/actions/diets/diets";
 import { getDietMeals } from "@/actions/diets/meals";
-import App from "./app";
-import { getFoods } from "@/actions/foods";
-
-export const dynamic = "force-dynamic";
+import DietsSlider from "@/components/by-page/diets/DietsSlider";
+import SelectedDiet from "@/components/by-page/diets/SelectedDiet";
+import Header from "@/components/Header";
+import { generateInitialData } from "../layout";
 
 export default async function DietPage() {
-  const diets = await getUserDiets();
-  const empty = diets?.length === 0;
-  const selectedDiet = diets?.[0];
-  const defaultDiet = await getDietMeals(selectedDiet?.id);
-  const foods = await getFoods();
+  const { empty, defaultDiet, diets } = await generateInitialData();
+
   return (
-    <App empty={empty} defaultDiet={defaultDiet} diets={diets} foods={foods} />
+    <>
+      <Header />
+      <DietsSlider initialDataDiets={diets} />
+      <SelectedDiet serverData={{ empty, defaultDiet, diets }} />
+    </>
   );
 }

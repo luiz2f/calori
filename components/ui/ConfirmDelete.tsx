@@ -36,7 +36,6 @@ function ConfirmDelete({
   }
 
   useEffect(() => {
-    console.log(7);
     if (loaded) {
       onCloseModal();
     }

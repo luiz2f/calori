@@ -39,6 +39,13 @@ function Header({
     throw new Error("Header must be used within a Table");
   }
 
+  const opacity =
+    carbo + prot + fat === 0
+      ? "opacity-30 transition duration-200"
+      : " transition duration-200";
+
+  const colStyle = `text-center font-normal align-bottom ${opacity}`;
+
   function handleClick(e) {
     e.stopPropagation();
     e.preventDefault();
@@ -59,19 +66,19 @@ function Header({
       >
         {name}
       </div>
-      <div className="text-center font-normal align-bottom">
-        <div className="grayscale contrast-150 text-xs opacity-50">🍞</div>
+      <div className={colStyle}>
+        <div className="grayscale contrast-150 text-xs ">🍞</div>
         <div>{carbo}</div>
       </div>
-      <div className="text-center font-normal align-bottom">
+      <div className={colStyle}>
         <div className="grayscale contrast-150 text-xs opacity-50">🥩</div>
         <div>{prot}</div>
       </div>
-      <div className="text-center font-normal align-bottom">
+      <div className={colStyle}>
         <div className="grayscale contrast-150 text-xs opacity-50">🥑</div>
         <div>{fat}</div>
       </div>
-      <div className="text-right font-normal align-bottom">
+      <div className={`text-right font-normal align-bottom ${opacity}`}>
         <div className="text-xs text-grey50">kcal</div>
         <div>{kcal}</div>
       </div>
@@ -96,6 +103,12 @@ function Row({
   if (!context) {
     throw new Error("Row must be used within a Table");
   }
+  const opacity =
+    carbo + prot + fat === 0
+      ? "opacity-30 transition duration-200"
+      : " transition duration-200";
+
+  const cellStyle = `text-center font-normal align-bottom`;
 
   return (
     <div
@@ -106,10 +119,16 @@ function Row({
       <div role="cell" className="pl-2 !text-left !text-black">
         {name}
       </div>
-      <div role="cell">{carbo}</div>
-      <div role="cell">{prot}</div>
-      <div role="cell">{fat}</div>
-      <div role="cell" className="!text-right">
+      <div role="cell" className={opacity}>
+        {carbo}
+      </div>
+      <div role="cell" className={opacity}>
+        {prot}
+      </div>
+      <div role="cell" className={opacity}>
+        {fat}
+      </div>
+      <div role="cell" className={`!text-right ${opacity}`}>
         {kcal}
       </div>
     </div>

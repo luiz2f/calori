@@ -49,7 +49,7 @@ export const ModalContext = createContext<ModalContextType>({
 function Modal({ children }: ModalProps) {
   const [openNames, setOpenNames] = useState<string[]>([]);
   const [modified, setModified] = useState<string>("");
-  console.log(openNames);
+  // console.log(openNames);
   const canClose = new Map(
     openNames.map((name) => [name, !modified?.includes(name)])
   );
@@ -166,9 +166,7 @@ function Window({ children, name }: WindowProps) {
     console.error("`children` must be a valid React element");
     return null;
   }
-  console.log(name);
   const closeModal = () => {
-    console.log(2);
     close(name);
   };
 

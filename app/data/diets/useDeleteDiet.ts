@@ -36,6 +36,9 @@ export function useDeleteDiet() {
         queryKey: ["diets"],
       });
     },
+    onError: (error) => {
+      console.log("useDeleteDiet", error);
+    },
   });
 
   return { isDeleting, deleteDiet, isSuccess };
