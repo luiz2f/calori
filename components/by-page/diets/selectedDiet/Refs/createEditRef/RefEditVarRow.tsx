@@ -26,7 +26,6 @@ export default function RefEditVarRow({
     e.stopPropagation();
     selectVariation();
   };
-
   const selectVariation = () => {
     onSelectVariation(index);
   };
@@ -34,12 +33,11 @@ export default function RefEditVarRow({
   return (
     <div
       key={refvar.name}
-      className="flex gap-2 cursor-pointer justify-between border-greylight border-b-1 py-1"
-      onClick={handleClick}
+      className="flex gap-2 justify-between border-redlight border-b-1 py-1"
     >
       <div
         onClick={(e) => handleClick(e)}
-        className="w-fit underline underline-offset-4 text-darkgreen  p-1 pl-2 rounded-lg"
+        className="w-fit cursor-pointer underline underline-offset-4 text-darkgreen  p-1 pl-2 rounded-lg"
       >
         {refvar.name}
       </div>

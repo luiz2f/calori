@@ -49,7 +49,27 @@ export const ModalContext = createContext<ModalContextType>({
 function Modal({ children }: ModalProps) {
   const [openNames, setOpenNames] = useState<string[]>([]);
   const [modified, setModified] = useState<string>("");
-  // console.log(openNames);
+  const empty = openNames.length === 0;
+
+  useEffect(() => {
+    const preventScroll = (e) => {
+      e.preventDefault();
+    };
+    if (!empty) {
+      document.body.addEventListener("wheel", preventScroll, {
+        passive: false,
+      });
+      document.body.addEventListener("touchmove", preventScroll, {
+        passive: false,
+      });
+    }
+    return () => {
+      document.body.removeEventListener("wheel", preventScroll);
+      document.body.removeEventListener("touchmove", preventScroll);
+    };
+  }, [empty]);
+
+  console.log(openNames);
   const canClose = new Map(
     openNames.map((name) => [name, !modified?.includes(name)])
   );

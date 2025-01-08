@@ -233,7 +233,7 @@ export async function updateDiet({ dietId, dietName, refs }) {
 
   // Aguardar todas as operações assíncronas serem concluídas
   await Promise.all([...updatedMeals, ...deletedMeals]);
-  return dietId;
+  return { dietId, dietName, refs };
 }
 
 export async function deleteDiet(dietId: string) {

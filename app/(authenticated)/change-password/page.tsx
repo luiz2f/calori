@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 export default async function ChangePassword() {
   const session = await auth();
 
-  const userEmail = session.user.email;
+  const userEmail = session?.user?.email;
   if (userEmail) {
     return (
       <>

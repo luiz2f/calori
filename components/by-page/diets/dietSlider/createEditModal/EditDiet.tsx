@@ -33,12 +33,31 @@ export default function EditDiet({ diet, modalName, creating = false }) {
   const { data } = useSession();
   const userId = data?.userId;
 
-  const { isUpdating, updateDiet, isSuccess: isSuccessU } = useUpdateDiet();
+  const {
+    isUpdating,
+    updateDiet,
+    isSuccess: isSuccessU,
+    reset,
+  } = useUpdateDiet();
   const { isCreating, createDiet, isSuccess: isSuccessC } = useCreateDiet();
 
   const isLoading = creating ? isCreating : isUpdating;
   const isSuccess = creating ? isSuccessC : isSuccessU;
   const isDisabled = !isFormValid || !isModified || isUpdating;
+
+  const now = new Date();
+  console.log(
+    `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}.${now.getMilliseconds()}`
+  );
+
+  console.log(
+    "🍳 isModified",
+    isModified,
+    "isLoading",
+    isLoading,
+    "isSuccess",
+    isSuccess
+  );
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -58,10 +77,24 @@ export default function EditDiet({ diet, modalName, creating = false }) {
   };
 
   useEffect(() => {
-    if (!isCreating && isSuccess && creating) {
-      close(modalName);
-    }
-  }, [isCreating, isSuccess, close, modalName, creating]);
+    if (isSuccess && !isLoading)
+      if (creating) {
+        close(modalName);
+      } else if (!creating) {
+        setOriginalRefs(refs);
+        setIsModified(false);
+        reset();
+      }
+  }, [
+    isCreating,
+    isSuccess,
+    close,
+    modalName,
+    creating,
+    isLoading,
+    refs,
+    reset,
+  ]);
 
   useEffect(() => {
     if (meals) {
@@ -78,10 +111,9 @@ export default function EditDiet({ diet, modalName, creating = false }) {
         unsavedChanges("");
       }
     }
-  }, [unsavedChanges, modalName, isModified]);
+  }, [unsavedChanges, modalName, isModified, creating]);
 
   useEffect(() => {
-    // Verifica se houve alterações em relação aos dados originais
     if (!creating) {
       const isModified =
         JSON.stringify(refs) !== JSON.stringify(originalRefs) ||

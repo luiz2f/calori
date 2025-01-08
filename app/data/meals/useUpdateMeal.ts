@@ -8,6 +8,7 @@ export function useUpdateMeal() {
     isPending: isUpdating,
     isSuccess,
     mutate: updateMeal,
+    reset,
   } = useMutation({
     mutationFn: updateMealAPI,
     onSuccess: (data) => {
@@ -20,5 +21,5 @@ export function useUpdateMeal() {
       console.log("useUpdateMeal", error);
     },
   });
-  return { isUpdating, updateMeal, isSuccess };
+  return { isUpdating, updateMeal, isSuccess, reset };
 }

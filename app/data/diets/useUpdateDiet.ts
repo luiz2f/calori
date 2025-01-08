@@ -8,10 +8,13 @@ export function useUpdateDiet() {
     isPending: isUpdating,
     isSuccess,
     mutate: updateDiet,
+    reset,
   } = useMutation({
     mutationFn: updateDietAPI,
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: [`meals-diet-${data}`] });
+      queryClient.invalidateQueries({
+        queryKey: [`meals-diet-${data.dietId}`],
+      });
       queryClient.invalidateQueries({
         queryKey: ["diets"],
       });
@@ -21,5 +24,5 @@ export function useUpdateDiet() {
     },
   });
 
-  return { isUpdating, updateDiet, isSuccess };
+  return { isUpdating, updateDiet, isSuccess, reset };
 }

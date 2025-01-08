@@ -50,15 +50,22 @@ export default function EditRef({
   );
   const [isModified, setIsModified] = useState(false);
   const [errors, setErrors] = useState({ name: "", time: "", food: false });
-  const disabled = !!errors.name || !!errors.time;
+  const disabled = !!errors?.name || !!errors.time;
   const dietId = dietFromId || meal?.dietId;
   const diet = diets?.filter((obj) => obj?.id === dietId)[0];
 
-  const { isUpdating, updateMeal, isSuccess: isSuccessU } = useUpdateMeal();
+  const {
+    isUpdating,
+    updateMeal,
+    isSuccess: isSuccessU,
+    reset,
+  } = useUpdateMeal();
   const { isCreating, createMeal, isSuccess: isSuccessC } = useCreateMeal();
 
   const isLoading = creating ? isCreating : isUpdating;
   const isSuccess = creating ? isSuccessC : isSuccessU;
+
+  const isDisabled = !isModified || disabled || isLoading;
 
   useEffect(() => {
     if (isModified) {
@@ -67,6 +74,27 @@ export default function EditRef({
       unsavedChanges(null);
     }
   }, [unsavedChanges, modalName, isModified]);
+
+  useEffect(() => {
+    if (isSuccess && !isLoading)
+      if (creating) {
+        close(modalName);
+      } else if (!creating) {
+        setOriginalMealList(mealList);
+        setIsModified(false);
+        reset();
+      }
+  }, [
+    isCreating,
+    isSuccess,
+    close,
+    modalName,
+    creating,
+    isLoading,
+    mealList,
+    reset,
+  ]);
+
   useEffect(() => {
     if (meal?.mealList) {
       setMealList(meal?.mealList);
@@ -146,7 +174,7 @@ export default function EditRef({
     const mealId = uuidv4();
     setMealList([
       ...mealList,
-      { id: mealId, name: "Nova Variação", kcal: 0, mealListItems: [] },
+      { id: mealId, name: "Nova Variação", mealListItems: [] },
     ]);
 
     handleAddFood(mealId);
@@ -161,7 +189,7 @@ export default function EditRef({
     const newVar = {
       ...variationToDuplicate,
       id: uuidv4(),
-      name: `${variationToDuplicate.name} - (Cópia)`,
+      name: `${variationToDuplicate?.name} - (Cópia)`,
     };
 
     setMealList((prevMealList) => [...prevMealList, newVar]);
@@ -180,7 +208,7 @@ export default function EditRef({
   const handleNameChange = (variationId, newName) => {
     setMealList((prevMealList) =>
       prevMealList.map((variation) =>
-        variation.id === variationId
+        variation?.id === variationId
           ? { ...variation, name: newName }
           : variation
       )
@@ -194,7 +222,7 @@ export default function EditRef({
           ? {
               ...meal,
               mealListItems: meal?.mealListItems.filter(
-                (item) => item.id !== foodId
+                (item) => item?.id !== foodId
               ),
             }
           : meal
@@ -205,7 +233,7 @@ export default function EditRef({
   const handleAddFood = (mealItemId) => {
     setMealList((prevMealList) =>
       prevMealList.map((variation) =>
-        variation.id === mealItemId
+        variation?.id === mealItemId
           ? {
               ...variation,
               mealListItems: [
@@ -228,7 +256,7 @@ export default function EditRef({
   };
   const handleDuplicateFood = (mealId, foodId) => {
     // Encontre a refeição que contém o alimento a ser duplicado
-    const mealToUpdate = mealList?.find((meal) => meal.id === mealId);
+    const mealToUpdate = mealList?.find((meal) => meal?.id === mealId);
     if (!mealToUpdate) {
       console.error("Refeição não encontrada");
       return;
@@ -236,7 +264,7 @@ export default function EditRef({
 
     // Encontre o alimento dentro da refeição
     const foodToDuplicate = mealToUpdate.mealListItems?.find(
-      (item) => item.id === foodId
+      (item) => item?.id === foodId
     );
     if (!foodToDuplicate) {
       console.error("Alimento não encontrado");
@@ -253,7 +281,7 @@ export default function EditRef({
 
     // Encontre o índice do alimento original
     const foodIndex = mealToUpdate.mealListItems.findIndex(
-      (item) => item.id === foodId
+      (item) => item?.id === foodId
     );
 
     // Crie uma nova lista de mealListItems, inserindo a cópia logo após o original
@@ -266,7 +294,7 @@ export default function EditRef({
     // Atualiza a refeição com o novo alimento duplicado na posição correta
     setMealList((prevMealList) =>
       prevMealList.map((meal) =>
-        meal.id === mealId
+        meal?.id === mealId
           ? { ...meal, mealListItems: updatedMealListItems } // Atualiza a refeição com a nova lista
           : meal
       )
@@ -291,11 +319,11 @@ export default function EditRef({
     const updatedMealList = mealList.map((list) => ({
       ...list,
       mealListItems: list.mealListItems.map((item) => {
-        if (!item.food.id) {
+        if (!item.food?.id) {
           item.food.erro = true;
           error = true; // Marca que existe um erro
         }
-        if (!item.unity.id) {
+        if (!item.unity?.id) {
           item.unity.erro = true;
           error = true; // Marca que existe um erro
         }
@@ -334,28 +362,28 @@ export default function EditRef({
 
     setMealList((prevMealList) =>
       prevMealList.map((variation) =>
-        variation.id === variationId
+        variation?.id === variationId
           ? {
               ...variation,
-              mealListItems: variation.mealListItems.map((item) =>
-                item.id === foodId
+              mealListItems: variation.mealListItems?.map((item) =>
+                item?.id === foodId
                   ? {
                       ...item,
-                      foodId: foodInfo.id,
-                      unityId: unityInfo.id,
+                      foodId: foodInfo?.id,
+                      unityId: unityInfo?.id,
                       quantity,
                       food: {
-                        id: foodInfo.id,
-                        name: foodInfo.name,
-                        carb: foodInfo.carb,
-                        protein: foodInfo.protein,
-                        fat: foodInfo.fat,
+                        id: foodInfo?.id,
+                        name: foodInfo?.name,
+                        carb: foodInfo?.carb,
+                        protein: foodInfo?.protein,
+                        fat: foodInfo?.fat,
                       },
                       unity: {
-                        id: unityInfo.id,
-                        foodId: foodInfo.id,
-                        un: unityInfo.un,
-                        unitMultiplier: unityInfo.unitMultiplier,
+                        id: unityInfo?.id,
+                        foodId: foodInfo?.id,
+                        un: unityInfo?.un,
+                        unitMultiplier: unityInfo?.unitMultiplier,
                       },
                     }
                   : item
@@ -365,10 +393,6 @@ export default function EditRef({
       )
     );
   };
-
-  useEffect(() => {
-    //newmacro
-  }, []);
 
   return (
     <>
@@ -390,7 +414,9 @@ export default function EditRef({
           <div className="relative w-full">
             <label
               className={`absolute top-[-6px] text-grey50 px-1 ml-1 text-sm bg-white line leading-3 ${
-                errors.name ? "!text-darkred !bg-half-lightred-transparent" : ""
+                errors?.name
+                  ? "!text-darkred !bg-half-lightred-transparent"
+                  : ""
               }`}
             >
               Nome da Refeição
@@ -400,7 +426,7 @@ export default function EditRef({
               onChange={handleMealChange}
               // onBlur={handleNameBlur}
               className={`p-2 w-full border-1 rounded-lg ${
-                errors.name
+                errors?.name
                   ? "border-darkred bg-lightred text-darkred"
                   : "border-grey-50"
               }`}
@@ -455,11 +481,7 @@ export default function EditRef({
           <Button size="small" cw="lightred" onClick={() => close(modalName)}>
             Cancelar
           </Button>
-          <Button
-            size="small"
-            onClick={handleSave}
-            disabled={!isModified || disabled}
-          >
+          <Button size="small" onClick={handleSave} disabled={isDisabled}>
             Salvar
           </Button>
         </div>
