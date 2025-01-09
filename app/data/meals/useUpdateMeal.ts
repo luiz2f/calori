@@ -18,7 +18,7 @@ export function useUpdateMeal() {
       });
     },
     onError: (error) => {
-      console.log("useUpdateMeal", error);
+      console.error("useUpdateMeal", error);
     },
   });
   return { isUpdating, updateMeal, isSuccess, reset };

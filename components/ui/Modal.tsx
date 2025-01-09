@@ -50,26 +50,15 @@ function Modal({ children }: ModalProps) {
   const [openNames, setOpenNames] = useState<string[]>([]);
   const [modified, setModified] = useState<string>("");
   const empty = openNames.length === 0;
-
   useEffect(() => {
-    const preventScroll = (e) => {
-      e.preventDefault();
-    };
     if (!empty) {
-      document.body.addEventListener("wheel", preventScroll, {
-        passive: false,
-      });
-      document.body.addEventListener("touchmove", preventScroll, {
-        passive: false,
-      });
+      document.body.className = "h-svh noScroll";
     }
     return () => {
-      document.body.removeEventListener("wheel", preventScroll);
-      document.body.removeEventListener("touchmove", preventScroll);
+      document.body.className = "h-svh";
     };
   }, [empty]);
 
-  console.log(openNames);
   const canClose = new Map(
     openNames.map((name) => [name, !modified?.includes(name)])
   );
@@ -89,11 +78,9 @@ function Modal({ children }: ModalProps) {
     setOpenNames((prev) => {
       const lastName = prev.at(-1);
       // console.log("🐢", lastName);
-
       if (lastName) {
         const canCloseLast = canClose.get(lastName);
         // console.log("🐢🐢", lastName);
-
         if (canCloseLast || force) {
           return prev.slice(0, prev.length - 1);
         } else {
@@ -192,11 +179,12 @@ function Window({ children, name }: WindowProps) {
 
   const zIndex = openNames.indexOf(name) + 2000;
   const message = "window" + name;
+  const modalWidth = `${95 - 3 * openNames.indexOf(name)}%`;
 
   return createPortal(
     <div
       style={{ zIndex: zIndex }}
-      className="fixed top-0 left-0 w-screen h-screen h-svh"
+      className="fixed top-0 left-0 w-screen h-svh"
     >
       <div
         className={`fixed inset-0 bg-black ${
@@ -204,7 +192,8 @@ function Window({ children, name }: WindowProps) {
         }`}
       />
       <div
-        className="fixed overflow-y-auto top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-4 w-11/12 flex flex-col max-h-[90vh] bg-white rounded-lg"
+        className="fixed overflow-y-auto top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-4 w-11/12 flex flex-col max-h-[90vh] max-w-screen-lg bg-white rounded-lg"
+        style={{ width: modalWidth }}
         data-name={name}
         ref={ref}
       >

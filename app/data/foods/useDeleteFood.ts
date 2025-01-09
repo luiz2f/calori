@@ -24,7 +24,7 @@ export function useDeleteFood() {
       }
     },
     onError: (error) => {
-      console.log("useDeleteFood", error);
+      console.error("useDeleteFood", error);
     },
   });
 
@@ -32,10 +32,10 @@ export function useDeleteFood() {
   useEffect(() => {
     if (!isDeleting && isSuccess && deletedId) {
       queryClient.setQueryData(["foods"], (oldFoods) => {
-        return oldFoods.filter((food) => food?.id !== deletedId);
+        return oldFoods?.filter((food) => food?.id !== deletedId);
       });
       queryClient.setQueryData(["userFoods"], (oldUserFoods) => {
-        return oldUserFoods.filter((food) => food?.id !== deletedId);
+        return oldUserFoods?.filter((food) => food?.id !== deletedId);
       });
     }
   }, [isDeleting, isSuccess, deletedId, queryClient]);

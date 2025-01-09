@@ -14,7 +14,7 @@ export function useDuplicateDiet() {
       });
     },
     onError: (error) => {
-      console.log("useDuplicateDiet", error);
+      console.error("useDuplicateDiet", error);
     },
   });
 

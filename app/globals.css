@@ -40,3 +40,8 @@ input:-webkit-autofill::first-line {
     transform: rotate(1turn);
   }
 }
+
+.noScroll {
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}

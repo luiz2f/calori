@@ -1,12 +1,11 @@
 "use client";
 
 import { updateFood as updateFoodAPI } from "@/actions/foods";
-import { useMacroContext } from "@/app/context/useMacroContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { calculateMacros } from "../meals/useMeals";
 
 export function useUpdateFood() {
   const queryClient = useQueryClient();
-  const { updateMacros } = useMacroContext();
   const {
     isPending: isUpdating,
     isSuccess,
@@ -15,7 +14,6 @@ export function useUpdateFood() {
   } = useMutation({
     mutationFn: updateFoodAPI,
     onSuccess: (data) => {
-      console.time("Tempo de Execução");
       queryClient.setQueryData(["foods"], (oldFoods) => {
         return oldFoods?.map((food) =>
           food.id === data.id ? { ...food, ...data } : food
@@ -32,32 +30,35 @@ export function useUpdateFood() {
 
       // Atualiza os dados de cada query
       allMealsQueries.forEach(([queryKey, queryData]) => {
-        // Percorre as refeições dentro de cada query
-        queryData.meals.forEach((meal) => {
-          // Atualiza a lista de refeições
-          meal.mealList.forEach((mealItem) => {
-            mealItem.mealListItems.forEach((item) => {
+        const updatedMeals = queryData?.meals?.map((meal) => ({
+          ...meal,
+          mealList: meal.mealList?.map((mealItem) => ({
+            ...mealItem,
+            mealListItems: mealItem.mealListItems?.map((item) => {
               if (item.foodId === data.id) {
                 // Substitui as informações do item na query
-                item.food = data;
-                item.unity = data.unities[0]; // Substitui a unidade
-
-                // Atualiza os dados da query com o item modificado
-                queryClient.setQueryData(queryKey, {
-                  ...queryData, // mantém os outros dados da query
-                  meals: queryData.meals, // atualiza a lista de refeições
-                });
+                const updatedFood = { ...item.food, ...data };
+                return {
+                  ...item,
+                  food: updatedFood,
+                  unity: data.unities[0], // Substitui a unidade
+                };
               }
-            });
-          });
+              return item;
+            }),
+            macro: calculateMacros(mealItem), // Recalcula os macros aqui
+          })),
+        }));
+
+        // Atualiza a query com as refeições modificadas
+        queryClient.setQueryData(queryKey, {
+          ...queryData,
+          meals: updatedMeals,
         });
       });
-
-      updateMacros();
-      console.timeEnd("Tempo de Execução");
     },
     onError: (error) => {
-      console.log("useUpdateFood", error);
+      console.error("useUpdateFood", error);
     },
   });
 

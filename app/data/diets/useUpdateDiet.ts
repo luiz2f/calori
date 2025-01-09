@@ -20,7 +20,7 @@ export function useUpdateDiet() {
       });
     },
     onError: (error) => {
-      console.log("useUpdateDiet", error);
+      console.error("useUpdateDiet", error);
     },
   });
 

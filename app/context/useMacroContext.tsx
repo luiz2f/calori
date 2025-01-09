@@ -32,15 +32,6 @@ export const MacroProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   };
 
-  const updateMacros = () => {
-    console.time(`updateMacros`);
-    console.log(macros);
-    macros.forEach((macro) => {
-      updateMacroForMeal(macro.mealId, macro.macro, "default");
-    });
-    console.timeEnd(`updateMacros`);
-  };
-
   const updateMacroForMeal = (mealId, macro, way) => {
     setMacros((prevMacros) => {
       const updatedMacros = [...prevMacros];
@@ -140,7 +131,6 @@ export const MacroProvider: React.FC<{ children: React.ReactNode }> = ({
         setDefaultMacro,
         totalMacros,
         columns,
-        updateMacros,
       }}
     >
       {children}

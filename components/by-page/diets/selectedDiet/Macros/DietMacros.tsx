@@ -85,7 +85,7 @@ export default function DietMacros() {
         <div className="grid grid-cols-3 max-w-64 m-auto">
           <div className="flex flex-col align-middle text-center">
             <div className="text-2xl mb-1">🍞</div>
-            <div>Carboitrado</div>
+            <div>Carboidrato</div>
             <div className="text-2xl text-darkgreen">
               {data[currentMetric].carb}
             </div>

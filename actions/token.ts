@@ -3,7 +3,7 @@ import prisma from "@/prisma";
 import { v4 as uuidv4 } from "uuid";
 import { sendEmailVerification, sendPasswordResetEmail } from "./email";
 import { Verificarion_purpose as VerificationPurpose } from "@prisma/client";
-import { changePasswordByEmail, getUserByEmail, resetPassword } from "./auth";
+import { getUserByEmail, resetPassword } from "./auth";
 
 const PurposeMap: Record<string, VerificationPurpose> = {
   email: VerificationPurpose.EMAIL_VERIFICATION,
@@ -165,12 +165,12 @@ export async function changePasswordByToken(token: string, formData: FormData) {
 export async function generateVerificationToken(email: string) {
   const user = await getUserByEmail(email);
 
-  if (user?.emailVerified) {
-    return { error: "User already verified" };
-  }
-
   if ("error" in user) {
     return user;
+  }
+
+  if (user?.emailVerified) {
+    return { error: "User already verified" };
   }
 
   const token = uuidv4();

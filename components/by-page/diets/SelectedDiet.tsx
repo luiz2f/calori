@@ -17,11 +17,7 @@ export default function SelectedDiet({ serverData }) {
   const dietId = selectedDietContext || selectedDietServer;
 
   const { data: dietsSlider } = useDiets();
-  const {
-    data: diet,
-    isLoading,
-    isSuccess,
-  } = useMeals(serverData?.defaultDiet, dietId);
+  const { data: diet, isLoading } = useMeals(serverData?.defaultDiet, dietId);
   const selectedDietName = dietsSlider?.filter((obj) => obj.id === dietId)[0]
     ?.name;
   const name = selectedDietName || diet?.name;

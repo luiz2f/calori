@@ -48,9 +48,8 @@ export default function DietMealsPage({ meals, dietId, name, isLoading }) {
           </Modal.Window>
           <Modal.Window name={"createNewMeal"}>
             <EditRef
-              dietFromId={dietId}
               creating={true}
-              createVariation={true}
+              dietFromId={dietId}
               meal={null}
               currentIndex={0}
               typeInput="Alimentos"

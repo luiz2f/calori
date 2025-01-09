@@ -1,11 +1,10 @@
 "use server";
 
-import { auth } from "@/auth";
 import prisma from "@/prisma";
+import { getSessionId } from "./session";
 
 export async function userWeight() {
-  const session = await auth();
-  const userId = session.userId;
+  const userId = await getSessionId();
 
   const bodyInfo = await prisma.bodyInfo.findUnique({
     where: { userId }, // Verifica se já existe BodyInfo para o userId
@@ -16,9 +15,8 @@ export async function userWeight() {
   return weight;
 }
 
-export async function updateWeight(weight) {
-  const session = await auth();
-  const userId = session.userId;
+export async function updateWeight(weight: number) {
+  const userId = await getSessionId();
 
   const bodyInfo = await prisma.bodyInfo.upsert({
     where: { userId }, // Verifica se já existe BodyInfo para o userId

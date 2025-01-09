@@ -15,20 +15,14 @@ export function useCreateMeal() {
     mutationFn: createMealAPI,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: [`meals-diet-${data}`] });
-      // queryClient.invalidateQueries({
-      //   queryKey: ["diets"],
-      // });
+      queryClient.invalidateQueries({
+        queryKey: ["diets"],
+      });
     },
     onError: (error) => {
-      console.log("useCreateMeal", error);
+      console.error("useCreateMeal", error);
     },
   });
-
-  useEffect(() => {
-    if (!isCreating && isSuccess) {
-      close("createNewMeal");
-    }
-  }, [isCreating, isSuccess, close]);
 
   return { isCreating, createMeal, isSuccess };
 }

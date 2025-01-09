@@ -33,7 +33,7 @@ export function useCreateFood({
     },
 
     onError: (error) => {
-      console.log("useCreateFood", error);
+      console.error("useCreateFood", error);
     },
   });
 

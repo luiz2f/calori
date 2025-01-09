@@ -3,60 +3,60 @@
 import prisma from "@/prisma";
 import { getSessionId } from "../session";
 
-const selectFullDiet = {
-  select: {
-    id: true,
-    name: true,
-    userId: true,
-    index: true,
-    archived: true,
-    meals: {
-      select: {
-        id: true,
-        name: true,
-        time: true,
-        dietId: true,
-        mealList: {
-          select: {
-            id: true,
-            name: true,
-            index: true,
-            mealListItems: {
-              select: {
-                id: true,
-                foodId: true,
-                unityId: true,
-                quantity: true,
-                mealListId: true,
-                index: true,
-                food: {
-                  select: {
-                    id: true,
-                    name: true,
-                    carb: true,
-                    protein: true,
-                    fat: true,
-                  },
-                },
-                unity: {
-                  select: {
-                    id: true,
-                    foodId: true,
-                    un: true,
-                    unitMultiplier: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-      orderBy: {
-        time: "asc", // Ordena os meals por time
-      },
-    },
-  },
-};
+// const selectFullDiet = {
+//   select: {
+//     id: true,
+//     name: true,
+//     userId: true,
+//     index: true,
+//     archived: true,
+//     meals: {
+//       select: {
+//         id: true,
+//         name: true,
+//         time: true,
+//         dietId: true,
+//         mealList: {
+//           select: {
+//             id: true,
+//             name: true,
+//             index: true,
+//             mealListItems: {
+//               select: {
+//                 id: true,
+//                 foodId: true,
+//                 unityId: true,
+//                 quantity: true,
+//                 mealListId: true,
+//                 index: true,
+//                 food: {
+//                   select: {
+//                     id: true,
+//                     name: true,
+//                     carb: true,
+//                     protein: true,
+//                     fat: true,
+//                   },
+//                 },
+//                 unity: {
+//                   select: {
+//                     id: true,
+//                     foodId: true,
+//                     un: true,
+//                     unitMultiplier: true,
+//                   },
+//                 },
+//               },
+//             },
+//           },
+//         },
+//       },
+//       orderBy: {
+//         time: "asc", // Ordena os meals por time
+//       },
+//     },
+//   },
+// };
 export async function getUserDiets() {
   const userId = await getSessionId();
   if (userId) {
@@ -77,12 +77,7 @@ export async function getUserDiets() {
   }
 }
 
-interface CreateDietProps {
-  dietName: string;
-  refs: { name: string; time: string }[];
-}
-
-export async function getDietIndex(userId) {
+export async function getDietIndex(userId: string) {
   const maxIndex = await prisma.diet.findFirst({
     where: { userId },
     orderBy: { index: "desc" },
@@ -94,7 +89,22 @@ export async function getDietIndex(userId) {
   return newIndex;
 }
 
-export async function createDiet({ userId, dietName, refs }) {
+type Refs = {
+  id: string;
+  name: string;
+  time: string;
+  dietId: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+};
+
+type CreateDiet = {
+  userId: string;
+  dietName: string;
+  refs?: Refs[];
+};
+
+export async function createDiet({ userId, dietName, refs }: CreateDiet) {
   const newIndex = await getDietIndex(userId);
 
   try {
@@ -104,7 +114,7 @@ export async function createDiet({ userId, dietName, refs }) {
         userId,
         index: newIndex,
         meals: {
-          create: refs.map((ref) => ({
+          create: refs?.map((ref) => ({
             name: ref.name,
             time: ref.time,
           })),
@@ -113,7 +123,6 @@ export async function createDiet({ userId, dietName, refs }) {
       include: { meals: true },
     });
 
-    // revalidatePath("/diets");
     return newDiet;
   } catch (error) {
     console.error("Erro ao criar a dieta:", error);
@@ -143,7 +152,7 @@ export async function duplicateDiet(dietId: string) {
         index: newIndex,
         archived: false,
         meals: {
-          create: dietToDuplicate.meals.map((meal, mealIndex) => ({
+          create: dietToDuplicate.meals.map((meal) => ({
             name: meal.name,
             time: meal.time,
             mealList: {
@@ -182,21 +191,25 @@ export async function duplicateDiet(dietId: string) {
     throw new Error("Erro ao duplicar dieta");
   }
 }
-
-export async function updateDiet({ dietId, dietName, refs }) {
+type UpdateDiet = {
+  dietId: string;
+  dietName: string;
+  refs?: Refs[];
+};
+export async function updateDiet({ dietId, dietName, refs }: UpdateDiet) {
+  console.log(refs);
   const originalMeals = await prisma.meal.findMany({
     where: { dietId: dietId },
     select: { id: true },
   });
 
   const originalMealIds = originalMeals.map((meal) => meal.id);
-  const currentMealIds = refs.map((meal) => meal.id);
+  const currentMealIds = refs?.map((meal) => meal.id);
 
   const mealsToDelete = originalMealIds.filter(
-    (id) => !currentMealIds.includes(id)
+    (id) => !currentMealIds?.includes(id)
   );
 
-  // Deletar refeições
   const deletedMeals = mealsToDelete.map(async (mealId) => {
     await prisma.meal.delete({
       where: { id: mealId },
@@ -208,47 +221,42 @@ export async function updateDiet({ dietId, dietName, refs }) {
     data: { name: dietName },
   });
 
-  // Atualizar ou criar refeições
-  const updatedMeals = refs.map(async (meal) => {
-    // the newrefs id generated by the client are uuidv4
-    if (!meal.id.includes("-")) {
-      await prisma.meal.update({
-        where: { id: meal.id },
-        data: {
-          name: meal.name,
-          time: meal.time,
-        },
-      });
-    } else {
-      // Criar novas refeições
-      await prisma.meal.create({
-        data: {
-          name: meal.name,
-          time: meal.time,
-          dietId: dietId, // Não inclui mealList, pois não será alterada
-        },
-      });
-    }
-  });
+  const updatedMeals =
+    refs?.map(async (meal) => {
+      // the newrefs id generated by the client are uuidv4
+      if (!meal.id.includes("-")) {
+        await prisma.meal.update({
+          where: { id: meal.id },
+          data: {
+            name: meal.name,
+            time: meal.time,
+          },
+        });
+      } else {
+        await prisma.meal.create({
+          data: {
+            name: meal.name,
+            time: meal.time,
+            dietId: dietId,
+          },
+        });
+      }
+    }) || [];
 
-  // Aguardar todas as operações assíncronas serem concluídas
   await Promise.all([...updatedMeals, ...deletedMeals]);
   return { dietId, dietName, refs };
 }
 
 export async function deleteDiet(dietId: string) {
   try {
-    const deletedDiet = await prisma.diet.delete({
+    await prisma.diet.delete({
       where: {
         id: dietId,
       },
     });
-    // revalidatePath("/diets");
     return dietId;
   } catch (error) {
     console.error("Erro ao apagar a dieta:", error);
     throw new Error("Erro ao apagar a dieta");
   }
 }
-
-// MEALS

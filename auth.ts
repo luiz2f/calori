@@ -7,6 +7,13 @@ import { prisma } from "./prisma";
 import { saltAndHashPassword } from "./utils/helper";
 import { generateTokenAndSendEmailVerification } from "./actions/token";
 import { getUserByEmail, updateUser } from "./actions/auth";
+import { Session } from "next-auth";
+
+declare module "next-auth" {
+  interface Session {
+    userId: string;
+  }
+}
 
 class CustomError extends CredentialsSignin {
   code = "custom";
@@ -86,7 +93,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               user.hashedPassword
             );
             if (!isMatch) {
-              throw new CustomError("Invalid credentials 3");
+              throw new CustomError("Invalid credentials");
             }
           }
         }
@@ -124,7 +131,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async session({ session, token }) {
       // Inclui o userId na sessão, disponível no client-side
 
-      session.userId = token.userId;
+      if (token.userId) {
+        session.userId = token.userId as string;
+      }
       return session;
     },
   },

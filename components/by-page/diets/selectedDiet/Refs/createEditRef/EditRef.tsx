@@ -1,8 +1,7 @@
 "use client";
 import { useState, useContext, useEffect, use } from "react";
 import Button from "@/components/ui/Button";
-import Menus from "@/components/ui/Menu";
-import Modal, { ModalContext } from "@/components/ui/Modal";
+import { ModalContext } from "@/components/ui/Modal";
 import EditRefList from "./EditRefList";
 import EditRefFoods from "./EditRefFoods";
 import Toogle from "@/components/ui/Toogle";
@@ -11,8 +10,21 @@ import { v4 as uuidv4 } from "uuid";
 import { useUpdateMeal } from "@/app/data/meals/useUpdateMeal";
 import { useCreateMeal } from "@/app/data/meals/useCreateMeal";
 import Spinner from "@/components/ui/Spinner";
-import { useFoods } from "@/app/data/foods/useFoods";
 
+const creatingMeal = [
+  {
+    id: "3660bc22-f82f-4cc7-b2a5-970fc66fxxx",
+    name: "Nova Variação",
+    mealListItems: [
+      {
+        id: "fafd01e0-ca8e-4296-b0c8-ec39167dexxx",
+        food: { value: "", label: "", unities: [{ value: "", label: "" }] },
+        unity: { value: "", label: "" },
+        quantity: 0,
+      },
+    ],
+  },
+];
 export default function EditRef({
   creating = false,
   createVariation = false,
@@ -24,6 +36,7 @@ export default function EditRef({
   goRight,
   dietFromId,
   modalName,
+  onCloseModal,
 }: {
   dietFromId?: string;
   creating: boolean;
@@ -35,25 +48,24 @@ export default function EditRef({
   goLeft: () => void;
   goRight: () => void;
   modalName: string;
+  onCloseModal: () => void;
 }) {
+  const name = creating ? "Nova Refeição" : meal?.name;
+  const time = creating ? "23:00" : meal?.time;
+  const dMeal = creating ? creatingMeal : meal?.mealList;
   const { data: diets } = useDiets();
   const [type, setType] = useState<"Lista" | "Alimentos">(typeInput);
   const [selectedVariation, setSelectedVariation] = useState(currentIndex);
-  const { close, unsavedChanges, open } = useContext(ModalContext);
-  const [mealName, setMealName] = useState(
-    creating ? "Nova Refeição" : meal?.name
-  );
-  const [mealTime, setMealTime] = useState(creating ? "23:00" : meal?.time);
-  const [mealList, setMealList] = useState(meal?.mealList || []);
-  const [originalMealList, setOriginalMealList] = useState(
-    meal?.mealList || []
-  );
-  const [isModified, setIsModified] = useState(false);
+  const { unsavedChanges, open, closeLast } = useContext(ModalContext);
+  const [mealName, setMealName] = useState(name);
+  const [mealTime, setMealTime] = useState(time);
+  const [mealList, setMealList] = useState(dMeal);
+  const [originalMealList, setOriginalMealList] = useState(dMeal);
+  const [isModified, setIsModified] = useState(creating ? true : false);
   const [errors, setErrors] = useState({ name: "", time: "", food: false });
-  const disabled = !!errors?.name || !!errors.time;
+  const disabled = !!errors?.name || !!errors?.time;
   const dietId = dietFromId || meal?.dietId;
   const diet = diets?.filter((obj) => obj?.id === dietId)[0];
-
   const {
     isUpdating,
     updateMeal,
@@ -71,29 +83,21 @@ export default function EditRef({
     if (isModified) {
       unsavedChanges(modalName);
     } else {
-      unsavedChanges(null);
+      unsavedChanges("");
     }
   }, [unsavedChanges, modalName, isModified]);
 
   useEffect(() => {
-    if (isSuccess && !isLoading)
+    if (isSuccess && !isLoading) {
       if (creating) {
-        close(modalName);
+        closeLast(true);
       } else if (!creating) {
         setOriginalMealList(mealList);
         setIsModified(false);
         reset();
       }
-  }, [
-    isCreating,
-    isSuccess,
-    close,
-    modalName,
-    creating,
-    isLoading,
-    mealList,
-    reset,
-  ]);
+    }
+  }, [closeLast, creating, isCreating, isLoading, isSuccess, mealList, reset]);
 
   useEffect(() => {
     if (meal?.mealList) {
@@ -103,23 +107,25 @@ export default function EditRef({
   }, [meal?.mealList]);
 
   useEffect(() => {
-    const isModified =
-      JSON.stringify(mealList) !== JSON.stringify(originalMealList) ||
-      mealName !== meal?.name ||
-      mealTime !== meal?.time;
-    setIsModified(isModified);
-  }, [mealList, mealName, mealTime, originalMealList, meal?.name, meal?.time]);
+    if (!creating) {
+      const isModified =
+        JSON.stringify(mealList) !== JSON.stringify(originalMealList) ||
+        mealName !== name ||
+        mealTime !== time;
+      setIsModified(isModified);
+    }
+  }, [mealList, mealName, mealTime, originalMealList, name, time, creating]);
 
   const toggleType = (type: "Lista" | "Alimentos") => {
     setType(type);
   };
 
   const handleMealChange = (e) => {
-    const value = e.target.value;
+    const value = e?.target?.value;
     setMealName(value);
     setErrors((prevErrors) => ({
       ...prevErrors,
-      name: value.trim() === "" ? "O nome não pode estar vazio." : "",
+      name: value?.trim() === "" ? "O nome não pode estar vazio." : "",
     }));
   };
 
@@ -127,16 +133,18 @@ export default function EditRef({
     let formattedTime = mealTime;
 
     if (/^\d{4}$/.test(formattedTime)) {
-      formattedTime = `${formattedTime.slice(0, 2)}:${formattedTime.slice(2)}`;
+      formattedTime = `${formattedTime?.slice(0, 2)}:${formattedTime?.slice(
+        2
+      )}`;
     }
 
-    let [hours, minutes] = formattedTime.split(":");
+    let [hours, minutes] = formattedTime?.split(":");
 
     if (!hours || isNaN(Number(hours))) hours = "00";
     if (!minutes || isNaN(Number(minutes))) minutes = "00";
 
-    hours = hours.padStart(2, "0");
-    minutes = minutes.padStart(2, "0");
+    hours = hours?.padStart(2, "0");
+    minutes = minutes?.padStart(2, "0");
 
     if (Number(hours) > 24) {
       setErrors((prevErrors) => ({
@@ -159,14 +167,14 @@ export default function EditRef({
   };
 
   const handleTimeChange = (e) => {
-    const value = e.target.value;
+    const value = e?.target?.value;
     if (/^[0-9:]*$/.test(value)) {
       setMealTime(value);
     }
   };
 
   const handleAddVariation = (e) => {
-    e.stopPropagation();
+    e?.stopPropagation();
     newVariation();
   };
 
@@ -201,13 +209,13 @@ export default function EditRef({
       setSelectedVariation(length - 2);
     }
     setMealList((prevMealList) =>
-      prevMealList.filter((meal) => meal?.id !== id)
+      prevMealList?.filter((meal) => meal?.id !== id)
     );
   };
 
   const handleNameChange = (variationId, newName) => {
     setMealList((prevMealList) =>
-      prevMealList.map((variation) =>
+      prevMealList?.map((variation) =>
         variation?.id === variationId
           ? { ...variation, name: newName }
           : variation
@@ -217,11 +225,11 @@ export default function EditRef({
 
   const deleteFoodFromMeal = (mealId, foodId) => {
     setMealList((prevMealList) =>
-      prevMealList.map((meal) =>
+      prevMealList?.map((meal) =>
         meal?.id === mealId
           ? {
               ...meal,
-              mealListItems: meal?.mealListItems.filter(
+              mealListItems: meal?.mealListItems?.filter(
                 (item) => item?.id !== foodId
               ),
             }
@@ -232,12 +240,12 @@ export default function EditRef({
 
   const handleAddFood = (mealItemId) => {
     setMealList((prevMealList) =>
-      prevMealList.map((variation) =>
+      prevMealList?.map((variation) =>
         variation?.id === mealItemId
           ? {
               ...variation,
               mealListItems: [
-                ...variation.mealListItems,
+                ...variation?.mealListItems,
                 {
                   id: uuidv4(),
                   food: {
@@ -263,11 +271,11 @@ export default function EditRef({
     }
 
     // Encontre o alimento dentro da refeição
-    const foodToDuplicate = mealToUpdate.mealListItems?.find(
+    const foodToDuplicate = mealToUpdate?.mealListItems?.find(
       (item) => item?.id === foodId
     );
     if (!foodToDuplicate) {
-      console.error("Alimento não encontrado");
+      console?.error("Alimento não encontrado");
       return;
     }
 
@@ -275,25 +283,25 @@ export default function EditRef({
     const duplicatedFood = {
       ...foodToDuplicate,
       id: uuidv4(), // Novo id para o alimento duplicado
-      food: { ...foodToDuplicate.food },
-      unity: { ...foodToDuplicate.unity },
+      food: { ...foodToDuplicate?.food },
+      unity: { ...foodToDuplicate?.unity },
     };
 
     // Encontre o índice do alimento original
-    const foodIndex = mealToUpdate.mealListItems.findIndex(
+    const foodIndex = mealToUpdate?.mealListItems?.findIndex(
       (item) => item?.id === foodId
     );
 
     // Crie uma nova lista de mealListItems, inserindo a cópia logo após o original
     const updatedMealListItems = [
-      ...mealToUpdate.mealListItems.slice(0, foodIndex + 1), // Todos os itens até o original
+      ...mealToUpdate?.mealListItems?.slice(0, foodIndex + 1), // Todos os itens até o original
       duplicatedFood, // O alimento duplicado
-      ...mealToUpdate.mealListItems.slice(foodIndex + 1), // Todos os itens depois do original
+      ...mealToUpdate?.mealListItems?.slice(foodIndex + 1), // Todos os itens depois do original
     ];
 
     // Atualiza a refeição com o novo alimento duplicado na posição correta
     setMealList((prevMealList) =>
-      prevMealList.map((meal) =>
+      prevMealList?.map((meal) =>
         meal?.id === mealId
           ? { ...meal, mealListItems: updatedMealListItems } // Atualiza a refeição com a nova lista
           : meal
@@ -316,14 +324,14 @@ export default function EditRef({
   const handleSave = async () => {
     let error = false;
 
-    const updatedMealList = mealList.map((list) => ({
+    const updatedMealList = mealList?.map((list) => ({
       ...list,
-      mealListItems: list.mealListItems.map((item) => {
-        if (!item.food?.id) {
+      mealListItems: list?.mealListItems?.map((item) => {
+        if (!item?.food?.id) {
           item.food.erro = true;
           error = true; // Marca que existe um erro
         }
-        if (!item.unity?.id) {
+        if (!item?.unity?.id) {
           item.unity.erro = true;
           error = true; // Marca que existe um erro
         }
@@ -361,11 +369,11 @@ export default function EditRef({
     const { foodInfo, unityInfo, quantity } = data;
 
     setMealList((prevMealList) =>
-      prevMealList.map((variation) =>
+      prevMealList?.map((variation) =>
         variation?.id === variationId
           ? {
               ...variation,
-              mealListItems: variation.mealListItems?.map((item) =>
+              mealListItems: variation?.mealListItems?.map((item) =>
                 item?.id === foodId
                   ? {
                       ...item,
@@ -435,7 +443,9 @@ export default function EditRef({
           <div className="relative">
             <label
               className={`absolute top-[-6px] text-grey50 px-1 ml-1 text-sm bg-white line leading-3 ${
-                errors.time ? "!text-darkred !bg-half-lightred-transparent" : ""
+                errors?.time
+                  ? "!text-darkred !bg-half-lightred-transparent"
+                  : ""
               }`}
             >
               Horário
@@ -445,7 +455,7 @@ export default function EditRef({
               onChange={handleTimeChange}
               onBlur={handleTimeBlur}
               className={`font-medium p-2 w-16 border-1 text-darkgreen text-center rounded-lg ${
-                errors.time
+                errors?.time
                   ? "border-darkred bg-lightred text-darkred"
                   : "border-grey-50"
               }`}
@@ -478,7 +488,7 @@ export default function EditRef({
         )}
 
         <div className="flex gap-4 px-1">
-          <Button size="small" cw="lightred" onClick={() => close(modalName)}>
+          <Button size="small" cw="lightred" onClick={onCloseModal}>
             Cancelar
           </Button>
           <Button size="small" onClick={handleSave} disabled={isDisabled}>

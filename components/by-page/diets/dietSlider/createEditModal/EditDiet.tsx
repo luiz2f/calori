@@ -45,20 +45,6 @@ export default function EditDiet({ diet, modalName, creating = false }) {
   const isSuccess = creating ? isSuccessC : isSuccessU;
   const isDisabled = !isFormValid || !isModified || isUpdating;
 
-  const now = new Date();
-  console.log(
-    `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}.${now.getMilliseconds()}`
-  );
-
-  console.log(
-    "🍳 isModified",
-    isModified,
-    "isLoading",
-    isLoading,
-    "isSuccess",
-    isSuccess
-  );
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (creating) {

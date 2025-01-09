@@ -1,10 +1,11 @@
 "use client";
 import { getUserDiets } from "@/actions/diets/diets";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
 export function useDiets(initialDataDiets = null) {
   const [initialUsed, setInitialUsed] = useState(false);
+  const queryclient = useQueryClient();
 
   useEffect(() => {
     if (initialDataDiets) {

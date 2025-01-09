@@ -18,7 +18,7 @@ export function useDeleteMeal() {
       });
     },
     onError: (error) => {
-      console.log("useDeleteMeal", error);
+      console.error("useDeleteMeal", error);
     },
   });
 

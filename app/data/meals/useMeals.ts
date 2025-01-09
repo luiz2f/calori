@@ -37,7 +37,6 @@ export function useMeals(initialData, dietId) {
   const { data, isLoading, isSuccess } = useQuery({
     queryKey: [`meals-diet-${dietId}`],
     queryFn: () => getDietMeals(dietId),
-
     initialData: initialUsed ? undefined : initialData,
   });
 

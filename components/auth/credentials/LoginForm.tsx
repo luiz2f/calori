@@ -39,10 +39,21 @@ export default function LoginForm() {
       const data = await loginWithCredentials(formData);
       if (data && "error" in data) {
         const dataError = data.error.split(".")[0];
+        console.log(dataError);
+
         if (dataError.startsWith("Read more")) {
           unexpectedError();
         } else if (dataError === "Token sent") {
           router?.push("/token-sent");
+          return;
+        } else if (dataError === "Invalid credentials") {
+          setErrors({
+            email: true,
+            password: "Credenciais inválidas",
+          });
+        } else if (dataError === "NEXT_REDIRECT") {
+          router?.push("/diets");
+          return;
         } else {
           setErrors({
             email: true,
@@ -51,6 +62,7 @@ export default function LoginForm() {
         }
       }
     } catch (error) {
+      console.log(error);
       if (isRedirectError(error)) {
         return;
       }

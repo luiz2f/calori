@@ -37,7 +37,7 @@ export function useDeleteDiet() {
       });
     },
     onError: (error) => {
-      console.log("useDeleteDiet", error);
+      console.error("useDeleteDiet", error);
     },
   });
 

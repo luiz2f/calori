@@ -4,7 +4,6 @@ import Table from "./RefTableModel";
 import RefSlider from "./RefSlider";
 import { ModalContext } from "@/components/ui/Modal";
 import { useMacroContext } from "@/app/context/useMacroContext";
-import macro from "styled-jsx/macro";
 
 export default function RefTable({
   mealId,
@@ -54,8 +53,6 @@ export default function RefTable({
   }
   const meal = mealsList[currentIndex];
   const macro = selectedMeal?.macro;
-  // console.log("selectedMeal", selectedMeal);
-  // console.log("macro", macro);
 
   function transformFoodData(foodData) {
     return foodData?.map((item) => {
@@ -67,7 +64,14 @@ export default function RefTable({
       const kcal = Math.round((carb + prot) * 4 + fat * 9);
 
       return {
-        name: quantity + " " + unity.un + " - " + food.name,
+        name: (
+          <>
+            <strong>
+              {quantity} {unity.un}
+            </strong>{" "}
+            - {food.name}
+          </>
+        ),
         carb: carb,
         prot: prot,
         fat: fat,

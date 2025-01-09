@@ -56,7 +56,7 @@ export async function getDietMeals(dietId: string) {
           },
         },
         orderBy: {
-          time: "asc", // Ordena os meals por time
+          time: "asc",
         },
       },
     },
@@ -71,7 +71,7 @@ export async function deleteMeal(mealId: string) {
       id: mealId,
     },
     select: {
-      dietId: true, // Seleciona apenas o campo dietId
+      dietId: true,
     },
   });
 
@@ -82,9 +82,55 @@ export async function deleteMeal(mealId: string) {
   });
   return mealToDelete?.dietId;
 }
-
-export async function updateMeal({ mealId, mealName, mealTime, refs }) {
-  // Busca os dados existentes da refeição e suas listas
+type Macro = {
+  carbo: number;
+  prot: number;
+  fat: number;
+  kcal: number;
+};
+type Food = {
+  id: string;
+  name: string;
+  carb: number;
+  protein: number;
+  fat: number;
+  satFat?: number;
+  fiber?: number;
+};
+type Unity = {
+  id: string;
+  foodId: string;
+  un: string;
+  unitMultiplier: number;
+};
+type RefItem = {
+  id: string;
+  foodId: string;
+  unityId: string;
+  quantity: number;
+  mealListId: string;
+  index: number;
+  food?: Food;
+  unity?: Unity;
+};
+type Ref = {
+  id: string;
+  name: string;
+  index: number;
+  mealListItems?: RefItem[];
+  macro?: Macro;
+};
+export async function updateMeal({
+  mealId,
+  mealName,
+  mealTime,
+  refs,
+}: {
+  mealId: string;
+  mealName: string;
+  mealTime: string;
+  refs: Ref[];
+}) {
   const mealToUpdate = await prisma.meal.findUnique({
     where: { id: mealId },
     select: {
@@ -110,7 +156,6 @@ export async function updateMeal({ mealId, mealName, mealTime, refs }) {
     },
   });
 
-  // básico da refeição
   await prisma.meal.update({
     where: { id: mealId },
     data: {
@@ -122,20 +167,19 @@ export async function updateMeal({ mealId, mealName, mealTime, refs }) {
   const originalMealLists = mealToUpdate?.mealList.map((list) => list.id);
   const currentMealLists = refs.map((list) => list.id);
 
-  // Identificar listas a serem deletadas
   const listsToDelete = originalMealLists?.filter(
     (id) => !currentMealLists?.includes(id)
   );
 
-  const deleteMealLists = listsToDelete?.map(async (listId) => {
-    await prisma.mealList.delete({
-      where: { id: listId },
-    });
-  });
+  const deleteMealLists =
+    listsToDelete?.map(async (listId) => {
+      await prisma.mealList.delete({
+        where: { id: listId },
+      });
+    }) || [];
 
   const updateOrCreateMealLists = refs?.map(async (list) => {
     if (!list.id?.includes("-")) {
-      // Atualiza lista existente
       await prisma.mealList.update({
         where: { id: list.id },
         data: {
@@ -143,7 +187,6 @@ export async function updateMeal({ mealId, mealName, mealTime, refs }) {
         },
       });
 
-      // Atualiza ou cria itens da lista
       const originalItemIds =
         mealToUpdate?.mealList
           ?.find((ml) => ml.id === list.id)
@@ -151,41 +194,39 @@ export async function updateMeal({ mealId, mealName, mealTime, refs }) {
 
       const currentItemIds = list.mealListItems?.map((item) => item.id);
       const itemsToDelete = originalItemIds?.filter(
-        (id) => !currentItemIds.includes(id)
+        (id) => !currentItemIds?.includes(id)
       );
 
-      // Deleta itens não mais presentes
       const deleteItems = itemsToDelete?.map(async (itemId) => {
         await prisma.mealListItem.delete({
           where: { id: itemId },
         });
       });
 
-      // Atualiza ou cria itens
-      const updateOrCreateItems = list.mealListItems?.map(async (item) => {
-        if (!item.id.includes("-")) {
-          await prisma.mealListItem.update({
-            where: { id: item.id },
-            data: {
-              foodId: item.foodId,
-              unityId: item.unityId,
-              quantity: toNumber(item.quantity),
-            },
-          });
-        } else {
-          await prisma.mealListItem.create({
-            data: {
-              foodId: item.foodId,
-              unityId: item.unityId,
-              quantity: toNumber(item.quantity),
-              mealListId: list.id,
-              index: 0,
-            },
-          });
-        }
-      });
+      const updateOrCreateItems =
+        list.mealListItems?.map(async (item) => {
+          if (!item.id.includes("-")) {
+            await prisma.mealListItem.update({
+              where: { id: item.id },
+              data: {
+                foodId: item.foodId,
+                unityId: item.unityId,
+                quantity: toNumber(item.quantity),
+              },
+            });
+          } else {
+            await prisma.mealListItem.create({
+              data: {
+                foodId: item.foodId,
+                unityId: item.unityId,
+                quantity: toNumber(item.quantity),
+                mealListId: list.id,
+                index: 0,
+              },
+            });
+          }
+        }) || [];
 
-      // Aguardar todas as operações de itens
       await Promise.all(updateOrCreateItems);
       await Promise.all(deleteItems);
     } else {
@@ -207,14 +248,22 @@ export async function updateMeal({ mealId, mealName, mealTime, refs }) {
     }
   });
 
-  // Aguardar todas as operações assíncronas
   await Promise.all([...updateOrCreateMealLists, ...deleteMealLists]);
 
   return mealToUpdate?.dietId;
 }
 
-export async function createMeal({ mealName, mealTime, refs, dietId }) {
-  // Criação básica da refeição
+export async function createMeal({
+  mealName,
+  mealTime,
+  refs,
+  dietId,
+}: {
+  mealName: string;
+  mealTime: string;
+  refs: Ref[];
+  dietId: string;
+}) {
   const newMeal = await prisma.meal.create({
     data: {
       name: mealName,
@@ -244,17 +293,13 @@ export async function createMeal({ mealName, mealTime, refs, dietId }) {
 
     await Promise.all(createMealLists);
   }
-  // Aguardar todas as operações assíncronas
 
   return dietId;
 }
 
-function toNumber(number) {
+function toNumber(number: string | number) {
   if (typeof number === "string") {
-    // Remove as vírgulas, se houver
     number = number.replace(/,/g, "");
   }
-
-  // Converte para número
-  return parseFloat(number);
+  return parseFloat(number.toString());
 }

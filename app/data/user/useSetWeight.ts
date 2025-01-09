@@ -18,7 +18,7 @@ export function useUpdateWeight() {
       queryClient.setQueryData(["userWeight"], data);
     },
     onError: (error) => {
-      console.log("useUpdateWeight", error);
+      console.error("useUpdateWeight", error);
     },
   });
 

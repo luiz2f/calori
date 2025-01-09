@@ -2,10 +2,9 @@ import { auth } from "@/auth";
 
 export async function getSessionId() {
   const session = await auth();
-
-  if (!session.userId) {
-    return null;
+  const userId = session?.userId;
+  if (!userId) {
+    throw new Error("Invalid Session");
   }
-
-  return session?.userId;
+  return userId;
 }

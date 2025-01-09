@@ -1,10 +1,18 @@
 "use server";
-import { auth } from "@/auth";
 import prisma from "@/prisma";
+import { getSessionId } from "./session";
+
+type FoodInput = {
+  name: string;
+  quantity: number;
+  unity: string;
+  carb: number;
+  prot: number;
+  fat: number;
+};
 
 export async function getFoods() {
-  const session = await auth();
-  const userId = session.userId;
+  const userId = await getSessionId();
 
   const defaultFoods = await prisma.food.findMany({
     select: {
@@ -65,8 +73,7 @@ export async function getFoods() {
 }
 
 export async function getUserFoods() {
-  const session = await auth();
-  const userId = session.userId;
+  const userId = await getSessionId();
 
   const userFoods = await prisma.food.findMany({
     select: {
@@ -96,9 +103,10 @@ export async function getUserFoods() {
   return userFoods;
 }
 
-export async function createFood(data, userId) {
+export async function createFood(data: FoodInput, userId: string) {
   {
-    let { name, quantity, unity, carb, prot, fat } = data;
+    const { name, unity } = data;
+    let { quantity, carb, prot, fat } = data;
     let idUser = userId;
     carb = parseFloat(carb.toFixed(4));
     prot = parseFloat(prot.toFixed(4));
@@ -106,20 +114,31 @@ export async function createFood(data, userId) {
     quantity = parseFloat(quantity.toFixed(4));
 
     if (!idUser) {
-      const session = await auth();
-      idUser = session.userId;
+      idUser = await getSessionId();
     }
     const foodData = {
       name,
-      carb: parseFloat(carb),
-      protein: parseFloat(prot),
-      fat: parseFloat(fat),
+      carb,
+      protein: prot,
+      fat,
       satFat: 0.0,
       fiber: 0.0,
       userFood: true,
       userId: idUser,
     };
-    const food = await prisma.food.create({ data: foodData });
+    const food = await prisma.food.create({
+      data: foodData,
+      select: {
+        id: true,
+        name: true,
+        carb: true,
+        protein: true,
+        fat: true,
+        satFat: true,
+        fiber: true,
+        userFood: true,
+      },
+    });
 
     if (!food) {
       return { error: "Error returning food" };
@@ -133,6 +152,12 @@ export async function createFood(data, userId) {
         un: unity,
         unitMultiplier,
       },
+      select: {
+        id: true,
+        foodId: true,
+        un: true,
+        unitMultiplier: true,
+      },
     });
 
     const newFood = { ...food, unities: [unityRecord] };
@@ -141,9 +166,8 @@ export async function createFood(data, userId) {
   }
 }
 
-export async function deleteFood(foodId) {
-  const session = await auth();
-  const userId = session.userId;
+export async function deleteFood(foodId: string) {
+  const userId = await getSessionId();
 
   const deletedFood = await prisma.food.delete({
     where: {
@@ -156,31 +180,62 @@ export async function deleteFood(foodId) {
   return deletedFood;
 }
 
-export async function updateFood({ inputs, foodId, unityId }) {
-  const unitMultiplier = 1 / inputs.quantity;
+export async function updateFood({
+  inputs,
+  foodId,
+  unityId,
+}: {
+  inputs: FoodInput;
+  foodId: string;
+  unityId: string;
+}) {
+  const { name, unity } = inputs;
+  let { quantity, carb, prot, fat } = inputs;
+
+  carb = parseFloat(carb.toFixed(4));
+  prot = parseFloat(prot.toFixed(4));
+  fat = parseFloat(fat.toFixed(4));
+  quantity = parseFloat(quantity.toFixed(4));
+  const unitMultiplier = parseFloat((1 / quantity).toFixed(6));
+
   const updatedFood = await prisma.food.update({
     where: {
       id: foodId,
     },
     data: {
-      name: inputs.name,
-      carb: inputs.carb,
-      protein: inputs.prot,
-      fat: inputs.fat,
+      name,
+      carb,
+      protein: prot,
+      fat,
       unities: {
         update: {
           where: {
             id: unityId,
           },
           data: {
-            un: inputs.unity,
+            un: unity,
             unitMultiplier,
           },
         },
       },
     },
-    include: {
-      unities: true, // Inclui as unities atualizadas no retorno
+    select: {
+      id: true,
+      name: true,
+      carb: true,
+      protein: true,
+      fat: true,
+      satFat: true,
+      fiber: true,
+      userFood: true,
+      unities: {
+        select: {
+          id: true,
+          foodId: true,
+          un: true,
+          unitMultiplier: true,
+        },
+      },
     },
   });
 

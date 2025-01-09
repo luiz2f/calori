@@ -4,19 +4,14 @@ import { auth, signIn, signOut } from "@/auth";
 import prisma from "@/prisma";
 import { saltAndHashPassword } from "@/utils/helper";
 import { User } from "@prisma/client";
-import { AuthError } from "next-auth";
-import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
-import { redirect } from "next/dist/server/api-utils";
 
 export const login = async (provider: string) => {
-  const user = await signIn(provider, { redirectTo: "/" });
-  revalidatePath("/diets");
+  await signIn(provider, { redirectTo: "/" });
 };
 
 export const logout = async () => {
   await signOut({ redirectTo: "/" });
-  revalidatePath("/");
 };
 
 // 📌 SEGURANÇA - NAO DEIXAR BUSCAR A HASHED, APENAS  ID NOME EMAIL IMAGEM
@@ -33,7 +28,7 @@ export const getUserByEmail = async (
   }
   return user;
 };
-
+type ErrorResponse = { error: string } | Error;
 export const loginWithCredentials = async (formData: FormData) => {
   const rawFormData = {
     email: formData.get("email"),
@@ -44,20 +39,23 @@ export const loginWithCredentials = async (formData: FormData) => {
   };
   try {
     await signIn("credentials", rawFormData);
-  } catch (error: any) {
-    console.log(error);
-    if (error instanceof AuthError) {
-      switch (error.type) {
-        case "CallbackRouteError":
-        case "CredentialsSignin":
-          return { error: error.message };
-        default:
-          return { error: error.message };
-      }
+  } catch (error: unknown) {
+    if (isErrorResponse(error)) {
+      return error;
+    } else if (error instanceof Error) {
+      return { error: error.message };
     }
     throw error;
   }
 };
+function isErrorResponse(error: unknown): error is ErrorResponse {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "error" in (error as Record<string, unknown>) &&
+    typeof (error as Record<string, unknown>).error === "string"
+  );
+}
 
 export const registerWithCredentials = async (formData: FormData) => {
   const rawFormData = {
@@ -70,20 +68,14 @@ export const registerWithCredentials = async (formData: FormData) => {
 
   try {
     await signIn("credentials", rawFormData);
-  } catch (error: any) {
-    console.log(error);
-    if (error instanceof AuthError) {
-      switch (error.type) {
-        case "CallbackRouteError":
-        case "CredentialsSignin":
-          return { error: error.message };
-        default:
-          return { error: error.message };
-      }
+  } catch (error: unknown) {
+    if (isErrorResponse(error)) {
+      return error;
+    } else if (error instanceof Error) {
+      return { error: error.message };
     }
     throw error;
   }
-  revalidatePath("/");
 };
 
 export const changePasswordByEmail = async (
