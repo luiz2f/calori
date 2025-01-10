@@ -114,7 +114,7 @@ function Row({
     <div
       role="row"
       style={{ gridTemplateColumns: context.columns }}
-      className="grid border-b-1 border-white text-sm pr-1 [&>div]:py-1 [&>div]:text-center [&>div]:text-blacklight last:text-right last:border-b-0 odd:bg-neutralgreen"
+      className="grid border-b-1 items-center border-white text-sm pr-1 [&>div]:py-1 [&>div]:text-center [&>div]:text-blacklight last:text-right last:border-b-0 odd:bg-neutralgreen"
     >
       <div role="cell" className="pl-2 !text-left !text-black">
         {name}

@@ -49,6 +49,7 @@ export const ModalContext = createContext<ModalContextType>({
 function Modal({ children }: ModalProps) {
   const [openNames, setOpenNames] = useState<string[]>([]);
   const [modified, setModified] = useState<string>("");
+  console.log(openNames);
   const empty = openNames.length === 0;
   useEffect(() => {
     if (!empty) {

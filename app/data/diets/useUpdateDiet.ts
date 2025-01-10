@@ -12,6 +12,7 @@ export function useUpdateDiet() {
   } = useMutation({
     mutationFn: updateDietAPI,
     onSuccess: (data) => {
+      // 🏓
       queryClient.invalidateQueries({
         queryKey: [`meals-diet-${data.dietId}`],
       });

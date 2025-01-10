@@ -3,6 +3,14 @@
 import prisma from "@/prisma";
 import { getSessionId } from "../session";
 
+type Refs = {
+  id: string;
+  name: string;
+  time: string;
+  dietId: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+};
 // const selectFullDiet = {
 //   select: {
 //     id: true,
@@ -73,6 +81,7 @@ export async function getUserDiets() {
         meals: { orderBy: { time: "asc" } },
       },
     });
+
     return userDiets;
   }
 }
@@ -88,15 +97,6 @@ export async function getDietIndex(userId: string) {
 
   return newIndex;
 }
-
-type Refs = {
-  id: string;
-  name: string;
-  time: string;
-  dietId: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-};
 
 type CreateDiet = {
   userId: string;
@@ -197,7 +197,6 @@ type UpdateDiet = {
   refs?: Refs[];
 };
 export async function updateDiet({ dietId, dietName, refs }: UpdateDiet) {
-  console.log(refs);
   const originalMeals = await prisma.meal.findMany({
     where: { dietId: dietId },
     select: { id: true },

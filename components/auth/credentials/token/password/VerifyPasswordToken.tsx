@@ -15,7 +15,7 @@ export default function VerifyPasswordToken() {
   const [success, setSuccess] = useState<string | undefined>(undefined);
   const [showForm, setShowForm] = useState<boolean>(false);
   const searchParams = useSearchParams();
-  const token = searchParams.get("token");
+  const token = searchParams?.get("token");
   // const token = searchParams.get("token");
   const onSubmit = useCallback(async () => {
     if (success || error) {

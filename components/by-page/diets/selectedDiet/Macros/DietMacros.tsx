@@ -6,16 +6,16 @@ import { useWeight } from "@/app/data/user/useWeight";
 import { ModalContext } from "@/components/ui/Modal";
 
 export default function DietMacros() {
-  const [currentMetric, setCurrentMetric] = useState<
-    "g/KG" | "kcal" | "% kcal"
-  >("kcal");
+  const [currentMetric, setCurrentMetric] = useState<"g/KG" | "g" | "% kcal">(
+    "g"
+  );
   const [data, setData] = useState({
     "g/KG": {
       carb: 0,
       prot: 0,
       fat: 0,
     },
-    kcal: {
+    g: {
       carb: 0,
       prot: 0,
       fat: 0,
@@ -47,10 +47,10 @@ export default function DietMacros() {
         prot: (totalMacros.prot / weight).toFixed(1),
         fat: (totalMacros.fat / weight).toFixed(1),
       },
-      kcal: {
-        carb: (totalMacros.carb * 4).toFixed(0),
-        prot: (totalMacros.prot * 4).toFixed(0),
-        fat: (totalMacros.fat * 9).toFixed(0),
+      g: {
+        carb: totalMacros.carb,
+        prot: totalMacros.prot,
+        fat: totalMacros.fat,
       },
       "% kcal": {
         carb: !isNaN(((totalMacros.carb * 4) / totalKcal) * 100)
@@ -74,7 +74,7 @@ export default function DietMacros() {
       <div className="flex w-full justify-between">
         <div className="flex items-center w-fit mx-auto ">
           <Toogle
-            options={["g/KG", "kcal", "% kcal"]}
+            options={["g/KG", "g", "% kcal"]}
             value={currentMetric}
             onChange={setCurrentMetric}
             className="mt-2"

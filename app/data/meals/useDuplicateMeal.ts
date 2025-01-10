@@ -8,8 +8,7 @@ export function useDuplicateDiet() {
   const { isPending: isDuplicating, mutate: duplicateDiet } = useMutation({
     mutationFn: duplicateDietAPI,
     onSuccess: (data) => {
-      queryClient.setQueryData([`meals-diet-${data?.id}`], data);
-
+      // queryClient.setQueryData([`meals-diet-${data?.id}`], data);
       queryClient.invalidateQueries({
         queryKey: ["diets"],
       });

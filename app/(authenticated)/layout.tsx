@@ -7,11 +7,16 @@ export const dynamic = "force-dynamic";
 
 export async function generateInitialData() {
   const diets = await getUserDiets();
-  const empty = diets?.length === 0;
+  if (!diets)
+    return {
+      defaultDiet: null,
+      diets: [],
+      foods: [],
+    };
   const selectedDiet = diets?.[0];
   const defaultDiet = await getDietMeals(selectedDiet?.id);
   const foods = await getFoods();
-  return { empty, defaultDiet, diets, foods };
+  return { defaultDiet, diets, foods };
 }
 
 export default async function RootLayout({
@@ -19,10 +24,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { empty, defaultDiet, diets, foods } = await generateInitialData();
+  const { defaultDiet, diets, foods } = await generateInitialData();
 
   return (
-    <App empty={empty} defaultDiet={defaultDiet} diets={diets} foods={foods}>
+    <App defaultDiet={defaultDiet} diets={diets} foods={foods}>
       {children}
     </App>
   );

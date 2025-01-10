@@ -14,7 +14,7 @@ export default function SuccessPage({
     <div className="flex flex-col w-full h-full justify-between items-center">
       <div className="flex flex-col items-center h-full justify-center">
         <HiCheck className="w-8 h-8 mb-4 text-darkgreen align-middle" />
-        <h1 className="text-2xl w-full text-center font-bold mb-2">{title} </h1>
+        <h1 className="text-2xl w-full text-center font-bold mb-2">{title}</h1>
         <h4 className="text-xl text-darkgreen w-full text-center mb-6">
           {subtitle}
         </h4>

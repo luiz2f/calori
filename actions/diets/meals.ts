@@ -103,7 +103,7 @@ type Unity = {
   un: string;
   unitMultiplier: number;
 };
-type RefItem = {
+type MealItems = {
   id: string;
   foodId: string;
   unityId: string;
@@ -113,24 +113,26 @@ type RefItem = {
   food?: Food;
   unity?: Unity;
 };
-type Ref = {
+type Meal = {
   id: string;
   name: string;
   index: number;
-  mealListItems?: RefItem[];
+  mealListItems?: MealItems[];
   macro?: Macro;
+};
+
+type updateMeal = {
+  mealId: string;
+  mealName: string;
+  mealTime: string;
+  refs: Meal[];
 };
 export async function updateMeal({
   mealId,
   mealName,
   mealTime,
   refs,
-}: {
-  mealId: string;
-  mealName: string;
-  mealTime: string;
-  refs: Ref[];
-}) {
+}: updateMeal) {
   const mealToUpdate = await prisma.meal.findUnique({
     where: { id: mealId },
     select: {
@@ -253,17 +255,18 @@ export async function updateMeal({
   return mealToUpdate?.dietId;
 }
 
+type createMeal = {
+  mealName: string;
+  mealTime: string;
+  refs: Meal[];
+  dietId: string;
+};
 export async function createMeal({
   mealName,
   mealTime,
   refs,
   dietId,
-}: {
-  mealName: string;
-  mealTime: string;
-  refs: Ref[];
-  dietId: string;
-}) {
+}: createMeal) {
   const newMeal = await prisma.meal.create({
     data: {
       name: mealName,

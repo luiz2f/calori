@@ -19,7 +19,7 @@ export default function DietMeal({ meal }) {
   const [defaultIndex, setDefaultIndex] = useState(true);
   const { isDeleting, deleteMeal, isSuccess } = useDeleteMeal();
   const { updateMacroForMeal } = useMacroContext();
-  const selectedMeal = meal.mealList[currentIndex] || {};
+  const selectedMeal = meal?.mealList[currentIndex] || {};
   const goLeft = () => {
     setCurrentIndex((prevIndex) =>
       prevIndex > 0 ? prevIndex - 1 : meal?.mealList?.length - 1

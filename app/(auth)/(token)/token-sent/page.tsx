@@ -4,7 +4,8 @@ import NavAnchor from "@/components/ui/NavAnchor";
 export default function TokenSent() {
   const subtitle = (
     <>
-      Verifique seu <strong></strong>e-mail e siga os passos <br />
+      Verifique seu <strong></strong>e-mail e siga os passos
+      <br />
       para continuar
     </>
   );

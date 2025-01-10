@@ -29,6 +29,7 @@ export function useDeleteFood() {
   });
 
   // manual delete from cache
+
   useEffect(() => {
     if (!isDeleting && isSuccess && deletedId) {
       queryClient.setQueryData(["foods"], (oldFoods) => {

@@ -39,7 +39,6 @@ export default function LoginForm() {
       const data = await loginWithCredentials(formData);
       if (data && "error" in data) {
         const dataError = data.error.split(".")[0];
-        console.log(dataError);
 
         if (dataError.startsWith("Read more")) {
           unexpectedError();
@@ -62,10 +61,10 @@ export default function LoginForm() {
         }
       }
     } catch (error) {
-      console.log(error);
       if (isRedirectError(error)) {
         return;
       }
+      console.error(error);
       unexpectedError();
     }
 
