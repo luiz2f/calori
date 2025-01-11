@@ -1,127 +1,133 @@
-"use client";
-import { useUpdateWeight } from "@/app/data/user/useSetWeight";
-import Button from "@/components/ui/Button";
-import Spinner from "@/components/ui/Spinner";
-import Toogle from "@/components/ui/Toogle";
-import React, { useEffect, useState } from "react";
+'use client'
+import { useUpdateWeight } from '@/app/data/user/useSetWeight'
+import Button from '@/components/ui/Button'
+import Spinner from '@/components/ui/Spinner'
+import Toogle from '@/components/ui/Toogle'
+import React, { useEffect, useState } from 'react'
+
+function toNumber(value: string | number) {
+  return typeof value === 'number' ? value : parseFloat(value)
+}
 
 export default function MyWeight({
-  userId,
   userWeight,
   closeAfter = false,
-  onCloseModal,
+  onCloseModal
+}: {
+  userWeight: number
+  closeAfter?: boolean
+  onCloseModal?: () => void
 }) {
-  const defaultWeight = userWeight;
-  const defaultWeightlb = parseFloat((userWeight * 2.20462).toFixed(2));
-  const [weight, setWeight] = useState(userWeight);
-  const [unity, setUnity] = useState<"kg" | "lb">("kg");
-  const [error, setError] = useState(false);
-  const { isPending, updateWeight, isSuccess, reset, isError } =
-    useUpdateWeight();
-  const isEqual = weight === defaultWeight || defaultWeightlb === weight;
+  const defaultWeight = userWeight
+  const defaultWeightlb = parseFloat((userWeight * 2.20462).toFixed(2))
+  const [weight, setWeight] = useState(userWeight)
+  const [unity, setUnity] = useState<'kg' | 'lb'>('kg')
+  const [error, setError] = useState(false)
+  const { isPending, updateWeight, isSuccess, isError } = useUpdateWeight()
+  const isEqual = weight === defaultWeight || defaultWeightlb === weight
   useEffect(() => {
     if (!isPending && isSuccess) {
-      if (closeAfter) {
-        onCloseModal();
+      if (closeAfter && onCloseModal) {
+        onCloseModal()
       } else {
-        setWeight(parseFloat(defaultWeight));
+        setWeight(toNumber(defaultWeight))
       }
     }
-  }, [closeAfter, isPending, isSuccess, onCloseModal]);
+  }, [closeAfter, defaultWeight, isPending, isSuccess, onCloseModal])
 
   useEffect(() => {
     if (isError) {
-      setError(true);
+      setError(true)
     }
-  }, [isError]);
+  }, [isError])
 
   function checkInput(input?: string) {
-    let weightKg = input || parseFloat(weight);
+    const weightKg = input || toNumber(weight)
     if (!weightKg) {
-      setError(true);
+      setError(true)
     } else {
-      setError(false);
+      setError(false)
     }
   }
 
-  function handleSubmit(event) {
-    event.preventDefault();
-    let weightKg = parseFloat(weight);
+  function handleSubmit(event: React.FormEvent) {
+    event.preventDefault()
+    let weightKg = toNumber(weight)
     if (!weightKg) {
-      setError(true);
+      setError(true)
     }
-    if (unity === "lb") {
-      weightKg = parseFloat((weight * 2.20462).toFixed(2));
+    if (unity === 'lb') {
+      weightKg = parseFloat((weight * 2.20462).toFixed(2))
     }
-    updateWeight(weightKg, userId);
+    updateWeight(weightKg)
   }
 
-  const handleWeightChange = (e) => {
-    const input = e.target.value.replace(/[^0-9.,]/g, "");
+  const handleWeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target.value.replace(/[^0-9.,]/g, '')
 
     if (/^[0-9.,]*$/.test(input)) {
-      setWeight(input);
-      checkInput(input);
+      setWeight(toNumber(input))
+      checkInput(input)
     }
-  };
+  }
 
-  const toggleUnity = (type: "kg" | "lb") => {
-    setUnity(type);
-    if (type === "kg") {
-      setWeight((prevWeight) => parseFloat((prevWeight / 2.20462).toFixed(2))); // Convert kg to lblb to kg
+  const toggleUnity = (type: 'kg' | 'lb') => {
+    setUnity(type)
+    if (type === 'kg') {
+      setWeight(prevWeight => parseFloat((prevWeight / 2.20462).toFixed(2))) // Convert kg to lblb to kg
     } else {
-      setWeight((prevWeight) => parseFloat((prevWeight * 2.20462).toFixed(2))); // Convert kg to lb
+      setWeight(prevWeight => parseFloat((prevWeight * 2.20462).toFixed(2))) // Convert kg to lb
     }
-  };
-  const exceptThisSymbols = ["e", "E", "+", "-", "."];
+  }
+  const exceptThisSymbols = ['e', 'E', '+', '-', '.']
   return (
     <>
-      <form onSubmit={handleSubmit} className="relative">
-        <div className="font-bold text-xl mb-8 text-center">
-          {defaultWeight ? "Meu Peso" : "Insira seu Peso"}
+      <form onSubmit={handleSubmit} className='relative'>
+        <div className='font-bold text-xl mb-8 text-center'>
+          {defaultWeight ? 'Meu Peso' : 'Insira seu Peso'}
         </div>
         <Toogle
-          options={["kg", "lb"]}
+          options={['kg', 'lb']}
           value={unity}
           onChange={toggleUnity}
-          className="mb-6"
+          className='mb-6'
         />
-        <div className="relative w-fit mx-auto">
-          <label className="absolute top-[-6px] hidden text-grey50 px-1 ml-1 text-sm bg-white line leading-3">
+        <div className='relative w-fit mx-auto'>
+          <label className='absolute top-[-6px] hidden text-grey50 px-1 ml-1 text-sm bg-white line leading-3'>
             Peso
           </label>
           <input
-            name="dietName"
-            type="number"
+            name='dietName'
+            type='number'
             value={weight}
-            onChange={(e) => handleWeightChange(e)}
+            onChange={e => handleWeightChange(e)}
             onBlur={() => checkInput()}
-            onKeyDown={(e) =>
+            onKeyDown={e =>
               exceptThisSymbols.includes(e.key) && e.preventDefault()
             }
             className={`p-2 w-40 border-1  rounded-lg mb-3 text-[2.5rem] font-bold text-center ${
               error
-                ? "bg-lightred border-darkred text-darkred"
-                : "border-grey-50"
+                ? 'bg-lightred border-darkred text-darkred'
+                : 'border-grey-50'
             }`}
           />
         </div>
 
-        <div className="flex gap-4 px-1 mt-6">
+        <div className='flex gap-4 px-1 mt-6'>
           <Button
-            size="small"
-            type="submit"
+            size='small'
+            type='submit'
             disabled={error || isEqual || isPending}
           >
-            {defaultWeight ? "Atualizar Peso" : "Salvar Peso"}
+            {defaultWeight ? 'Atualizar Peso' : 'Salvar Peso'}
           </Button>
         </div>
         {isPending && (
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex justify-center items-center bg-white w-full h-full bg-opacity-80">
+          <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex justify-center items-center bg-white w-full h-full bg-opacity-80'>
             <Spinner />
           </div>
         )}
       </form>
     </>
-  );
+  )
 }

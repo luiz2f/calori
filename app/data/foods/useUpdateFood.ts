@@ -3,6 +3,7 @@
 import { updateFood as updateFoodAPI } from "@/actions/foods";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { calculateMacros } from "../meals/useMeals";
+import { Diet, Food } from "@/app/(authenticated)/app";
 
 export function useUpdateFood() {
   const queryClient = useQueryClient();
@@ -14,23 +15,28 @@ export function useUpdateFood() {
   } = useMutation({
     mutationFn: updateFoodAPI,
     onSuccess: (data) => {
-      queryClient.setQueryData(["foods"], (oldFoods) => {
+      queryClient.setQueryData<Food[]>(["foods"], (oldFoods) => {
         return oldFoods?.map((food) =>
           food.id === data.id ? { ...food, ...data } : food
         );
       });
-      queryClient.setQueryData(["userFoods"], (oldUserFoods) => {
+      queryClient.setQueryData<Food[]>(["userFoods"], (oldUserFoods) => {
         return oldUserFoods?.map((food) =>
           food.id === data.id ? { ...food, ...data } : food
         );
       });
-      const allMealsQueries = queryClient
-        .getQueriesData()
-        .filter(([queryKey]) => queryKey[0].startsWith("meals"));
 
+      const allMealsQueries = queryClient
+        .getQueriesData({})
+        .filter(
+          ([queryKey]) =>
+            Array.isArray(queryKey) &&
+            queryKey[0]?.toString().startsWith("meals")
+        );
+      console.log(allMealsQueries);
       // Atualiza os dados de cada query
       allMealsQueries.forEach(([queryKey, queryData]) => {
-        const updatedMeals = queryData?.meals?.map((meal) => ({
+        const updatedMeals = (queryData as Diet).meals?.map((meal) => ({
           ...meal,
           mealList: meal.mealList?.map((mealItem) => ({
             ...mealItem,
@@ -52,7 +58,7 @@ export function useUpdateFood() {
 
         // Atualiza a query com as refeições modificadas
         queryClient.setQueryData(queryKey, {
-          ...queryData,
+          ...(queryData as object),
           meals: updatedMeals,
         });
       });

@@ -45,6 +45,7 @@ export default function VerifyPasswordToken() {
   useEffect(() => {
     onSubmit();
   }, []);
+
   useEffect(() => {
     if (success) {
       setTimeout(() => {

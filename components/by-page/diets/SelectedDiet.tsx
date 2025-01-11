@@ -8,19 +8,19 @@ import { useMeals } from "@/app/data/meals/useMeals";
 import { useDiets } from "@/app/data/diets/useDiets";
 import { useMacroContext } from "@/app/context/useMacroContext";
 import { useEffect } from "react";
+import { Diet } from "@/app/(authenticated)/app";
 
 export default function SelectedDiet({ serverData }) {
-  const { defaultDiet, empty } = serverData;
+  const { defaultDiet }: { defaultDiet: Diet } = serverData;
   const { selectedDiet: selectedDietContext } = useDietContext();
   const { setDefaultMacro } = useMacroContext();
   const selectedDietServer = defaultDiet?.id;
   const dietId = selectedDietContext || selectedDietServer;
-
   const { data: dietsSlider } = useDiets();
-  const { data: diet, isLoading } = useMeals(serverData?.defaultDiet, dietId);
+  const { data: diet, isLoading } = useMeals(dietId, serverData?.defaultDiet);
   const selectedDietName = dietsSlider?.filter((obj) => obj.id === dietId)[0]
     ?.name;
-  const name = selectedDietName || diet?.name;
+  const name = selectedDietName || diet?.name || "";
 
   useEffect(() => {
     if (diet) {

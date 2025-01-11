@@ -12,6 +12,7 @@ export function useDeleteMeal() {
   } = useMutation({
     mutationFn: deleteMealAPI,
     onSuccess: (data) => {
+      // 🏓
       queryClient.invalidateQueries({ queryKey: [`meals-diet-${data}`] });
       queryClient.invalidateQueries({
         queryKey: ["diets"],

@@ -4,14 +4,14 @@ import Header from "@/components/Header";
 import { generateInitialData } from "../layout";
 
 export default async function DietPage() {
-  const { empty, defaultDiet, diets } = await generateInitialData();
+  const { defaultDiet, diets } = await generateInitialData();
   console.log(1);
 
   return (
     <>
       <Header />
       <DietsSlider initialDataDiets={diets} />
-      <SelectedDiet serverData={{ empty, defaultDiet, diets }} />
+      <SelectedDiet serverData={{ defaultDiet, diets }} />
     </>
   );
 }

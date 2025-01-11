@@ -6,6 +6,7 @@ import { FcGoogle } from "react-icons/fc";
 type LoginGoogleProps = {
   isLogin?: boolean;
 };
+
 export default function LoginGoogle({ isLogin = true }: LoginGoogleProps) {
   return (
     <Button

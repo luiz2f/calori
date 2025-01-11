@@ -1,6 +1,7 @@
 "use client";
 
 import { deleteFood as deleteFoodAPI } from "@/actions/foods";
+import { Food } from "@/app/(authenticated)/app";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
@@ -32,10 +33,10 @@ export function useDeleteFood() {
 
   useEffect(() => {
     if (!isDeleting && isSuccess && deletedId) {
-      queryClient.setQueryData(["foods"], (oldFoods) => {
+      queryClient.setQueryData<Food[]>(["foods"], (oldFoods) => {
         return oldFoods?.filter((food) => food?.id !== deletedId);
       });
-      queryClient.setQueryData(["userFoods"], (oldUserFoods) => {
+      queryClient.setQueryData<Food[]>(["userFoods"], (oldUserFoods) => {
         return oldUserFoods?.filter((food) => food?.id !== deletedId);
       });
     }

@@ -96,7 +96,7 @@ export type BasicDiet = {
 };
 
 export type AppProps = {
-  defaultDiet: Diet | null;
+  defaultDiet: Diet;
   diets: BasicDiet[];
   foods: Food[];
   children: React.ReactNode;

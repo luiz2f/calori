@@ -2,7 +2,7 @@
 import prisma from "@/prisma";
 import { getSessionId } from "./session";
 
-type FoodInput = {
+export type FoodInput = {
   name: string;
   quantity: number;
   unity: string;

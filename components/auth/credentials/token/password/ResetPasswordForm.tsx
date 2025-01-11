@@ -5,7 +5,6 @@ import SuccessPage from "@/components/by-page/auth/SucessPage";
 import NavAnchor from "@/components/ui/NavAnchor";
 import NavButton from "@/components/ui/NavButton";
 import PasswordInput from "@/components/ui/PasswordInput";
-import Link from "next/link";
 import { useState } from "react";
 
 interface ResetPasswordFormProps {
