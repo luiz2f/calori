@@ -1,22 +1,23 @@
-"use client";
-import { getUserDiets } from "@/actions/diets/diets";
-import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+'use client'
+import { getUserDiets } from '@/actions/diets/diets'
+import { BasicDiet } from '@/app/(authenticated)/app'
+import { useQuery } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
 
-export function useDiets(initialDataDiets = null) {
-  const [initialUsed, setInitialUsed] = useState(false);
+export function useDiets(initialDataDiets: BasicDiet[] | null = null) {
+  const [initialUsed, setInitialUsed] = useState(false)
 
   useEffect(() => {
     if (initialDataDiets) {
-      setInitialUsed(true);
+      setInitialUsed(true)
     }
-  }, [initialDataDiets]);
+  }, [initialDataDiets])
 
   const { data, isLoading } = useQuery({
-    queryKey: ["diets"],
+    queryKey: ['diets'],
     queryFn: getUserDiets,
-    initialData: initialUsed ? undefined : initialDataDiets,
-  });
+    initialData: initialUsed ? undefined : initialDataDiets
+  })
 
-  return { data, isLoading };
+  return { data, isLoading }
 }
