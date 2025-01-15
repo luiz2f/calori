@@ -38,44 +38,44 @@ export default function DietMacros() {
     open('my-weight-false')
   }
 
-  // useEffect(() => {
-  //   const totalKcal =
-  //     totalMacros.carb * 4 + totalMacros.prot * 4 + totalMacros.fat * 9
+  useEffect(() => {
+    const totalKcal =
+      totalMacros.carb * 4 + totalMacros.prot * 4 + totalMacros.fat * 9
 
-  //   const setMacroPercent = (macro: number) => {
-  //     return !isNaN(((macro * 4) / totalKcal) * 100)
-  //       ? `${(((macro * 4) / totalKcal) * 100).toFixed(0)}%`
-  //       : '0%'
-  //   }
-  //   const setMacroPerWeight = (macro: number) => {
-  //     return parseFloat((macro / weight).toFixed(1))
-  //   }
-  //   const newData = {
-  //     'g/KG': {
-  //       carb: setMacroPerWeight(totalMacros.carb),
-  //       prot: setMacroPerWeight(totalMacros.prot),
-  //       fat: setMacroPerWeight(totalMacros.fat)
-  //     },
-  //     g: {
-  //       carb: totalMacros.carb,
-  //       prot: totalMacros.prot,
-  //       fat: totalMacros.fat
-  //     },
-  //     '% kcal': {
-  //       carb: setMacroPercent(totalMacros.carb),
-  //       prot: setMacroPercent(totalMacros.prot),
-  //       fat: setMacroPercent(totalMacros.fat)
-  //     },
-  //     totalKcal: totalKcal
-  //   }
+    const setMacroPercent = (macro: number) => {
+      return !isNaN(((macro * 4) / totalKcal) * 100)
+        ? `${(((macro * 4) / totalKcal) * 100).toFixed(0)}%`
+        : '0%'
+    }
+    const setMacroPerWeight = (macro: number) => {
+      return parseFloat((macro / weight).toFixed(1))
+    }
+    const newData = {
+      'g/KG': {
+        carb: setMacroPerWeight(totalMacros.carb),
+        prot: setMacroPerWeight(totalMacros.prot),
+        fat: setMacroPerWeight(totalMacros.fat)
+      },
+      g: {
+        carb: totalMacros.carb,
+        prot: totalMacros.prot,
+        fat: totalMacros.fat
+      },
+      '% kcal': {
+        carb: setMacroPercent(totalMacros.carb),
+        prot: setMacroPercent(totalMacros.prot),
+        fat: setMacroPercent(totalMacros.fat)
+      },
+      totalKcal: totalKcal
+    }
 
-  //   setData(prevData => {
-  //     if (JSON.stringify(prevData) !== JSON.stringify(newData)) {
-  //       return newData
-  //     }
-  //     return prevData
-  //   })
-  // }, [totalMacros, weight])
+    setData(prevData => {
+      if (JSON.stringify(prevData) !== JSON.stringify(newData)) {
+        return newData
+      }
+      return prevData
+    })
+  }, [totalMacros, weight])
 
   return (
     <div className='flex flex-col w-full p-4'>

@@ -1,16 +1,16 @@
-"use server";
+'use server'
 
-import prisma from "@/prisma";
-import { getSessionId } from "../session";
+import prisma from '@/prisma'
+import { getSessionId } from '../session'
 
-type Refs = {
-  id: string;
-  name: string;
-  time: string;
-  dietId: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-};
+export type Ref = {
+  id: string
+  name: string
+  time: string
+  dietId?: string
+  createdAt?: Date
+  updatedAt?: Date
+}
 // const selectFullDiet = {
 //   select: {
 //     id: true,
@@ -66,46 +66,50 @@ type Refs = {
 //   },
 // };
 export async function getUserDiets() {
-  const userId = await getSessionId();
+  const userId = await getSessionId()
   if (userId) {
     const userDiets = await prisma.diet.findMany({
       where: {
-        userId: userId,
+        userId: userId
       },
-      orderBy: { index: "asc" },
+      orderBy: { index: 'asc' },
       select: {
         id: true,
         name: true,
         userId: true,
         index: true,
-        meals: { orderBy: { time: "asc" } },
-      },
-    });
+        meals: { orderBy: { time: 'asc' } }
+      }
+    })
 
-    return userDiets;
+    return userDiets
   }
 }
 
 export async function getDietIndex(userId: string) {
   const maxIndex = await prisma.diet.findFirst({
     where: { userId },
-    orderBy: { index: "desc" },
-    select: { index: true },
-  });
+    orderBy: { index: 'desc' },
+    select: { index: true }
+  })
 
-  const newIndex = maxIndex ? maxIndex.index + 1 : 1;
+  const newIndex = maxIndex ? maxIndex.index + 1 : 1
 
-  return newIndex;
+  return newIndex
 }
 
 type CreateDiet = {
-  userId: string;
-  dietName: string;
-  refs?: Refs[];
-};
+  userId: string
+  dietName: string
+  refs?: Ref[]
+}
 
 export async function createDiet({ userId, dietName, refs }: CreateDiet) {
-  const newIndex = await getDietIndex(userId);
+  const newIndex = await getDietIndex(userId)
+
+  if (!userId) {
+    throw new Error('Invalid User ID')
+  }
 
   try {
     const newDiet = await prisma.diet.create({
@@ -114,19 +118,19 @@ export async function createDiet({ userId, dietName, refs }: CreateDiet) {
         userId,
         index: newIndex,
         meals: {
-          create: refs?.map((ref) => ({
+          create: refs?.map(ref => ({
             name: ref.name,
-            time: ref.time,
-          })),
-        },
+            time: ref.time
+          }))
+        }
       },
-      include: { meals: true },
-    });
+      include: { meals: true }
+    })
 
-    return newDiet;
+    return newDiet
   } catch (error) {
-    console.error("Erro ao criar a dieta:", error);
-    throw new Error("Erro ao criar a dieta");
+    console.error('Erro ao criar a dieta:', error)
+    throw new Error('Erro ao criar a dieta')
   }
 }
 export async function duplicateDiet(dietId: string) {
@@ -134,16 +138,16 @@ export async function duplicateDiet(dietId: string) {
     const dietToDuplicate = await prisma.diet.findUnique({
       where: { id: dietId },
       include: {
-        meals: { include: { mealList: { include: { mealListItems: true } } } },
-      },
-    });
+        meals: { include: { mealList: { include: { mealListItems: true } } } }
+      }
+    })
 
     if (!dietToDuplicate) {
-      throw new Error("Dieta não encontrada");
+      throw new Error('Dieta não encontrada')
     }
 
-    const newIndex = await getDietIndex(dietToDuplicate.userId);
-    const newDietName = `${dietToDuplicate.name} - Cópia`;
+    const newIndex = await getDietIndex(dietToDuplicate.userId)
+    const newDietName = `${dietToDuplicate.name} - Cópia`
 
     const newDiet = await prisma.diet.create({
       data: {
@@ -152,7 +156,7 @@ export async function duplicateDiet(dietId: string) {
         index: newIndex,
         archived: false,
         meals: {
-          create: dietToDuplicate.meals.map((meal) => ({
+          create: dietToDuplicate.meals.map(meal => ({
             name: meal.name,
             time: meal.time,
             mealList: {
@@ -164,98 +168,99 @@ export async function duplicateDiet(dietId: string) {
                     foodId: item.foodId,
                     unityId: item.unityId,
                     quantity: item.quantity,
-                    index: itemIndex,
-                  })),
-                },
-              })),
-            },
-          })),
-        },
+                    index: itemIndex
+                  }))
+                }
+              }))
+            }
+          }))
+        }
       },
       include: {
         meals: {
           include: {
             mealList: {
               include: {
-                mealListItems: { include: { food: true, unity: true } },
-              },
-            },
-          },
-        },
-      },
-    });
+                mealListItems: { include: { food: true, unity: true } }
+              }
+            }
+          }
+        }
+      }
+    })
 
-    return newDiet;
+    return newDiet
   } catch (error) {
-    console.error("Erro ao duplicar dieta:", error);
-    throw new Error("Erro ao duplicar dieta");
+    console.error('Erro ao duplicar dieta:', error)
+    throw new Error('Erro ao duplicar dieta')
   }
 }
 type UpdateDiet = {
-  dietId: string;
-  dietName: string;
-  refs?: Refs[];
-};
+  dietId: string
+  dietName: string
+  refs?: Ref[]
+}
 export async function updateDiet({ dietId, dietName, refs }: UpdateDiet) {
+  if (!dietId) throw new Error('Invalid Diet ID')
   const originalMeals = await prisma.meal.findMany({
     where: { dietId: dietId },
-    select: { id: true },
-  });
+    select: { id: true }
+  })
 
-  const originalMealIds = originalMeals.map((meal) => meal.id);
-  const currentMealIds = refs?.map((meal) => meal.id);
+  const originalMealIds = originalMeals.map(meal => meal.id)
+  const currentMealIds = refs?.map(meal => meal.id)
 
   const mealsToDelete = originalMealIds.filter(
-    (id) => !currentMealIds?.includes(id)
-  );
+    id => !currentMealIds?.includes(id)
+  )
 
-  const deletedMeals = mealsToDelete.map(async (mealId) => {
+  const deletedMeals = mealsToDelete.map(async mealId => {
     await prisma.meal.delete({
-      where: { id: mealId },
-    });
-  });
+      where: { id: mealId }
+    })
+  })
 
   await prisma.diet.update({
     where: { id: dietId },
-    data: { name: dietName },
-  });
+    data: { name: dietName }
+  })
 
   const updatedMeals =
-    refs?.map(async (meal) => {
+    refs?.map(async meal => {
       // the newrefs id generated by the client are uuidv4
-      if (!meal.id.includes("-")) {
+      if (!meal.id.includes('-')) {
         await prisma.meal.update({
           where: { id: meal.id },
           data: {
             name: meal.name,
-            time: meal.time,
-          },
-        });
+            time: meal.time
+          }
+        })
       } else {
         await prisma.meal.create({
           data: {
             name: meal.name,
             time: meal.time,
-            dietId: dietId,
-          },
-        });
+            dietId: dietId
+          }
+        })
       }
-    }) || [];
+    }) || []
 
-  await Promise.all([...updatedMeals, ...deletedMeals]);
-  return { dietId, dietName, refs };
+  await Promise.all([...updatedMeals, ...deletedMeals])
+  return { dietId, dietName, refs }
 }
 
 export async function deleteDiet(dietId: string) {
   try {
     await prisma.diet.delete({
       where: {
-        id: dietId,
-      },
-    });
-    return dietId;
+        id: dietId
+      }
+    })
+    return dietId
   } catch (error) {
-    console.error("Erro ao apagar a dieta:", error);
-    throw new Error("Erro ao apagar a dieta");
+    console.error('Erro ao apagar a dieta:', error)
+    throw new Error('Erro ao apagar a dieta')
   }
 }

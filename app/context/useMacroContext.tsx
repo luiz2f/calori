@@ -38,19 +38,16 @@ export const MacroProvider: React.FC<{ children: React.ReactNode }> = ({
     kcal: 0
   })
 
-  const setDefaultMacro = useCallback(
-    (data: Diet) => {
-      const newData = data.meals
-      setMacros([])
-      newData.forEach(meal => {
-        if (!meal?.mealList?.length) {
-          return
-        }
-        updateMacroForMeal(meal?.id, meal?.mealList[0]?.macro)
-      })
-    },
-    [setMacros, updateMacroForMeal]
-  )
+  const setDefaultMacro = (data: Diet) => {
+    const newData = data.meals
+    setMacros([])
+    newData.forEach(meal => {
+      if (!meal?.mealList?.length) {
+        return
+      }
+      updateMacroForMeal(meal?.id, meal?.mealList[0]?.macro)
+    })
+  }
 
   const updateMacroForMeal = (
     mealId: string,

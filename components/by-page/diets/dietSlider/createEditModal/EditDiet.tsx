@@ -1,7 +1,6 @@
 'use client'
-import { useState, useContext, useEffect, useCallback } from 'react'
+import React, { useState, useContext, useEffect, useCallback } from 'react'
 import Button from '@/components/ui/Button'
-import Menus from '@/components/ui/Menu'
 import { ModalContext } from '@/components/ui/Modal'
 import DietEditRefRow from './DietEditRefRow'
 import { v4 as uuidv4 } from 'uuid'
@@ -9,7 +8,7 @@ import Spinner from '@/components/ui/Spinner'
 import { useUpdateDiet } from '@/app/data/diets/useUpdateDiet'
 import { useCreateDiet } from '@/app/data/diets/useCreateDiet'
 import { useSession } from 'next-auth/react'
-import { BasicDiet, Diet } from '@/app/(authenticated)/app'
+import { BasicDiet } from '@/app/(authenticated)/app'
 
 const BaseRefs = [
   { id: '1', name: 'Café da Manhã', time: '09:00' },
@@ -41,17 +40,17 @@ export default function EditDiet({
 }: EditDietProps) {
   const { unsavedChanges } = useContext(ModalContext)
 
-  const meals = creating ? BaseRefs : diet?.meals
-  const name = creating ? 'Nova Dieta' : diet?.name
+  const meals = creating ? BaseRefs : diet?.meals || BaseRefs
+  const name = creating ? 'Nova Dieta' : diet?.name || 'Nova Dieta'
   const modifiedDefault = creating ? true : false
   const [dietName, setDietName] = useState(name)
   const [refs, setRefs] = useState(meals)
   const [originalRefs, setOriginalRefs] = useState(meals)
-  const [errors, setErrors] = useState({})
+  const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [isFormValid, setIsFormValid] = useState(true)
   const [isModified, setIsModified] = useState(modifiedDefault)
   const { data } = useSession()
-  const userId = data?.userId
+  const userId = data?.userId || ''
 
   const {
     isUpdating,
@@ -65,27 +64,27 @@ export default function EditDiet({
   const isSuccess = creating ? isSuccessC : isSuccessU
   const isDisabled = !isFormValid || !isModified || isUpdating
 
-  const handleSubmit = async event => {
-    event.preventDefault()
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
     if (creating) {
       try {
         await createDiet({
           userId,
           dietName: dietName,
-          refs: refs
+          refs
         })
       } catch (error) {
         console.error(error)
       }
     } else {
-      updateDiet({ dietName, dietId: diet?.id, refs })
+      updateDiet({ dietName, dietId: diet?.id || '', refs })
     }
   }
 
   useEffect(() => {
     if (isSuccess && !isLoading)
       if (creating) {
-        onCloseModal()
+        onCloseModal?.()
       } else if (!creating) {
         setOriginalRefs(refs)
         setIsModified(false)
@@ -134,37 +133,29 @@ export default function EditDiet({
     setIsFormValid(!hasError && !hasEmptyName)
   }, [errors, refs])
 
-  const handleNameChange = e => {
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDietName(e.target.value)
   }
-
-  const handleRefChange = (index, key, value) => {
-    const newRefs = refs.map((ref, i) =>
-      i === index ? { ...ref, [key]: value } : ref
+  const handleRefChange = (id: string, key: string, value: string) => {
+    const newRefs = refs.map(ref =>
+      ref.id === id ? { ...ref, [key]: value } : ref
     )
     setRefs(newRefs)
 
     if (key === 'name' && value.trim() === '') {
       setErrors(prevErrors => ({
         ...prevErrors,
-        [`${index}_name`]: 'Nome não pode estar vazio'
+        [`${id}_name`]: 'Nome não pode estar vazio'
       }))
     } else if (key === 'name' && value.trim() !== '') {
-      setErrors(prevErrors => {
-        const { [`${index}_name`]: omit, ...rest } = prevErrors
-        return rest
-      })
+      setErrors(prevErrors => ({
+        ...prevErrors,
+        [`${id}_name`]: ''
+      }))
     }
   }
 
-  const handleErrorChange = (index, key, error) => {
-    setErrors(prevErrors => ({
-      ...prevErrors,
-      [`${index}_${key}`]: error
-    }))
-  }
-
-  const handleAddRef = e => {
+  const handleAddRef = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation()
     e.preventDefault()
     setRefs([...refs, { id: uuidv4(), name: 'Nova Refeição', time: '23:00' }])
@@ -179,7 +170,7 @@ export default function EditDiet({
     setRefs(sortedRefs)
   }, [refs])
 
-  const handleDeleteRef = id => {
+  const handleDeleteRef = (id: string) => {
     setRefs(prevRefs => prevRefs.filter(ref => ref.id !== id))
   }
 
@@ -194,25 +185,23 @@ export default function EditDiet({
           <input
             name='dietName'
             value={dietName}
-            onChange={handleNameChange}
+            onChange={e => handleNameChange(e)}
             className='font-medium p-2 w-full border-1 border-grey-50 rounded-lg mb-3'
           />
         </div>
         <label className='text-grey50 text-sm mb-1 pl-2'>Refeições</label>
         <div className='flex flex-col gap-2 mb-3'>
-          {refs.map((ref, index) => (
+          {refs.map(ref => (
             <DietEditRefRow
-              key={ref.id}
+              key={ref?.id}
               refData={ref}
-              onRefChange={(key, value) => handleRefChange(index, key, value)}
-              onErrorChange={(key, error) =>
-                handleErrorChange(index, key, error)
+              onRefChange={(key: string, value: string) =>
+                handleRefChange(ref?.id, key, value)
               }
               onTimeBlur={handleTimeBlur}
-              nameError={errors[`${index}_name`]}
-              timeError={errors[`${index}_time`]}
+              nameError={errors[`${ref?.id}_name`]}
+              timeError={errors[`${ref?.id}_time`]}
               onDelete={handleDeleteRef}
-              index={index}
             />
           ))}
         </div>
@@ -226,7 +215,7 @@ export default function EditDiet({
           </button>
         )}
         <div className='flex gap-4 px-1 mt-6'>
-          <Button size='small' cw='lightred' onClick={() => onCloseModal()}>
+          <Button size='small' cw='lightred' onClick={() => onCloseModal?.()}>
             Cancelar
           </Button>
           <Button size='small' type='submit' disabled={isDisabled}>

@@ -3,8 +3,8 @@ import Button from './Button'
 import Spinner from './Spinner'
 
 type ConfirmDeleteProps = {
-  loading: boolean
-  loaded: boolean | undefined
+  loading?: boolean
+  loaded?: boolean | undefined
   resource: string
   resourceName: string
   modalName: string
@@ -30,14 +30,14 @@ function ConfirmDelete({
       console.error(error)
     } finally {
       if (loaded === undefined) {
-        onCloseModal()
+        onCloseModal?.()
       }
     }
   }
 
   useEffect(() => {
     if (loaded) {
-      onCloseModal()
+      onCloseModal?.()
     }
   }, [loaded, onCloseModal, modalName])
 
@@ -57,7 +57,7 @@ function ConfirmDelete({
           cw='grey'
           size='small'
           disabled={disabled || loading}
-          onClick={() => onCloseModal()}
+          onClick={() => onCloseModal?.()}
         >
           Cancelar
         </Button>

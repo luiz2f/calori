@@ -18,13 +18,14 @@ export default function Header({ home = false }) {
   const [profileMenu, setProfileMenu] = useState(false)
   const user = useSession()
   const username = user.data?.user?.name || 'Usuário'
-  const userId = user.data?.userId
   const handler = () => setProfileMenu(false)
   const { data: weight } = useWeight()
   const { data: userFoods, isLoading } = useUserFoods()
   const router = useRouter()
 
-  const handleClick = e => {
+  const handleClick = (
+    e: React.MouseEvent<HTMLButtonElement | HTMLDivElement>
+  ) => {
     e.stopPropagation()
     e.preventDefault()
     router.push('/diets')
