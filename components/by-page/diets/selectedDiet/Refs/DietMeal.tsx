@@ -1,62 +1,71 @@
-"use client";
-import Menus from "@/components/ui/Menu";
-import RefTableTest from "./RefTable";
+'use client'
+import Menus from '@/components/ui/Menu'
 import {
   HiDotsHorizontal,
   HiOutlinePencilAlt,
-  HiOutlineTrash,
-} from "react-icons/hi";
-import Modal from "@/components/ui/Modal";
-import ConfirmDelete from "@/components/ui/ConfirmDelete";
-import EditRef from "./createEditRef/EditRef";
-import { useEffect, useState } from "react";
-import RefTable from "./RefTable";
-import { useDeleteMeal } from "@/app/data/meals/useDeleteMeal";
-import { useMacroContext } from "@/app/context/useMacroContext";
+  HiOutlineTrash
+} from 'react-icons/hi'
+import Modal from '@/components/ui/Modal'
+import ConfirmDelete from '@/components/ui/ConfirmDelete'
+import EditRef from './createEditRef/EditRef'
+import { useEffect, useState } from 'react'
+import RefTable from './RefTable'
+import { useDeleteMeal } from '@/app/data/meals/useDeleteMeal'
+import { useMacroContext } from '@/app/context/useMacroContext'
+import { MealList } from '@/app/(authenticated)/app'
 
-export default function DietMeal({ meal }) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [defaultIndex, setDefaultIndex] = useState(true);
-  const { isDeleting, deleteMeal, isSuccess } = useDeleteMeal();
-  const { updateMacroForMeal } = useMacroContext();
-  const selectedMeal = meal?.mealList[currentIndex] || {};
+export type Meal = {
+  id: string
+  name: string
+  time: string
+  dietId: string
+  mealList: MealList[] | []
+  createdAt?: Date
+  updatedAt?: Date
+}
+export default function DietMeal({ meal }: { meal: Meal }) {
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [defaultIndex, setDefaultIndex] = useState(true)
+  const { isDeleting, deleteMeal, isSuccess } = useDeleteMeal()
+  const { updateMacroForMeal } = useMacroContext()
+  const selectedMeal = meal?.mealList[currentIndex] || {}
   const goLeft = () => {
-    setCurrentIndex((prevIndex) =>
+    setCurrentIndex(prevIndex =>
       prevIndex > 0 ? prevIndex - 1 : meal?.mealList?.length - 1
-    );
-  };
+    )
+  }
   const goRight = () => {
-    setCurrentIndex((prevIndex) =>
+    setCurrentIndex(prevIndex =>
       prevIndex < meal?.mealList?.length - 1 ? prevIndex + 1 : 0
-    );
-  };
+    )
+  }
   const handleDeleteMeal = async () => {
-    await deleteMeal(meal.id);
-  };
+    await deleteMeal(meal.id)
+  }
 
   useEffect(() => {
     if (currentIndex === 0 && defaultIndex) {
-      return;
+      return
     }
-    setDefaultIndex(false);
-    const macro = selectedMeal?.macro;
-    updateMacroForMeal(meal.id, macro, "dietMeal");
-  }, [currentIndex, meal, defaultIndex]); // Agora depende de `isFirstLoad`
+    setDefaultIndex(false)
+    const macro = selectedMeal?.macro
+    updateMacroForMeal(meal.id, macro)
+  }, [currentIndex, meal, defaultIndex, selectedMeal?.macro]) // Agora depende de `isFirstLoad`
 
-  const deleteModalName = `deleteMeal${meal.id}`;
+  const deleteModalName = `deleteMeal${meal.id}`
 
   return (
     <div>
-      <div className="border-grey10 border-1 rounded-lg flex flex-col w-full relative">
-        <div className="flex items-baseline  gap-1 absolute top-[-16px] bg-white px-1 left-0 ">
+      <div className='border-grey10 border-1 rounded-lg flex flex-col w-full relative'>
+        <div className='flex items-baseline  gap-1 absolute top-[-16px] bg-white px-1 left-0 '>
           <Modal.Open opens={`editMeal${meal.id}`}>
-            <button className="font-medium text-2xl cursor-pointer">
+            <button className='font-medium text-2xl cursor-pointer'>
               {meal.name}
             </button>
           </Modal.Open>
-          <div className="text-darkgreen">{meal.time}</div>
+          <div className='text-darkgreen'>{meal.time}</div>
         </div>
-        <Menus.Menu className="bg-white p-1 rounded-lg border-grey10 border-1  absolute top-[-12px] right-1 text-grey50">
+        <Menus.Menu className='bg-white p-1 rounded-lg border-grey10 border-1  absolute top-[-12px] right-1 text-grey50'>
           <Menus.Toggle id={`MealToogle${meal.id}`}>
             <HiDotsHorizontal />
           </Menus.Toggle>
@@ -87,7 +96,7 @@ export default function DietMeal({ meal }) {
             <EditRef
               meal={meal}
               currentIndex={currentIndex}
-              typeInput="Alimentos"
+              typeInput='Alimentos'
               modalName={`editMealAlimento${meal.id}`}
             />
           </Modal.Window>
@@ -96,7 +105,7 @@ export default function DietMeal({ meal }) {
               createFood={true}
               meal={meal}
               currentIndex={currentIndex}
-              typeInput="Alimentos"
+              typeInput='Alimentos'
               modalName={`editMealAlimentoCreate${meal.id}`}
             />
           </Modal.Window>
@@ -105,7 +114,7 @@ export default function DietMeal({ meal }) {
               createVariation={true}
               meal={meal}
               currentIndex={currentIndex}
-              typeInput="Alimentos"
+              typeInput='Alimentos'
               modalName={`editMealVarCreate${meal.id}`}
             />
           </Modal.Window>
@@ -113,7 +122,7 @@ export default function DietMeal({ meal }) {
             <ConfirmDelete
               loading={isDeleting}
               loaded={!isDeleting && isSuccess}
-              resource="Refeição"
+              resource='Refeição'
               resourceName={`${meal.name} - ${meal.time}`}
               onConfirm={handleDeleteMeal}
               modalName={deleteModalName}
@@ -131,5 +140,5 @@ export default function DietMeal({ meal }) {
         {/* 😀 */}
       </div>
     </div>
-  );
+  )
 }

@@ -1,10 +1,10 @@
-"use server";
+'use server'
 
-import prisma from "@/prisma";
+import prisma from '@/prisma'
 
 export async function getDietMeals(dietId: string) {
   if (!dietId) {
-    return null;
+    return null
   }
   const dietMeals = await prisma.diet.findUnique({
     where: { id: dietId },
@@ -39,99 +39,106 @@ export async function getDietMeals(dietId: string) {
                       name: true,
                       carb: true,
                       protein: true,
-                      fat: true,
-                    },
+                      fat: true
+                    }
                   },
                   unity: {
                     select: {
                       id: true,
                       foodId: true,
                       un: true,
-                      unitMultiplier: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
+                      unitMultiplier: true
+                    }
+                  }
+                }
+              }
+            }
+          }
         },
         orderBy: {
-          time: "asc",
-        },
-      },
-    },
-  });
+          time: 'asc'
+        }
+      }
+    }
+  })
 
-  return dietMeals;
+  return dietMeals
 }
 
 export async function deleteMeal(mealId: string) {
   const mealToDelete = await prisma.meal.findUnique({
     where: {
-      id: mealId,
+      id: mealId
     },
     select: {
-      dietId: true,
-    },
-  });
+      dietId: true
+    }
+  })
 
   await prisma.meal.delete({
     where: {
-      id: mealId,
-    },
-  });
-  return mealToDelete?.dietId;
+      id: mealId
+    }
+  })
+  return mealToDelete?.dietId
 }
-type Macro = {
-  carbo: number;
-  prot: number;
-  fat: number;
-  kcal: number;
-};
-type Food = {
-  id: string;
-  name: string;
-  carb: number;
-  protein: number;
-  fat: number;
-  satFat?: number;
-  fiber?: number;
-};
-type Unity = {
-  id: string;
-  foodId: string;
-  un: string;
-  unitMultiplier: number;
-};
-type MealItems = {
-  id: string;
-  foodId: string;
-  unityId: string;
-  quantity: number;
-  mealListId: string;
-  index: number;
-  food?: Food;
-  unity?: Unity;
-};
-type Meal = {
-  id: string;
-  name: string;
-  index: number;
-  mealListItems?: MealItems[];
-  macro?: Macro;
-};
+// type Macro = {
+//   carb: number
+//   prot: number
+//   fat: number
+//   kcal: number
+// }
+// type Food = {
+//   carb: number
+//   protein: number
+//   fat: number
+//   id: string
+//   name: string
+//   unities?: Unity[]
+//   erro?: boolean
+// }
+// type Unity = {
+//   foodId: string
+//   id: string
+//   un: string
+//   unitMultiplier: number
+//   erro?: boolean
+// }
+// export type MealItem = {
+//   id: string
+//   foodId: string
+//   unityId: string
+//   quantity: number
+//   mealListId?: string
+//   index?: number
+//   food: Food
+//   unity: Unity
+// }
+// export type Meal = {
+//   id: string
+//   name: string
+//   index?: number
+//   mealListItems: MealItem[]
+//   macro?: Macro
+// }
 
+// type updateMeal = {
+//   mealId: string
+//   mealName: string
+//   mealTime: string
+//   refs: Meal[]
+// }
 type updateMeal = {
-  mealId: string;
-  mealName: string;
-  mealTime: string;
-  refs: Meal[];
-};
+  mealId: string
+  mealName: string
+  mealTime: string
+  refs: any
+}
 export async function updateMeal({
   mealId,
   mealName,
   mealTime,
-  refs,
+  refs
 }: updateMeal) {
   const mealToUpdate = await prisma.meal.findUnique({
     where: { id: mealId },
@@ -150,72 +157,72 @@ export async function updateMeal({
               foodId: true,
               unityId: true,
               quantity: true,
-              mealListId: true,
-            },
-          },
-        },
-      },
-    },
-  });
+              mealListId: true
+            }
+          }
+        }
+      }
+    }
+  })
 
   await prisma.meal.update({
     where: { id: mealId },
     data: {
       name: mealName,
-      time: mealTime,
-    },
-  });
+      time: mealTime
+    }
+  })
 
-  const originalMealLists = mealToUpdate?.mealList.map((list) => list.id);
-  const currentMealLists = refs.map((list) => list.id);
+  const originalMealLists = mealToUpdate?.mealList.map(list => list.id)
+  const currentMealLists = refs.map(list => list.id)
 
   const listsToDelete = originalMealLists?.filter(
-    (id) => !currentMealLists?.includes(id)
-  );
+    id => !currentMealLists?.includes(id)
+  )
 
   const deleteMealLists =
-    listsToDelete?.map(async (listId) => {
+    listsToDelete?.map(async listId => {
       await prisma.mealList.delete({
-        where: { id: listId },
-      });
-    }) || [];
+        where: { id: listId }
+      })
+    }) || []
 
-  const updateOrCreateMealLists = refs?.map(async (list) => {
-    if (!list.id?.includes("-")) {
+  const updateOrCreateMealLists = refs?.map(async list => {
+    if (!list.id?.includes('-')) {
       await prisma.mealList.update({
         where: { id: list.id },
         data: {
-          name: list.name,
-        },
-      });
+          name: list.name
+        }
+      })
 
       const originalItemIds =
         mealToUpdate?.mealList
-          ?.find((ml) => ml.id === list.id)
-          ?.mealListItems?.map((item) => item.id) || [];
+          ?.find(ml => ml.id === list.id)
+          ?.mealListItems?.map(item => item.id) || []
 
-      const currentItemIds = list.mealListItems?.map((item) => item.id);
+      const currentItemIds = list.mealListItems?.map(item => item.id)
       const itemsToDelete = originalItemIds?.filter(
-        (id) => !currentItemIds?.includes(id)
-      );
+        id => !currentItemIds?.includes(id)
+      )
 
-      const deleteItems = itemsToDelete?.map(async (itemId) => {
+      const deleteItems = itemsToDelete?.map(async itemId => {
         await prisma.mealListItem.delete({
-          where: { id: itemId },
-        });
-      });
+          where: { id: itemId }
+        })
+      })
 
       const updateOrCreateItems =
-        list.mealListItems?.map(async (item) => {
-          if (!item.id.includes("-")) {
+        list.mealListItems?.map(async item => {
+          if (!item.id.includes('-')) {
             await prisma.mealListItem.update({
               where: { id: item.id },
               data: {
                 foodId: item.foodId,
                 unityId: item.unityId,
-                quantity: toNumber(item.quantity),
-              },
-            });
+                quantity: toNumber(item.quantity)
+              }
+            })
           } else {
             await prisma.mealListItem.create({
               data: {
@@ -223,14 +230,14 @@ export async function updateMeal({
                 unityId: item.unityId,
                 quantity: toNumber(item.quantity),
                 mealListId: list.id,
-                index: 0,
-              },
-            });
+                index: 0
+              }
+            })
           }
-        }) || [];
+        }) || []
 
-      await Promise.all(updateOrCreateItems);
-      await Promise.all(deleteItems);
+      await Promise.all(updateOrCreateItems)
+      await Promise.all(deleteItems)
     } else {
       await prisma.mealList.create({
         data: {
@@ -238,71 +245,71 @@ export async function updateMeal({
           mealId: mealId,
           index: 1,
           mealListItems: {
-            create: list.mealListItems?.map((item) => ({
+            create: list.mealListItems?.map(item => ({
               foodId: item.foodId,
               unityId: item.unityId,
               quantity: toNumber(item.quantity),
-              index: 1,
-            })),
-          },
-        },
-      });
+              index: 1
+            }))
+          }
+        }
+      })
     }
-  });
+  })
 
-  await Promise.all([...updateOrCreateMealLists, ...deleteMealLists]);
+  await Promise.all([...updateOrCreateMealLists, ...deleteMealLists])
 
-  return mealToUpdate?.dietId;
+  return mealToUpdate?.dietId
 }
 
 type createMeal = {
-  mealName: string;
-  mealTime: string;
-  refs: Meal[];
-  dietId: string;
-};
+  mealName: string
+  mealTime: string
+  refs: any
+  dietId: string
+}
 export async function createMeal({
   mealName,
   mealTime,
   refs,
-  dietId,
+  dietId
 }: createMeal) {
   const newMeal = await prisma.meal.create({
     data: {
       name: mealName,
       time: mealTime,
-      dietId: dietId,
-    },
-  });
+      dietId: dietId
+    }
+  })
 
   if (refs) {
-    const createMealLists = refs?.map(async (list) => {
+    const createMealLists = refs?.map(async list => {
       await prisma.mealList.create({
         data: {
           name: list.name,
           mealId: newMeal.id,
           index: 1,
           mealListItems: {
-            create: list.mealListItems?.map((item) => ({
+            create: list.mealListItems?.map(item => ({
               foodId: item.foodId,
               unityId: item.unityId,
               quantity: toNumber(item.quantity),
-              index: 1,
-            })),
-          },
-        },
-      });
-    });
+              index: 1
+            }))
+          }
+        }
+      })
+    })
 
-    await Promise.all(createMealLists);
+    await Promise.all(createMealLists)
   }
 
-  return dietId;
+  return dietId
 }
 
 function toNumber(number: string | number) {
-  if (typeof number === "string") {
-    number = number.replace(/,/g, "");
+  if (typeof number === 'string') {
+    number = number.replace(/,/g, '')
   }
-  return parseFloat(number.toString());
+  return parseFloat(number.toString())
 }

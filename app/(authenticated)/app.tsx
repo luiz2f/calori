@@ -17,7 +17,7 @@ export type Macro = {
   carb: number
   prot: number
   fat: number
-  kcal?: number
+  kcal: number
 }
 export type Food = {
   id: string
@@ -51,14 +51,14 @@ export type MealListItem = {
   unityId: string
   quantity: number
   mealListId: string
-  index: number
+  index?: number
   food?: BasicFood
   unity?: Unity
 }
 export type MealList = {
   id: string
   name: string
-  index: number
+  index?: number
   mealListItems: MealListItem[]
   macro?: Macro
 }

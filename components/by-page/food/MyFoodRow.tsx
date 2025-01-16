@@ -1,27 +1,29 @@
-import { useDeleteFood } from "@/app/data/foods/useDeleteFood";
-import ConfirmDelete from "@/components/ui/ConfirmDelete";
-import Menus from "@/components/ui/Menu";
-import Modal from "@/components/ui/Modal";
-import { HiDotsVertical, HiOutlinePencilAlt } from "react-icons/hi";
-import { HiOutlineTrash } from "react-icons/hi2";
-import CreateEditFood from "../food/CreateEditFood";
+'use client'
+import { useDeleteFood } from '@/app/data/foods/useDeleteFood'
+import ConfirmDelete from '@/components/ui/ConfirmDelete'
+import Menus from '@/components/ui/Menu'
+import Modal from '@/components/ui/Modal'
+import { HiDotsVertical, HiOutlinePencilAlt } from 'react-icons/hi'
+import { HiOutlineTrash } from 'react-icons/hi2'
+import CreateEditFood from '../food/CreateEditFood'
+import { Food } from '@/app/(authenticated)/app'
 
-export default function MyFoodRow({ food }) {
-  const { isDeleting, deleteFood, isSuccess } = useDeleteFood();
+export default function MyFoodRow({ food }: { food: Food }) {
+  const { isDeleting, deleteFood, isSuccess } = useDeleteFood()
 
-  const deleteModal = `deleteUserFood${food?.id}`;
-  const editModal = `editUserFood${food?.id}`;
+  const deleteModal = `deleteUserFood${food?.id}`
+  const editModal = `editUserFood${food?.id}`
   return (
     <div
       key={food.id}
-      className="gap-2 flex items-center p-1 pl-2 justify-between rounded-lg border-grey10 border-1 "
+      className='gap-2 flex items-center p-1 pl-2 justify-between rounded-lg border-grey10 border-1 '
     >
       <div>{food.name}</div>
 
-      <Menus.Menu className=" p-1 rounded-lg text-grey50 ">
+      <Menus.Menu className=' p-1 rounded-lg text-grey50 '>
         <Menus.Toggle
           id={`userFoodMenuToogle${food?.id}`}
-          className="rounded-lg items-center"
+          className='rounded-lg items-center'
         >
           <HiDotsVertical />
         </Menus.Toggle>
@@ -50,7 +52,7 @@ export default function MyFoodRow({ food }) {
             loading={isDeleting}
             loaded={!isDeleting && isSuccess}
             disabled={isDeleting}
-            resource="Alimento"
+            resource='Alimento'
             resourceName={food.name}
             onConfirm={() => deleteFood(food?.id)}
             modalName={deleteModal}
@@ -58,5 +60,5 @@ export default function MyFoodRow({ food }) {
         </Modal.Window>
       </Menus.Menu>
     </div>
-  );
+  )
 }

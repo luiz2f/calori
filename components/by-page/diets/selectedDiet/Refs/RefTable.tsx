@@ -1,9 +1,48 @@
-"use client";
-import { useContext } from "react";
-import Table from "./RefTableModel";
-import RefSlider from "./RefSlider";
-import { ModalContext } from "@/components/ui/Modal";
-import { useMacroContext } from "@/app/context/useMacroContext";
+'use client'
+import { useContext } from 'react'
+import Table from './RefTableModel'
+import RefSlider from './RefSlider'
+import { ModalContext } from '@/components/ui/Modal'
+import { useMacroContext } from '@/app/context/useMacroContext'
+
+type Macro = {
+  carb: number
+  prot: number
+  fat: number
+  kcal: number
+}
+type Food = {
+  id: string
+  name: string
+  carb: number
+  protein: number
+  fat: number
+  satFat?: number
+  fiber?: number
+}
+type Unity = {
+  id: string
+  foodId: string
+  un: string
+  unitMultiplier: number
+}
+type MealItems = {
+  id: string
+  foodId: string
+  unityId: string
+  quantity: number
+  mealListId: string
+  index: number
+  food: Food
+  unity: Unity
+}
+type Meal = {
+  id: string
+  name: string
+  index: number
+  mealListItems?: MealItems[]
+  macro: Macro
+}
 
 export default function RefTable({
   mealId,
@@ -11,64 +50,69 @@ export default function RefTable({
   goLeft,
   goRight,
   mealsList,
-  modalName,
-  macros,
-  selectedMeal,
+  selectedMeal
+}: {
+  mealId: string
+  currentIndex: number
+  goLeft: () => void
+  goRight: () => void
+  mealsList: Meal[]
+  selectedMeal: Meal
 }) {
-  const { open } = useContext(ModalContext);
-  const { columns } = useMacroContext();
+  const { open } = useContext(ModalContext)
+  const { columns } = useMacroContext()
 
   if (!mealsList || mealsList.length === 0) {
     return (
-      <div role="table" className="flex flex-col w-full p-2 mb-2">
+      <div role='table' className='flex flex-col w-full p-2 mb-2'>
         <div
-          role="row"
-          style={{ gridTemplateColumns: "1fr 32px 32px 32px 32px" }}
-          className="grid mt-4 pr-1 text-darkgreen"
+          role='row'
+          style={{ gridTemplateColumns: '1fr 32px 32px 32px 32px' }}
+          className='grid mt-4 pr-1 text-darkgreen'
         >
           <div
-            className="text-left align-bottom text-xl font-normal self-end pl-1 underline underline-offset-2 cursor-pointer"
+            className='text-left align-bottom text-xl font-normal self-end pl-1 underline underline-offset-2 cursor-pointer'
             onClick={handleClickNoVar}
           >
             + Adicionar variação de refeição
           </div>
-          <div className="text-center font-normal align-bottom opacity-30">
-            <div className="grayscale contrast-150 text-xs opacity-30">🍞</div>
+          <div className='text-center font-normal align-bottom opacity-30'>
+            <div className='grayscale contrast-150 text-xs opacity-30'>🍞</div>
             <div>0</div>
           </div>
-          <div className="text-center font-normal align-bottom opacity-30">
-            <div className="grayscale contrast-150 text-xs opacity-30">🥩</div>
+          <div className='text-center font-normal align-bottom opacity-30'>
+            <div className='grayscale contrast-150 text-xs opacity-30'>🥩</div>
             <div>0</div>
           </div>
-          <div className="text-center font-normal align-bottom opacity-30">
-            <div className="grayscale contrast-150 text-xs opacity-30">🥑</div>
+          <div className='text-center font-normal align-bottom opacity-30'>
+            <div className='grayscale contrast-150 text-xs opacity-30'>🥑</div>
             <div>0</div>
           </div>
-          <div className="text-right font-normal align-bottom opacity-30">
-            <div className="text-xs text-grey50">kcal</div> <div>0</div>
+          <div className='text-right font-normal align-bottom opacity-30'>
+            <div className='text-xs text-grey50'>kcal</div> <div>0</div>
           </div>
         </div>
       </div>
-    );
+    )
   }
-  const meal = mealsList[currentIndex];
-  const macro = selectedMeal?.macro;
+  const meal = mealsList[currentIndex]
+  const macro = selectedMeal?.macro
 
-  function transformFoodData(foodData) {
-    return foodData?.map((item) => {
-      const { food, unity, quantity } = item;
+  function transformFoodData(foodData: MealItems[] | undefined) {
+    return foodData?.map(item => {
+      const { food, unity, quantity } = item
 
-      const carb = Math.round(food.carb * (quantity * unity.unitMultiplier));
-      const prot = Math.round(food.protein * (quantity * unity.unitMultiplier));
-      const fat = Math.round(food.fat * (quantity * unity.unitMultiplier));
-      const kcal = Math.round((carb + prot) * 4 + fat * 9);
+      const carb = Math.round(food.carb * (quantity * unity.unitMultiplier))
+      const prot = Math.round(food.protein * (quantity * unity.unitMultiplier))
+      const fat = Math.round(food.fat * (quantity * unity.unitMultiplier))
+      const kcal = Math.round((carb + prot) * 4 + fat * 9)
 
       return {
         name: (
           <>
             <strong>
               {quantity} {unity.un}
-            </strong>{" "}
+            </strong>{' '}
             - {food.name}
           </>
         ),
@@ -77,25 +121,25 @@ export default function RefTable({
         fat: fat,
         kcal: kcal,
         quantity: quantity,
-        unit: unity.un.replace(/"/g, ""), // Remove aspas se houver
-      };
-    });
+        unit: unity.un.replace(/"/g, '') // Remove aspas se houver
+      }
+    })
   }
 
   function handleOpenVar() {
-    open(`editMealAlimento${mealId}`);
+    open(`editMealAlimento${mealId}`)
   }
 
   function handleClickNoFood() {
-    open(`editMealAlimentoCreate${mealId}`);
+    open(`editMealAlimentoCreate${mealId}`)
   }
 
   function handleClickNoVar() {
-    open(`editMealVarCreate${mealId}`);
+    open(`editMealVarCreate${mealId}`)
   }
-  const simplifiedData = transformFoodData(meal?.mealListItems);
-  const defaultColumns = "1fr 32px 32px 32px 32px";
-  const gridColumn = columns || defaultColumns;
+  const simplifiedData = transformFoodData(meal?.mealListItems)
+  const defaultColumns = '1fr 32px 32px 32px 32px'
+  const gridColumn = columns || defaultColumns
   return (
     <Table columns={gridColumn}>
       <Table.Header
@@ -129,5 +173,5 @@ export default function RefTable({
         current={currentIndex}
       />
     </Table>
-  );
+  )
 }
