@@ -1,5 +1,6 @@
 'use server'
 
+import { MealVar } from '@/components/by-page/diets/selectedDiet/Refs/createEditRef/EditRef'
 import prisma from '@/prisma'
 
 export async function getDietMeals(dietId: string) {
@@ -122,17 +123,11 @@ export async function deleteMeal(mealId: string) {
 //   macro?: Macro
 // }
 
-// type updateMeal = {
-//   mealId: string
-//   mealName: string
-//   mealTime: string
-//   refs: Meal[]
-// }
 type updateMeal = {
   mealId: string
   mealName: string
   mealTime: string
-  refs: any
+  refs: MealVar[]
 }
 export async function updateMeal({
   mealId,
@@ -265,7 +260,7 @@ export async function updateMeal({
 type createMeal = {
   mealName: string
   mealTime: string
-  refs: any
+  refs: MealVar[]
   dietId: string
 }
 export async function createMeal({

@@ -1,59 +1,58 @@
-import NextAuth, { CredentialsSignin } from "next-auth";
-import Google from "next-auth/providers/google";
-import Credentials from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import bcrypt from "bcryptjs";
-import { prisma } from "./prisma";
-import { saltAndHashPassword } from "./utils/helper";
-import { generateTokenAndSendEmailVerification } from "./actions/token";
-import { getUserByEmail, updateUser } from "./actions/auth";
-import { Session } from "next-auth";
+import NextAuth, { CredentialsSignin } from 'next-auth'
+import Google from 'next-auth/providers/google'
+import Credentials from 'next-auth/providers/credentials'
+import { PrismaAdapter } from '@auth/prisma-adapter'
+import bcrypt from 'bcryptjs'
+import { prisma } from './prisma'
+import { saltAndHashPassword } from './utils/helper'
+import { generateTokenAndSendEmailVerification } from './actions/token'
+import { getUserByEmail, updateUser } from './actions/auth'
 
-declare module "next-auth" {
+declare module 'next-auth' {
   interface Session {
-    userId: string;
+    userId: string
   }
 }
 
 class CustomError extends CredentialsSignin {
-  code = "custom";
+  code = 'custom'
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
-  session: { strategy: "jwt" },
+  session: { strategy: 'jwt' },
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      allowDangerousEmailAccountLinking: true,
+      allowDangerousEmailAccountLinking: true
     }),
     Credentials({
-      name: "Credentials",
+      name: 'Credentials',
       credentials: {
         email: {
-          label: "Email",
-          type: "email",
-          placeholder: "email@example.com",
+          label: 'Email',
+          type: 'email',
+          placeholder: 'email@example.com'
         },
-        password: { label: "Password", type: "password" },
+        password: { label: 'Password', type: 'password' },
         isRegistering: {
-          label: "Registering",
-          type: "boolean",
-          optional: true,
-        },
+          label: 'Registering',
+          type: 'boolean',
+          optional: true
+        }
       },
-      authorize: async (credentials) => {
+      authorize: async credentials => {
         if (!credentials || !credentials.email || !credentials.password) {
-          throw new Error("Invalid credentials");
+          throw new Error('Invalid credentials')
         }
 
-        const email = credentials.email as string;
-        const hash = saltAndHashPassword(credentials.password);
+        const email = credentials.email as string
+        const hash = saltAndHashPassword(credentials?.password as string)
 
         let user = await prisma.user.findUnique({
-          where: { email },
-        });
+          where: { email }
+        })
 
         if (credentials.isRegistering) {
           // usuario não existe
@@ -61,80 +60,80 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             user = await prisma.user.create({
               data: {
                 email,
-                hashedPassword: hash,
-              },
-            });
-            await generateTokenAndSendEmailVerification(email);
-            throw new CustomError("Token sent");
+                hashedPassword: hash
+              }
+            })
+            await generateTokenAndSendEmailVerification(email)
+            throw new CustomError('Token sent')
           } else if (!user.hashedPassword) {
             user = await prisma.user.update({
               where: { email },
-              data: { hashedPassword: hash },
-            });
-            await generateTokenAndSendEmailVerification(email);
-            throw new CustomError("Token sent");
+              data: { hashedPassword: hash }
+            })
+            await generateTokenAndSendEmailVerification(email)
+            throw new CustomError('Token sent')
           } else if (!user.emailVerified) {
-            await generateTokenAndSendEmailVerification(email);
-            throw new CustomError("Token sent");
+            await generateTokenAndSendEmailVerification(email)
+            throw new CustomError('Token sent')
           } else {
-            throw new CustomError("User already exists");
+            throw new CustomError('User already exists')
           }
         } else {
           if (!user) {
-            throw new CustomError("Invalid credentials");
+            throw new CustomError('Invalid credentials')
           } else if (!user.hashedPassword) {
-            throw new CustomError("Invalid credentials");
+            throw new CustomError('Invalid credentials')
           } else if (!user.emailVerified) {
-            await generateTokenAndSendEmailVerification(email);
-            throw new CustomError("Token sent");
+            await generateTokenAndSendEmailVerification(email)
+            throw new CustomError('Token sent')
           } else {
             const isMatch = bcrypt.compareSync(
               credentials.password as string,
               user.hashedPassword
-            );
+            )
             if (!isMatch) {
-              throw new CustomError("Invalid credentials");
+              throw new CustomError('Invalid credentials')
             }
           }
         }
-        return user;
-      },
-    }),
+        return user
+      }
+    })
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      if (account?.provider === "google") {
+      if (account?.provider === 'google') {
         const existingUser = user?.email
           ? await getUserByEmail(user.email)
-          : null;
-        if (existingUser && "id" in existingUser) {
+          : null
+        if (existingUser && 'id' in existingUser) {
           if (existingUser.name && existingUser.image) {
-            return true;
+            return true
           }
-          const name = existingUser.name || profile?.name || "";
-          const image = existingUser.image || profile?.picture || "";
+          const name = existingUser.name || profile?.name || ''
+          const image = existingUser.image || profile?.picture || ''
 
-          await updateUser(existingUser.id, name, image);
+          await updateUser(existingUser.id, name, image)
         } else if (!profile) {
-          return false;
+          return false
         }
       }
-      return true;
+      return true
     },
     async jwt({ token, user }) {
       // Se o user existir (ex.: durante o login), adiciona o userId ao token
       if (user) {
-        token.userId = user.id;
+        token.userId = user.id
       }
-      return token;
+      return token
     },
     async session({ session, token }) {
       // Inclui o userId na sessão, disponível no client-side
 
       if (token.userId) {
-        session.userId = token.userId as string;
+        session.userId = token.userId as string
       }
-      return session;
-    },
-  },
-});
+      return session
+    }
+  }
+})

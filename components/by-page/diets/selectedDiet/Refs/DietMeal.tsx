@@ -11,19 +11,9 @@ import EditRef from './createEditRef/EditRef'
 import { useEffect, useState } from 'react'
 import RefTable from './RefTable'
 import { useDeleteMeal } from '@/app/data/meals/useDeleteMeal'
-import { useMacroContext } from '@/app/context/useMacroContext'
-import { MealList } from '@/app/(authenticated)/app'
+import { MealMacro, useMacroContext } from '@/app/context/useMacroContext'
 
-export type Meal = {
-  id: string
-  name: string
-  time: string
-  dietId: string
-  mealList: MealList[] | []
-  createdAt?: Date
-  updatedAt?: Date
-}
-export default function DietMeal({ meal }: { meal: Meal }) {
+export default function DietMeal({ meal }: { meal: MealMacro }) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [defaultIndex, setDefaultIndex] = useState(true)
   const { isDeleting, deleteMeal, isSuccess } = useDeleteMeal()

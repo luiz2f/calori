@@ -14,7 +14,7 @@ import { useUserFoods } from '@/app/data/foods/useUserFoods'
 import { HiMiniHome } from 'react-icons/hi2'
 import { useRouter } from 'next/navigation'
 
-export default function Header({ home = false }) {
+export default function Header({ home = false }: { home?: boolean }) {
   const [profileMenu, setProfileMenu] = useState(false)
   const user = useSession()
   const username = user.data?.user?.name || 'Usuário'

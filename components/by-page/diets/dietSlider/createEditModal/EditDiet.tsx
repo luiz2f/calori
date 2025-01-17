@@ -8,7 +8,7 @@ import Spinner from '@/components/ui/Spinner'
 import { useUpdateDiet } from '@/app/data/diets/useUpdateDiet'
 import { useCreateDiet } from '@/app/data/diets/useCreateDiet'
 import { useSession } from 'next-auth/react'
-import { BasicDiet } from '@/app/(authenticated)/app'
+import { DietFromSlider } from '@/app/(authenticated)/layout'
 
 const BaseRefs = [
   { id: '1', name: 'Café da Manhã', time: '09:00' },
@@ -27,7 +27,7 @@ type EditDietProps =
     }
   | {
       creating?: false
-      diet: BasicDiet
+      diet: DietFromSlider
       modalName: string
       onCloseModal?: () => void
     }
@@ -68,7 +68,7 @@ export default function EditDiet({
     e.preventDefault()
     if (creating) {
       try {
-        await createDiet({
+        createDiet({
           userId,
           dietName: dietName,
           refs

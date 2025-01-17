@@ -1,10 +1,10 @@
 'use client'
 import { getDietMeals } from '@/actions/diets/meals'
-import { Diet, MealList } from '@/app/(authenticated)/app'
+import { MealVarMacro } from '@/app/context/useMacroContext'
 import { useQuery } from '@tanstack/react-query'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 
-export const calculateMacros = (variation: MealList) => {
+export const calculateMacros = (variation: MealVarMacro) => {
   let carb = 0
   let prot = 0
   let fat = 0
@@ -34,21 +34,10 @@ export const calculateMacros = (variation: MealList) => {
   return { carb, prot, fat, kcal }
 }
 
-export function useMeals(dietId: string, inputInitialData?: Diet) {
-  const [initialUsed, setInitialUsed] = useState(false)
-  useEffect(() => {
-    if (inputInitialData?.id === dietId) {
-      setInitialUsed(true)
-    }
-  }, [inputInitialData, dietId])
-
-  const queryObk = !initialUsed ? { initialData: inputInitialData } : {}
-  // Não faço ideia do motivo, mas foi a única forma de não ter erro no type e as meals carregarem antes do Query
-  // rever
+export function useMeals(dietId: string) {
   const { data, isLoading, isSuccess } = useQuery({
     queryKey: [`meals-diet-${dietId}`],
-    queryFn: () => getDietMeals(dietId),
-    ...queryObk
+    queryFn: () => getDietMeals(dietId)
   })
 
   const mealsWithMacros = useMemo(() => {

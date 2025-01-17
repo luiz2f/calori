@@ -12,7 +12,7 @@ import ConfirmDelete from '@/components/ui/ConfirmDelete'
 import EditDiet from './dietSlider/createEditModal/EditDiet'
 import { useDeleteDiet } from '@/app/data/diets/useDeleteDiet'
 import { useDuplicateDiet } from '@/app/data/diets/useDuplicateDiet'
-import { BasicDiet } from '@/app/(authenticated)/app'
+import { DietFromSlider } from '@/app/(authenticated)/layout'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,7 +26,7 @@ export default function DietBox({
 }: {
   name: string
   active: boolean
-  diet: BasicDiet
+  diet: DietFromSlider
   onClick: () => void
 }) {
   const { isDeleting, deleteDiet, isSuccess } = useDeleteDiet()

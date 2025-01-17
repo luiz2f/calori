@@ -3,8 +3,12 @@ import React, { useState, useEffect } from 'react'
 import { HiOutlineTrash } from 'react-icons/hi'
 import Modal from '@/components/ui/Modal'
 import ConfirmDelete from '@/components/ui/ConfirmDelete'
-import { Ref } from '@/actions/diets/diets'
-
+export type MealFromEditDiet = {
+  id: string
+  name: string
+  time: string
+  dietId?: string
+}
 export default function DietEditRefRow({
   refData,
   onRefChange,
@@ -13,7 +17,7 @@ export default function DietEditRefRow({
   timeError,
   onDelete
 }: {
-  refData: Ref
+  refData: MealFromEditDiet
   onRefChange: (key: string, value: string) => void
   onTimeBlur: () => void
   nameError: string

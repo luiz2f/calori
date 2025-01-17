@@ -10,8 +10,8 @@ import { v4 as uuidv4 } from 'uuid'
 import { useUpdateMeal } from '@/app/data/meals/useUpdateMeal'
 import { useCreateMeal } from '@/app/data/meals/useCreateMeal'
 import Spinner from '@/components/ui/Spinner'
-import { Meal } from '../DietMeal'
-import { Macro } from '@/app/(authenticated)/app'
+import { Macro } from '@/app/context/useMacroContext'
+import { Meal } from '@/app/(authenticated)/layout'
 
 export type Unity = {
   foodId: string
@@ -33,7 +33,7 @@ export type MealItem = {
   id: string
   foodId: string
   unityId: string
-  quantity: number | string
+  quantity: number
   mealListId?: string
   index?: number
   food: Food
@@ -43,7 +43,7 @@ export type MealVar = {
   id: string
   name: string
   index?: number
-  mealListItems: MealItem[]
+  mealListItems: MealItem[] | []
   macro?: Macro
 }
 const creatingMeal: MealVar[] = [
@@ -79,18 +79,18 @@ type CreateOrEditProps =
   | {
       creating: true
       currentIndex: 0
-      createFood: boolean
-      createVariation: boolean
-      meal: never
+      createFood?: boolean
+      createVariation?: boolean
+      meal?: undefined
       typeInput: 'Alimentos'
     }
   | {
+      creating?: false
       meal: Meal
       currentIndex: number
       createFood?: boolean
       createVariation?: boolean
-      creating?: boolean
-      typeInput?: 'Alimentos' | 'Lista' | (() => 'Alimentos' | 'Lista')
+      typeInput?: 'Alimentos' | 'Lista'
     }
 export default function EditRef({
   creating = false,
@@ -111,7 +111,7 @@ export default function EditRef({
   const time = creating ? '23:00' : meal?.time
   const dMeal = creating ? creatingMeal : (meal?.mealList as MealVar[])
   const { data: diets } = useDiets()
-  const [type, setType] = useState<'Lista' | 'Alimentos'>(typeInput)
+  const [type, setType] = useState<string>(typeInput)
   const [selectedVariation, setSelectedVariation] = useState(currentIndex)
   const { unsavedChanges, open, closeLast } = useContext(ModalContext)
   const [mealName, setMealName] = useState(name)
@@ -172,7 +172,7 @@ export default function EditRef({
     }
   }, [mealList, mealName, mealTime, originalMealList, name, time, creating])
 
-  const toggleType = (type: 'Lista' | 'Alimentos') => {
+  const toggleType = (type: string) => {
     setType(type)
   }
 
@@ -369,26 +369,27 @@ export default function EditRef({
         return item
       })
     }))
-    console.log(updatedMealList)
 
     setMealList(updatedMealList)
     if (error) {
       return
     }
-    if (!creating) {
-      await updateMeal({
-        mealId: meal?.id,
-        mealName,
-        mealTime,
-        refs: updatedMealList
-      })
-    } else {
-      await createMeal({
-        dietId,
-        mealName,
-        mealTime,
-        refs: updatedMealList
-      })
+    if (mealName && mealTime) {
+      if (!creating && meal?.id) {
+        await updateMeal({
+          mealId: meal?.id,
+          mealName,
+          mealTime,
+          refs: updatedMealList
+        })
+      } else if (creating && dietId) {
+        await createMeal({
+          dietId,
+          mealName,
+          mealTime,
+          refs: updatedMealList
+        })
+      }
     }
   }
 
@@ -403,12 +404,11 @@ export default function EditRef({
     data: {
       foodInfo: Food
       unityInfo: Unity
-      quantity: number | string
+      quantity: number
     }
   ) => {
     const { foodInfo, unityInfo, quantity } = data
-    console.log(quantity)
-    console.log(typeof quantity)
+    const newQuantity = isNaN(quantity) ? 0 : quantity
     setMealList(prevMealList =>
       prevMealList?.map(variation =>
         variation?.id === variationId
@@ -420,7 +420,7 @@ export default function EditRef({
                       ...item,
                       foodId: foodInfo?.id,
                       unityId: unityInfo?.id,
-                      quantity,
+                      quantity: newQuantity,
                       food: {
                         id: foodInfo?.id,
                         name: foodInfo?.name,

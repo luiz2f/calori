@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 import React, {
   cloneElement,
   createContext,
+  ReactElement,
   useContext,
   useEffect,
   useState
@@ -119,13 +120,6 @@ function Modal({ children }: ModalProps) {
     }
   }, [modified])
 
-  // useEffect(() => {
-  //   console.log(`Modal mounted: ${name}`);
-  //   return () => {
-  //     console.log(`Modal unmounted: ${name}`);
-  //   };
-  // });
-
   return (
     <ModalContext.Provider
       value={{
@@ -144,13 +138,13 @@ function Modal({ children }: ModalProps) {
 
 function Open({ children, opens }: OpenProps) {
   const { open } = useContext(ModalContext)
-  return cloneElement(children, {
-    onClick: e => {
+  return cloneElement(children as ReactElement, {
+    onClick: (e: React.MouseEvent) => {
       e?.stopPropagation()
       e?.preventDefault()
       open(opens)
-      if (children.props.onClick) {
-        children.props.onClick(e)
+      if ((children as ReactElement).props.onClick) {
+        ;(children as ReactElement).props.onClick(e)
       }
     }
   })
@@ -179,7 +173,6 @@ function Window({ children, name }: WindowProps) {
   }
 
   const zIndex = openNames.indexOf(name) + 2000
-  const message = 'window' + name
   const modalWidth = `${95 - 3 * openNames.indexOf(name)}%`
 
   return createPortal(

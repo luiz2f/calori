@@ -8,7 +8,33 @@ import React, {
   useMemo,
   useCallback
 } from 'react'
-import { Diet, Macro } from '../(authenticated)/app'
+import { MealItem } from '../(authenticated)/layout'
+
+export type Macro = {
+  carb: number
+  prot: number
+  fat: number
+  kcal: number
+}
+export type MealVarMacro = {
+  id: string
+  name: string
+  mealListItems: MealItem[] | []
+  macro?: Macro
+}
+export type MealMacro = {
+  dietId: string
+  id: string
+  name: string
+  time: string
+  mealList: MealVarMacro[] | []
+}
+export type SelectedDietMacro = {
+  id: string
+  name: string
+  userId: string
+  meals: MealMacro[] | []
+}
 
 type mealMacro = {
   mealId: string
@@ -17,7 +43,7 @@ type mealMacro = {
 type MacroContextType = {
   macros: mealMacro[] | []
   updateMacroForMeal: (mealId: string, macro: Macro | undefined) => void
-  setDefaultMacro: (data: Diet) => void
+  setDefaultMacro: (data: SelectedDietMacro) => void
   totalMacros: Macro
   columns: string | null
 }
@@ -38,10 +64,11 @@ export const MacroProvider: React.FC<{ children: React.ReactNode }> = ({
     kcal: 0
   })
 
-  const setDefaultMacro = (data: Diet) => {
-    const newData = data.meals
+  const setDefaultMacro = (data: SelectedDietMacro) => {
+    console.log(data)
+    const newData = data?.meals
     setMacros([])
-    newData.forEach(meal => {
+    newData?.forEach(meal => {
       if (!meal?.mealList?.length) {
         return
       }

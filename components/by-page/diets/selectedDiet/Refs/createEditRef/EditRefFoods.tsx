@@ -7,7 +7,7 @@ import { useFoods } from '@/app/data/foods/useFoods'
 import { calculateMacros } from '@/app/data/meals/useMeals'
 import { useQueryClient } from '@tanstack/react-query'
 import { Food, MealVar, Unity } from './EditRef'
-import { MealList } from '@/app/(authenticated)/app'
+import { MealVarMacro } from '@/app/context/useMacroContext'
 
 export default function EditRefFoods({
   mealsList,
@@ -140,7 +140,7 @@ export default function EditRefFoods({
   const fat = currentMeal?.macro?.fat || 0
   const kcal = currentMeal?.macro?.kcal || 0
 
-  const newMacros = calculateMacros(currentMeal as MealList)
+  const newMacros = calculateMacros(currentMeal as MealVarMacro)
   return (
     <>
       {!!mealsList.length ? (

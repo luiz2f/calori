@@ -7,7 +7,7 @@ import { useDeleteDiet } from '@/app/data/diets/useDeleteDiet'
 import ConfirmDelete from '@/components/ui/ConfirmDelete'
 import UnsavedChanges from '@/components/ui/UnsavedChanges'
 import Spinner from '@/components/ui/Spinner'
-import { Meal } from '@/actions/diets/meals'
+import { Meal } from '@/app/(authenticated)/layout'
 
 export default function DietMealsPage({
   meals,
@@ -34,9 +34,7 @@ export default function DietMealsPage({
       ) : (
         <>
           <div className='flex flex-col w-full p-4 gap-12 mt-6 '>
-            {meals?.map((meal: Meal) => (
-              <DietMeal key={meal.id} meal={meal} />
-            ))}
+            {meals?.map((meal: Meal) => <DietMeal key={meal.id} meal={meal} />)}
             <AddRef />
           </div>
           <Modal.Open opens={`deleteDietG${dietId}`}>
@@ -61,7 +59,6 @@ export default function DietMealsPage({
             <EditRef
               creating={true}
               dietFromId={dietId}
-              meal={null}
               currentIndex={0}
               typeInput='Alimentos'
               modalName='createNewMeal'

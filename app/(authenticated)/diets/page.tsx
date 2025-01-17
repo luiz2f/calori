@@ -10,7 +10,7 @@ export default async function DietPage() {
     <>
       <Header />
       <DietsSlider initialDataDiets={diets} />
-      <SelectedDiet serverData={{ defaultDiet, diets }} />
+      <SelectedDiet defaultDiet={defaultDiet} />
     </>
   )
 }

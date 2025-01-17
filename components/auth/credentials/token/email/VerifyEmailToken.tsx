@@ -1,75 +1,76 @@
-"use client";
-import { verifyEmailToken } from "@/actions/token";
-import ErrorPage from "@/components/by-page/auth/ErrorPage";
-import LoadingPage from "@/components/by-page/auth/LoadingPage";
-import SuccessPage from "@/components/by-page/auth/SucessPage";
-import NavButton from "@/components/ui/NavButton";
-import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+'use client'
+import { verifyEmailToken } from '@/actions/token'
+import ErrorPage from '@/components/by-page/auth/ErrorPage'
+import LoadingPage from '@/components/by-page/auth/LoadingPage'
+import SuccessPage from '@/components/by-page/auth/SucessPage'
+import NavButton from '@/components/ui/NavButton'
+import { useSearchParams } from 'next/navigation'
+import { useCallback, useEffect, useState } from 'react'
 
 export default function VerifyEmailToken() {
-  const [error, setError] = useState<string | undefined>(undefined);
-  const [success, setSuccess] = useState<string | undefined>(undefined);
-  const searchParams = useSearchParams();
-  const token = searchParams?.get("token");
+  const [error, setError] = useState<string | undefined>(undefined)
+  const [success, setSuccess] = useState<string | undefined>(undefined)
+  const searchParams = useSearchParams()
+  const token = searchParams?.get('token')
 
   const onSubmit = useCallback(async () => {
     if (success || error) {
-      return;
+      return
     }
 
     if (!token) {
-      setError("Nenhum token fornecido");
-      return;
+      setError('Nenhum token fornecido')
+      return
     }
 
     try {
-      const data = await verifyEmailToken(token);
+      const data = await verifyEmailToken(token)
 
-      if ("success" in data) {
-        setSuccess(data.success);
-      } else if ("error" in data) {
-        setError(data.error);
+      if ('success' in data) {
+        setSuccess(data.success)
+      } else if ('error' in data) {
+        setError(data.error)
       }
     } catch (error) {
-      console.error(error);
-      setError("Um erro inesperado ocorreu 😢");
+      console.error(error)
+      setError('Um erro inesperado ocorreu 😢')
     }
-  }, [token, success, error]);
+  }, [token, success, error])
 
   useEffect(() => {
-    onSubmit();
-  }, []);
+    onSubmit()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <>
       {!error && !success && (
         <LoadingPage
-          title="Verificando token"
-          subtitle="Só alguns segundos 😉"
+          title='Verificando token'
+          subtitle='Só alguns segundos 😉'
         ></LoadingPage>
       )}
       {success && (
         <SuccessPage
-          title="Token Verificado"
-          subtitle="Seu e-mail foi verificado com sucesso!"
+          title='Token Verificado'
+          subtitle='Seu e-mail foi verificado com sucesso!'
         >
-          <NavButton href="/login">Fazer Login</NavButton>
+          <NavButton href='/login'>Fazer Login</NavButton>
         </SuccessPage>
       )}
       {error &&
-        (error == "Invalid token" || error == "Token has expired" ? (
+        (error == 'Invalid token' || error == 'Token has expired' ? (
           <ErrorPage
-            title="Token Invalido"
-            subtitle="Gere um novo token de verificação"
+            title='Token Invalido'
+            subtitle='Gere um novo token de verificação'
           >
-            <NavButton href="/verify-email">Gerar Novo Token</NavButton>
+            <NavButton href='/verify-email'>Gerar Novo Token</NavButton>
           </ErrorPage>
         ) : (
-          <ErrorPage title="Erro" subtitle={error}>
-            <NavButton href="/login">Voltar</NavButton>
+          <ErrorPage title='Erro' subtitle={error}>
+            <NavButton href='/login'>Voltar</NavButton>
           </ErrorPage>
         ))}
     </>
-  );
+  )
 }

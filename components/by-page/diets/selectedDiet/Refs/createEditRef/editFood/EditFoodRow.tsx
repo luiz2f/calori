@@ -2,13 +2,17 @@
 import ConfirmDelete from '@/components/ui/ConfirmDelete'
 import Menus from '@/components/ui/Menu'
 import Modal from '@/components/ui/Modal'
-import React, { useState, useEffect, useCallback, CSSProperties } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import {
   HiDotsVertical,
   HiOutlineDuplicate,
   HiOutlineTrash
 } from 'react-icons/hi'
-import Select from 'react-select'
+import Select, {
+  CSSObjectWithLabel,
+  SingleValue,
+  StylesConfig
+} from 'react-select'
 import { Food, MealItem, Unity } from '../EditRef'
 type UnityOption = {
   value: string
@@ -17,7 +21,7 @@ type UnityOption = {
 type FoodOption = {
   value: string
   label: string
-  unities: UnityOption[]
+  unities?: UnityOption[]
 }
 export default function EditFoodRow({
   createFood,
@@ -37,7 +41,7 @@ export default function EditFoodRow({
   cleanReturn: () => void
   mealId: string
   food: MealItem
-  foods: Food[]
+  foods: Food[] | undefined
   onFoodChange: (
     foodId: string,
     data: {
@@ -63,33 +67,35 @@ export default function EditFoodRow({
   const [selectedFood, setSelectedFood] = useState(foodDefault || null)
   const [selectedUnity, setSelectedUnity] = useState(unityDefault || null)
   const foodInfo = foods?.find(obj => obj?.id === selectedFood?.value)
-  const unityInfo =
-    foodInfo?.unities?.find(unity => unity?.foodId === selectedFood?.value) ||
-    {}
+  const unityInfo = foodInfo?.unities?.find(
+    unity => unity?.foodId === selectedFood?.value
+  )
   const [quantity, setQuantity] = useState(food.quantity || 0)
   const unityOptions =
     foodOptions?.find(obj => obj.value === selectedFood?.value)?.unities || []
   useEffect(() => {
-    if (selectedFood.value) {
+    if (selectedFood.value && foodInfo && unityInfo) {
       onFoodChange(food.id, { foodInfo, unityInfo, quantity })
     }
-  }, [selectedFood, selectedUnity, quantity, food.id])
+  }, [selectedFood, selectedUnity, quantity, food.id, unityInfo, foodInfo])
 
   const handleFoodChange = useCallback(
-    (selected: FoodOption) => {
-      if (selected.value === 'create-food') {
+    (selected: SingleValue<FoodOption>) => {
+      if (selected?.value === 'create-food') {
         createFood()
         createReturn()
-      } else {
+      } else if (selected?.unities) {
         setSelectedFood(selected)
-        setSelectedUnity(selected.unities[0])
+        setSelectedUnity(selected?.unities[0])
       }
     },
     [createFood, createReturn, setSelectedFood, setSelectedUnity]
   )
 
-  const handleUnityChange = (selected: UnityOption) => {
-    setSelectedUnity(selected)
+  const handleUnityChange = (selected: SingleValue<UnityOption>) => {
+    if (selected) {
+      setSelectedUnity(selected)
+    }
   }
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,33 +115,37 @@ export default function EditFoodRow({
     }
   }, [foodReturned, handleFoodChange, foodOptions, cleanReturn])
 
-  const selectStyle = {
-    indicatorsContainer: (base: CSSProperties) => ({
+  const selectStyle: StylesConfig<{ value: string; label: string }, false> = {
+    indicatorsContainer: (base: CSSObjectWithLabel) => ({
       ...base
     }),
-    indicatorSeparator: (base: CSSProperties) => ({
+    indicatorSeparator: (base: CSSObjectWithLabel) => ({
       ...base,
       display: 'none'
     }),
-    dropdownIndicator: (base: CSSProperties) => ({
+    dropdownIndicator: (base: CSSObjectWithLabel) => ({
       ...base,
       padding: '0 4px 0 0',
       width: '18px'
     }),
-    control: (base: CSSProperties) => ({
+    control: (base: CSSObjectWithLabel) => ({
       ...base,
-      borderColor: '#d1d1d1',
+      // borderColor: '#d1d1d1',
       borderWidth: '1px',
       padding: '0',
       textAlign: 'center',
       minHeight: '25px',
-      width: '100%'
+      width: '100%',
+      borderColor: error?.food ? '#7B3232' : '#d1d1d1',
+      backgroundColor: error?.food ? '#FFEDED' : 'white',
+      color: error?.food ? '#7B3232' : 'inherit',
+      borderRadius: '8px'
     }),
-    singleValue: (base: CSSProperties) => ({
+    singleValue: (base: CSSObjectWithLabel) => ({
       ...base,
       textAlign: 'center'
     }),
-    menu: (base: CSSProperties) => ({
+    menu: (base: CSSObjectWithLabel) => ({
       ...base,
       borderRadius: '8px',
       borderColor: '#d1d1d1',
@@ -143,13 +153,13 @@ export default function EditFoodRow({
       bottom: '100%',
       zIndex: 6000
     }),
-    menuPortal: (base: CSSProperties) => ({
+    menuPortal: (base: CSSObjectWithLabel) => ({
       ...base,
       zIndex: 6000,
       transform: 'translateX(-4vw)'
     }),
     option: (
-      base: CSSProperties,
+      base: CSSObjectWithLabel,
       state: { isSelected: boolean; isFocused: boolean }
     ) => ({
       ...base,
@@ -163,6 +173,7 @@ export default function EditFoodRow({
       textAlign: 'center'
     })
   }
+
   const modalName = `deletereffood${food?.id}`
   const error = {
     food: food?.food?.erro || false,
@@ -175,7 +186,7 @@ export default function EditFoodRow({
         value={quantity}
         onChange={e => handleQuantityChange(e)}
         className={`border-1 py-[2px] text-center rounded-lg  ${
-          quantity === ''
+          quantity < 0
             ? 'bg-lightred border-darkred text-darkred'
             : 'border-grey10'
         }`}
@@ -187,39 +198,14 @@ export default function EditFoodRow({
         onChange={handleUnityChange}
         placeholder=''
         isDisabled={!selectedFood}
-        // menuPortalTarget={document.querySelector("#editref")}
-        // menuPosition="fixed"
-        // menuPlacement="auto"
-        styles={{
-          ...selectStyle,
-          control: base => ({
-            ...base,
-            transition: '200ms all ease',
-            borderColor: error?.unity ? '#7B3232' : '#d1d1d1',
-            backgroundColor: error?.unity ? '#FFEDED' : 'white',
-            color: error?.unity ? '#7B3232' : 'inherit',
-            borderRadius: '8px'
-          })
-        }}
+        styles={selectStyle}
       />
       <Select
         options={foodOptions}
         value={selectedFood}
         placeholder='Selecionar Alimento'
         onChange={handleFoodChange}
-        // menuPortalTarget={document.querySelector("#editref")}
-        // menuPosition="fixed"
-        // menuPlacement="auto"
-        styles={{
-          ...selectStyle,
-          control: base => ({
-            ...base,
-            borderColor: error?.food ? '#7B3232' : '#d1d1d1',
-            backgroundColor: error?.food ? '#FFEDED' : 'white',
-            color: error?.food ? '#7B3232' : 'inherit',
-            borderRadius: '8px'
-          })
-        }}
+        styles={selectStyle}
         noOptionsMessage={() => 'Nenhum alimento encontrado'}
       />
 

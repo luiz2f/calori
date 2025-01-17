@@ -84,7 +84,9 @@ export default function DietMacros() {
           <Toogle
             options={['g/KG', 'g', '% kcal']}
             value={currentMetric}
-            onChange={setCurrentMetric}
+            onChange={value =>
+              setCurrentMetric(value as 'g/KG' | 'g' | '% kcal')
+            }
             className='mt-2'
           />
         </div>

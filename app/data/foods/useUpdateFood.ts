@@ -35,7 +35,7 @@ export function useUpdateFood() {
         )
       // Atualiza os dados de cada query
       allMealsQueries.forEach(([queryKey, queryData]) => {
-        const updatedMeals = (queryData as Diet).meals?.map(meal => ({
+        const updatedMeals = (queryData as Diet)?.meals?.map(meal => ({
           ...meal,
           mealList: meal.mealList?.map(mealItem => ({
             ...mealItem,

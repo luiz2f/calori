@@ -5,10 +5,10 @@ import AddDiet from './dietSlider/AddDiet'
 import { useDietContext } from '@/app/context/useDietContext'
 import { useDiets } from '@/app/data/diets/useDiets'
 import Spinner from '@/components/ui/Spinner'
-import { BasicDiet } from '@/app/(authenticated)/app'
+import { DietFromSlider } from '@/app/(authenticated)/layout'
 
 type DietSliderProps = {
-  initialDataDiets: BasicDiet[]
+  initialDataDiets: DietFromSlider[]
 }
 
 export default function DietsSlider({ initialDataDiets }: DietSliderProps) {

@@ -3,46 +3,8 @@ import { useContext } from 'react'
 import Table from './RefTableModel'
 import RefSlider from './RefSlider'
 import { ModalContext } from '@/components/ui/Modal'
-import { useMacroContext } from '@/app/context/useMacroContext'
-
-type Macro = {
-  carb: number
-  prot: number
-  fat: number
-  kcal: number
-}
-type Food = {
-  id: string
-  name: string
-  carb: number
-  protein: number
-  fat: number
-  satFat?: number
-  fiber?: number
-}
-type Unity = {
-  id: string
-  foodId: string
-  un: string
-  unitMultiplier: number
-}
-type MealItems = {
-  id: string
-  foodId: string
-  unityId: string
-  quantity: number
-  mealListId: string
-  index: number
-  food: Food
-  unity: Unity
-}
-type Meal = {
-  id: string
-  name: string
-  index: number
-  mealListItems?: MealItems[]
-  macro: Macro
-}
+import { MealVarMacro, useMacroContext } from '@/app/context/useMacroContext'
+import { MealItem } from '@/app/(authenticated)/layout'
 
 export default function RefTable({
   mealId,
@@ -56,8 +18,8 @@ export default function RefTable({
   currentIndex: number
   goLeft: () => void
   goRight: () => void
-  mealsList: Meal[]
-  selectedMeal: Meal
+  mealsList: MealVarMacro[] | []
+  selectedMeal: MealVarMacro
 }) {
   const { open } = useContext(ModalContext)
   const { columns } = useMacroContext()
@@ -98,7 +60,7 @@ export default function RefTable({
   const meal = mealsList[currentIndex]
   const macro = selectedMeal?.macro
 
-  function transformFoodData(foodData: MealItems[] | undefined) {
+  function transformFoodData(foodData: MealItem[] | undefined) {
     return foodData?.map(item => {
       const { food, unity, quantity } = item
 
@@ -140,15 +102,16 @@ export default function RefTable({
   const simplifiedData = transformFoodData(meal?.mealListItems)
   const defaultColumns = '1fr 32px 32px 32px 32px'
   const gridColumn = columns || defaultColumns
+
   return (
     <Table columns={gridColumn}>
       <Table.Header
         onClick={handleOpenVar}
         name={meal?.name}
-        carbo={Math.round(macro?.carb)}
-        prot={Math.round(macro?.prot)}
-        fat={Math.round(macro?.fat)}
-        kcal={Math.round(macro?.kcal)}
+        carbo={Math.round(macro?.carb || 0)}
+        prot={Math.round(macro?.prot || 0)}
+        fat={Math.round(macro?.fat || 0)}
+        kcal={Math.round(macro?.kcal || 0)}
       />
       <Table.Body>
         {simplifiedData?.length ? (

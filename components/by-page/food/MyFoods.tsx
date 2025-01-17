@@ -6,15 +6,15 @@ import MyFoodRow from './MyFoodRow'
 import { IoSearchSharp } from 'react-icons/io5'
 import { useState } from 'react'
 import Spinner from '@/components/ui/Spinner'
-import { Food } from '@/app/(authenticated)/app'
+import { Food } from '@/app/(authenticated)/layout'
 
 export default function MyFoods({
   onCloseModal,
   userFoods,
   isLoading
 }: {
-  onCloseModal: () => void
-  userFoods: Food[]
+  onCloseModal?: () => void
+  userFoods: Food[] | [] | undefined
   isLoading: boolean
 }) {
   const [search, setSearch] = useState('')
@@ -66,7 +66,7 @@ export default function MyFoods({
             </Modal.Open>
           </>
         )}
-        <Button size='small' cw='lightred' onClick={() => onCloseModal()}>
+        <Button size='small' cw='lightred' onClick={() => onCloseModal?.()}>
           Fechar{' '}
         </Button>
       </div>

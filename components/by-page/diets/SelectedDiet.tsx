@@ -7,31 +7,37 @@ import { useDietContext } from '@/app/context/useDietContext'
 import { useMeals } from '@/app/data/meals/useMeals'
 import { useDiets } from '@/app/data/diets/useDiets'
 import { useMacroContext } from '@/app/context/useMacroContext'
-import { useEffect } from 'react'
-import { BasicDiet, Diet } from '@/app/(authenticated)/app'
+import { useEffect, useState } from 'react'
+import { SelectedDiet as SelectedDietType } from '@/app/(authenticated)/layout'
 
 type selectedDietProps = {
-  serverData: {
-    defaultDiet: Diet | null
-    diets: BasicDiet[]
-  }
+  defaultDiet: SelectedDietType | null
 }
-export default function SelectedDiet({ serverData }: selectedDietProps) {
-  const { defaultDiet }: { defaultDiet: Diet | null } = serverData
+export default function SelectedDiet({ defaultDiet }: selectedDietProps) {
+  const [firstLoad, setFirstLoad] = useState(true)
   const { selectedDiet: selectedDietContext } = useDietContext()
-  const { setDefaultMacro } = useMacroContext()
   const dietId = selectedDietContext || defaultDiet?.id || ''
-  const { data: dietsSlider } = useDiets()
-  const { data: diet, isLoading } = useMeals(dietId, defaultDiet)
-  const selectedDietName = dietsSlider?.filter(obj => obj.id === dietId)[0]
-    ?.name
-  const name = selectedDietName || diet?.name || ''
+  const { data: dietData, isLoading, isSuccess } = useMeals(dietId)
+  const diet = dietData || defaultDiet
+
+  useEffect(() => {
+    if (firstLoad && !isLoading && isSuccess) {
+      setFirstLoad(false)
+    }
+  }, [isLoading, isSuccess, firstLoad])
+
+  const { setDefaultMacro } = useMacroContext()
 
   useEffect(() => {
     if (diet) {
       setDefaultMacro(diet)
     }
   }, [diet])
+
+  const { data: dietsSlider } = useDiets()
+  const selectedDietName = dietsSlider?.filter(obj => obj.id === dietId)[0]
+    ?.name
+  const name = selectedDietName || diet?.name || ''
 
   if (dietsSlider?.length === 0) {
     return (
@@ -41,14 +47,22 @@ export default function SelectedDiet({ serverData }: selectedDietProps) {
     )
   }
 
+  if (!diet) {
+    return (
+      <div className='w-full flex flex-col h-full text-center'>
+        <DietName name='Selecione uma dieta' />
+      </div>
+    )
+  }
+
   return (
     <div className='w-full flex flex-col h-full'>
       <DietName name={name} />
       <DietMacros />
       <DietMealsPage
-        isLoading={isLoading}
+        isLoading={isLoading && !firstLoad}
         key={dietId}
-        meals={diet?.meals}
+        meals={diet.meals}
         dietId={dietId}
         name={name}
       />
