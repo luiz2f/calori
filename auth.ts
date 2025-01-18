@@ -2,9 +2,8 @@ import NextAuth, { CredentialsSignin } from 'next-auth'
 import Google from 'next-auth/providers/google'
 import Credentials from 'next-auth/providers/credentials'
 import { PrismaAdapter } from '@auth/prisma-adapter'
-import bcrypt from 'bcryptjs'
 import { prisma } from './prisma'
-import { saltAndHashPassword } from './utils/helper'
+import { saltAndHashPassword, verifyPassword } from './utils/helper'
 import { generateTokenAndSendEmailVerification } from './actions/token'
 import { getUserByEmail, updateUser } from './actions/auth'
 
@@ -48,7 +47,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
 
         const email = credentials.email as string
-        const hash = saltAndHashPassword(credentials?.password as string)
+        const hash = await saltAndHashPassword(credentials?.password as string)
 
         let user = await prisma.user.findUnique({
           where: { email }
@@ -87,7 +86,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             await generateTokenAndSendEmailVerification(email)
             throw new CustomError('Token sent')
           } else {
-            const isMatch = bcrypt.compareSync(
+            const isMatch = verifyPassword(
               credentials.password as string,
               user.hashedPassword
             )
