@@ -1,10 +1,10 @@
 'use client'
 import { getUserDiets } from '@/actions/diets/diets'
-import { BasicDiet } from '@/app/(authenticated)/app'
+import { DietFromSlider } from '@/app/(authenticated)/layout'
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 
-export function useDiets(initialDataDiets: BasicDiet[] | null = null) {
+export function useDiets(initialDataDiets: DietFromSlider[] | null = null) {
   const [initialUsed, setInitialUsed] = useState(false)
 
   useEffect(() => {

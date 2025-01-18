@@ -3,7 +3,7 @@
 import { updateFood as updateFoodAPI } from '@/actions/foods'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { calculateMacros } from '../meals/useMeals'
-import { Diet, Food } from '@/app/(authenticated)/app'
+import { Food, SelectedDiet } from '@/app/(authenticated)/layout'
 
 export function useUpdateFood() {
   const queryClient = useQueryClient()
@@ -35,7 +35,7 @@ export function useUpdateFood() {
         )
       // Atualiza os dados de cada query
       allMealsQueries.forEach(([queryKey, queryData]) => {
-        const updatedMeals = (queryData as Diet)?.meals?.map(meal => ({
+        const updatedMeals = (queryData as SelectedDiet)?.meals?.map(meal => ({
           ...meal,
           mealList: meal.mealList?.map(mealItem => ({
             ...mealItem,

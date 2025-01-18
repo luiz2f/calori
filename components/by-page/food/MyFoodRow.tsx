@@ -6,7 +6,7 @@ import Modal from '@/components/ui/Modal'
 import { HiDotsVertical, HiOutlinePencilAlt } from 'react-icons/hi'
 import { HiOutlineTrash } from 'react-icons/hi2'
 import CreateEditFood from '../food/CreateEditFood'
-import { Food } from '@/app/(authenticated)/app'
+import { Food } from '@/app/(authenticated)/layout'
 
 export default function MyFoodRow({ food }: { food: Food }) {
   const { isDeleting, deleteFood, isSuccess } = useDeleteFood()

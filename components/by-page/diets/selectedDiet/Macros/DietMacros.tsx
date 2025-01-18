@@ -1,6 +1,6 @@
 'use client'
 import React, { useContext, useEffect, useState } from 'react'
-import Toogle from '@/components/ui/Toogle'
+import Toggle from '@/components/ui/Toggle'
 import { useMacroContext } from '@/app/context/useMacroContext'
 import { useWeight } from '@/app/data/user/useWeight'
 import { ModalContext } from '@/components/ui/Modal'
@@ -81,7 +81,7 @@ export default function DietMacros() {
     <div className='flex flex-col w-full p-4'>
       <div className='flex w-full justify-between'>
         <div className='flex items-center w-fit mx-auto '>
-          <Toogle
+          <Toggle
             options={['g/KG', 'g', '% kcal']}
             value={currentMetric}
             onChange={value =>

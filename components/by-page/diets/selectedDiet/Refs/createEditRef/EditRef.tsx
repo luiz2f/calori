@@ -4,7 +4,6 @@ import Button from '@/components/ui/Button'
 import { ModalContext } from '@/components/ui/Modal'
 import EditRefList from './EditRefList'
 import EditRefFoods from './EditRefFoods'
-import Toogle from '@/components/ui/Toogle'
 import { useDiets } from '@/app/data/diets/useDiets'
 import { v4 as uuidv4 } from 'uuid'
 import { useUpdateMeal } from '@/app/data/meals/useUpdateMeal'
@@ -12,6 +11,7 @@ import { useCreateMeal } from '@/app/data/meals/useCreateMeal'
 import Spinner from '@/components/ui/Spinner'
 import { Macro } from '@/app/context/useMacroContext'
 import { Meal } from '@/app/(authenticated)/layout'
+import Toggle from '@/components/ui/Toggle'
 
 export type Unity = {
   foodId: string
@@ -452,10 +452,12 @@ export default function EditRef({
         <div className='text-base mb-3 text-grey50 text-center'>
           Dieta - {diet?.name}
         </div>
-        <Toogle
+        <Toggle
           options={['Lista', 'Alimentos']}
           value={type}
-          onChange={toggleType}
+          onChange={(value: string) =>
+            toggleType(value as 'Lista' | 'Alimentos')
+          }
           className='mb-7'
         />
 

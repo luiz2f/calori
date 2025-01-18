@@ -1,9 +1,9 @@
 'use client'
 import { duplicateDiet as duplicateDietAPI } from '@/actions/diets/diets'
-import { Diet } from '@/app/(authenticated)/app'
+import { DietFromSlider } from '@/app/(authenticated)/layout'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-const filterData = (data: Diet) => {
+const filterData = (data: DietFromSlider) => {
   return {
     id: data?.id,
     name: data?.name,

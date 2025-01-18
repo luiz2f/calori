@@ -6,7 +6,7 @@ import { useCreateFood } from '@/app/data/foods/useCreateFood'
 import { ModalContext } from '@/components/ui/Modal'
 import Spinner from '@/components/ui/Spinner'
 import { useUpdateFood } from '@/app/data/foods/useUpdateFood'
-import { Food } from '@/app/(authenticated)/app'
+import { Food } from '@/app/(authenticated)/layout'
 interface Errors {
   name: boolean
   quantity: boolean
@@ -160,8 +160,8 @@ export default function CreateEditFood({
           {editing
             ? 'Editar Alimento'
             : isSuccess
-            ? 'Alimento Criado'
-            : 'Criar Alimento'}
+              ? 'Alimento Criado'
+              : 'Criar Alimento'}
         </div>
         <div className='flex gap-2 mb-8'>
           <div className='relative w-full'>
