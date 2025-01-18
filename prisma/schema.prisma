@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Session {
@@ -17,7 +18,7 @@ model Session {
   updatedAt    DateTime @updatedAt
   user         User     @relation(fields: [userId], references: [id])
 
-  @@index([userId], map: "Session_userId_fkey")
+  @@index([userId], map: "idx_Session_userId")
 }
 
 model VerificationRequest {
@@ -59,7 +60,7 @@ model Food {
   unities       Unity[]
   mealListItems MealListItem[]
 
-  @@index([userId], map: "Food_userId_fkey")
+  @@index([userId], map: "idx_Food_userId")
 }
 
 model Unity {
@@ -72,7 +73,7 @@ model Unity {
   food           Food           @relation(fields: [foodId], references: [id], onDelete: Cascade)
   mealListItems  MealListItem[]
 
-  @@index([foodId], map: "Unity_foodId_fkey")
+  @@index([foodId], map: "idx_Unity_foodId")
 }
 
 model Diet {
@@ -86,7 +87,7 @@ model Diet {
   user      User     @relation(fields: [userId], references: [id])
   meals     Meal[]
 
-  @@index([userId], map: "Diet_userId_fkey")
+  @@index([userId], map: "idx_Diet_userId")
 }
 
 model Meal {
@@ -99,7 +100,7 @@ model Meal {
   diet      Diet       @relation(fields: [dietId], references: [id], onDelete: Cascade)
   mealList  MealList[]
 
-  @@index([dietId], map: "Meal_dietId_fkey")
+  @@index([dietId], map: "idx_Meal_dietId")
 }
 
 model MealList {
@@ -112,7 +113,7 @@ model MealList {
   meal          Meal           @relation(fields: [mealId], references: [id], onDelete: Cascade)
   mealListItems MealListItem[]
 
-  @@index([mealId], map: "MealList_mealId_fkey")
+  @@index([mealId], map: "idx_MealList_mealId")
 }
 
 model MealListItem {
@@ -128,9 +129,9 @@ model MealListItem {
   food       Food     @relation(fields: [foodId], references: [id], onDelete: Cascade)
   unity      Unity    @relation(fields: [unityId], references: [id], onDelete: Cascade)
 
-  @@index([mealListId], map: "MealListItem_mealListId_fkey")
-  @@index([foodId], map: "MealListItem_foodId_fkey")
-  @@index([unityId], map: "MealListItem_unityId_fkey")
+  @@index([mealListId], map: "idx_MealListItem_mealListId")
+  @@index([foodId], map: "idx_MealListItem_foodId")
+  @@index([unityId], map: "idx_MealListItem_unityId")
 }
 
 model Account {
