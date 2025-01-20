@@ -34,7 +34,7 @@ export default function DietsSlider({ initialDataDiets }: DietSliderProps) {
                 diet={diet}
                 active={selectedDiet === diet?.id}
                 key={diet.id}
-                onClick={() => handleDietClick(diet.id)} // Evento de clique para selecionar
+                onClick={() => handleDietClick(diet.id)}
               />
             ))
           )}

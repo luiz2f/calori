@@ -112,7 +112,7 @@ export default function RegisterForm({ setExistentUser }: RegisterFormProps) {
           newPassword={true}
         />
 
-        <AuthButton actionText='Sign Up' className='mt-2' />
+        <AuthButton actionText='Registrar' className='mt-2' />
       </form>
     </div>
   )

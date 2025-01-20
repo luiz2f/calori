@@ -53,54 +53,56 @@ export default function DietBox({
   }
 
   return (
-    <div className={borderClass} onClick={onClick}>
-      <div className='flex justify-between w-full'>
-        <div className='text-sm font-medium max-w-32 overflow-hidden ellipsis h-14 pt-2'>
-          {adaptedName}
-        </div>
-        <Menus.Menu className='!items-baseline'>
-          <Menus.Toggle id={`DietToogle${dietId}`} className='p-3'>
-            <HiDotsHorizontal />
-          </Menus.Toggle>
+    <>
+      <div className={borderClass} onClick={onClick}>
+        <div className='flex justify-between w-full'>
+          <div className='text-sm font-medium max-w-32 overflow-hidden ellipsis h-14 pt-2'>
+            {adaptedName}
+          </div>
+          <Menus.Menu className='!items-baseline'>
+            <Menus.Toggle id={`DietToogle${dietId}`} className='p-3'>
+              <HiDotsHorizontal />
+            </Menus.Toggle>
 
-          <Menus.List id={`DietToogle${dietId}`}>
-            <Modal.Open opens={`editDiet${dietId}`}>
-              <Menus.Button icon={<HiOutlinePencilAlt />}>
-                Editar dieta
-                {/* modal🐥 */}
-              </Menus.Button>
-            </Modal.Open>
-            <Menus.Button
-              icon={<HiOutlineDuplicate />}
-              onClick={handleDuplicateDiet}
-            >
-              Duplicar dieta
-              {/* action 🐥 */}
-            </Menus.Button>
-            <Modal.Open opens={`deleteDiet${dietId}`}>
-              <Menus.Button icon={<HiOutlineTrash />}>
-                Apagar dieta
-                {/* confirm ⛔ */}
+            <Menus.List id={`DietToogle${dietId}`}>
+              <Modal.Open opens={`editDiet${dietId}`}>
+                <Menus.Button icon={<HiOutlinePencilAlt />}>
+                  Editar dieta
+                  {/* modal🐥 */}
+                </Menus.Button>
+              </Modal.Open>
+              <Menus.Button
+                icon={<HiOutlineDuplicate />}
+                onClick={handleDuplicateDiet}
+              >
+                Duplicar dieta
                 {/* action 🐥 */}
               </Menus.Button>
-            </Modal.Open>
-          </Menus.List>
-        </Menus.Menu>
-        <Modal.Window name={`deleteDiet${dietId}`}>
-          <ConfirmDelete
-            loading={isDeleting}
-            loaded={!isDeleting && isSuccess}
-            resource='Dieta'
-            resourceName={`${name}`}
-            onConfirm={handleDeleteDiet}
-            modalName={`deleteDiet${dietId}`}
-          />
-        </Modal.Window>
-        <Modal.Window name={`editDiet${dietId}`}>
-          <EditDiet diet={diet} modalName={`editDiet${dietId}`} />
-        </Modal.Window>
+              <Modal.Open opens={`deleteDiet${dietId}`}>
+                <Menus.Button icon={<HiOutlineTrash />}>
+                  Apagar dieta
+                  {/* confirm ⛔ */}
+                  {/* action 🐥 */}
+                </Menus.Button>
+              </Modal.Open>
+            </Menus.List>
+          </Menus.Menu>
+        </div>
+        <div className='font-bold pr-3 w-full align-bottom text-right'></div>
       </div>
-      <div className='font-bold pr-3 w-full align-bottom text-right'></div>
-    </div>
+      <Modal.Window name={`deleteDiet${dietId}`}>
+        <ConfirmDelete
+          loading={isDeleting}
+          loaded={!isDeleting && isSuccess}
+          resource='Dieta'
+          resourceName={`${name}`}
+          onConfirm={handleDeleteDiet}
+          modalName={`deleteDiet${dietId}`}
+        />
+      </Modal.Window>
+      <Modal.Window name={`editDiet${dietId}`}>
+        <EditDiet diet={diet} modalName={`editDiet${dietId}`} />
+      </Modal.Window>
+    </>
   )
 }

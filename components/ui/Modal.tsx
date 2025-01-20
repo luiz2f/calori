@@ -200,7 +200,7 @@ function Window({ children, name }: WindowProps) {
         >
           <HiXMark className='w-4 h-4 text-gray-500' />
         </button>
-        <div className='flex flex-col h-full  '>
+        <div className='flex flex-col h-full'>
           {cloneElement(children, { onCloseModal: closeModal })}
         </div>
       </div>
