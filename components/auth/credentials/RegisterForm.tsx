@@ -101,13 +101,13 @@ export default function RegisterForm({ setExistentUser }: RegisterFormProps) {
         />
         <PasswordInput
           id='password'
-          placeholder='Password'
+          placeholder='Senha'
           error={errors?.password}
           newPassword={true}
         />
         <PasswordInput
           id='confirmPassword'
-          placeholder='Confirm Password'
+          placeholder='Confirmar Senha'
           error={errors.confirmPassword}
           newPassword={true}
         />

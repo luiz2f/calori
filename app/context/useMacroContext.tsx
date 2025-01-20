@@ -65,7 +65,6 @@ export const MacroProvider: React.FC<{ children: React.ReactNode }> = ({
   })
 
   const setDefaultMacro = (data: SelectedDietMacro) => {
-    console.log(data)
     const newData = data?.meals
     setMacros([])
     newData?.forEach(meal => {

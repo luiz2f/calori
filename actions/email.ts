@@ -1,37 +1,42 @@
-import { Resend } from "resend";
+import emailFormat from '@/utils/emailFormat'
+import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY)
 
-const domain = "http://localhost:3000";
+const domain = process.env.DOMAIN || 'http://localhost:3000'
 
 export const sendEmailVerification = async (email: string, token: string) => {
-  const confirmationLink = `${domain}/verify-email?token=${token}`;
+  const confirmationLink = `${domain}/verify-email?token=${token}`
+
+  const htmlContent = emailFormat('verification', confirmationLink)
 
   try {
     await resend.emails.send({
-      from: "calori-noreply@luizluiz.dev",
+      from: 'calori-noreply@luizluiz.dev',
       to: email,
-      subject: "Calori - Verify your email",
-      html: `<p> Click the link to verify your email address: </p> <a href="${confirmationLink}">${confirmationLink}</a>`,
-    });
+      subject: 'Calori - Verificar Email',
+      html: htmlContent
+    })
   } catch (error) {
-    console.error(error);
-    return { error: "Error sending email verification" };
+    console.error(error)
+    return { error: 'Error sending email verification' }
   }
-};
+}
 
 export const sendPasswordResetEmail = async (email: string, token: string) => {
-  const confirmationLink = `${domain}/reset-password?token=${token}`;
+  const confirmationLink = `${domain}/reset-password?token=${token}`
+
+  const htmlContent = emailFormat('password', confirmationLink)
 
   try {
     await resend.emails.send({
-      from: "calori-noreply@luizluiz.dev",
+      from: 'calori-noreply@luizluiz.dev',
       to: email,
-      subject: "Calori - Reset your password",
-      html: `<p> Click the link to reset your password: </p> <a href="${confirmationLink}">${confirmationLink}</a>`,
-    });
+      subject: 'Calori - Redefinir Senha',
+      html: htmlContent
+    })
   } catch (error) {
-    console.error(error);
-    return { error: "Error sending password reset email" };
+    console.error(error)
+    return { error: 'Error sending password reset email' }
   }
-};
+}

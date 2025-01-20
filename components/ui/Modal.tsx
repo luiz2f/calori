@@ -50,7 +50,6 @@ export const ModalContext = createContext<ModalContextType>({
 function Modal({ children }: ModalProps) {
   const [openNames, setOpenNames] = useState<string[]>([])
   const [modified, setModified] = useState<string>('')
-  // console.log(openNames);
   const empty = openNames.length === 0
   useEffect(() => {
     if (!empty) {
@@ -68,7 +67,6 @@ function Modal({ children }: ModalProps) {
   const unsavedChanges = (name: string) => setModified(name)
   const open = (name: string) => setOpenNames(prev => [...prev, name])
   const close = (name: string) => {
-    // console.log("🐢", name);
     const canCloseModal = canClose.get(name)
     if (canCloseModal) {
       setOpenNames(prev => prev.filter(n => n !== name))
@@ -79,10 +77,8 @@ function Modal({ children }: ModalProps) {
   const closeLast = (force = false) => {
     setOpenNames(prev => {
       const lastName = prev.at(-1)
-      // console.log("🐢", lastName);
       if (lastName) {
         const canCloseLast = canClose.get(lastName)
-        // console.log("🐢🐢", lastName);
         if (canCloseLast || force) {
           return prev.slice(0, prev.length - 1)
         } else {
@@ -155,12 +151,6 @@ function Window({ children, name }: WindowProps) {
   const mounted = openNames.includes(name) && React.isValidElement(children)
   const ref = useOutsideClickModal<HTMLDivElement>(closeLast, mounted, name)
 
-  // useEffect(() => {
-  //   console.log(`Window mounted: ${name}`);
-  //   return () => {
-  //     console.log(`Window unmounted: ${name}`);
-  //   };
-  // });
 
   if (!openNames.includes(name)) return null
 

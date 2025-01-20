@@ -13,21 +13,16 @@ export function useOutsideClickModal<T extends HTMLElement>(
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      // console.log("🐀", name);
       if (!mounted || !isLast) return // Cancel the handler if the component is not mounted
       const target = e.target as Element
       const menu = document?.getElementById('menu-container')
-      // const lastOpenName = openNames[openNames.length - 1];
       const isSelectMenu = target.role === 'option'
       if (
         ref.current &&
         !ref.current.contains(target) &&
         !(menu && menu.contains(target)) &&
         !isSelectMenu
-        // (!ref.current.dataset.name ||
-        //   lastOpenName === ref.current?.dataset.name)
       ) {
-        // console.log("🐀🐀", name);
         handler()
       }
     }
