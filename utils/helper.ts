@@ -1,6 +1,6 @@
 export async function saltAndHashPassword(password: string): Promise<string> {
   const saltLength = 16
-  const iterations = 1000
+  const iterations = 100000 // Um número maior de iterações
   const keyLength = 64
   const digest = 'SHA-512'
 
@@ -9,11 +9,30 @@ export async function saltAndHashPassword(password: string): Promise<string> {
 
     const encoder = new TextEncoder()
     const passwordBuffer = encoder.encode(password)
-    const combinedBuffer = new Uint8Array(passwordBuffer.length + salt.length)
-    combinedBuffer.set(passwordBuffer)
-    combinedBuffer.set(salt, passwordBuffer.length)
 
-    const hashBuffer = await crypto.subtle.digest(digest, combinedBuffer)
+    // Usando PBKDF2 para gerar o hash com salt e iterações
+    const keyMaterial = await crypto.subtle.importKey(
+      'raw',
+      passwordBuffer,
+      { name: 'PBKDF2' },
+      false,
+      ['deriveKey']
+    )
+
+    const derivedKey = await crypto.subtle.deriveKey(
+      {
+        name: 'PBKDF2',
+        salt: salt,
+        iterations: iterations,
+        hash: digest
+      },
+      keyMaterial,
+      { name: 'HMAC', hash: { name: 'SHA-512' }, length: keyLength * 8 },
+      true,
+      ['sign']
+    )
+
+    const hashBuffer = await crypto.subtle.exportKey('raw', derivedKey)
 
     const hashArray = Array.from(new Uint8Array(hashBuffer))
     const hash = hashArray
@@ -41,16 +60,42 @@ export async function verifyPassword(
 
   const encoder = new TextEncoder()
   const passwordBuffer = encoder.encode(password)
-  const combinedBuffer = new Uint8Array(passwordBuffer.length + salt.length)
-  combinedBuffer.set(passwordBuffer)
-  combinedBuffer.set(salt, passwordBuffer.length)
 
-  const hashBuffer = await crypto.subtle.digest('SHA-512', combinedBuffer)
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    passwordBuffer,
+    { name: 'PBKDF2' },
+    false,
+    ['deriveKey']
+  )
 
-  const hashArray = Array.from(new Uint8Array(hashBuffer))
-  const hash = hashArray
-    .map(byte => byte.toString(16).padStart(2, '0'))
-    .join('')
+  const derivedKey = await crypto.subtle.deriveKey(
+    {
+      name: 'PBKDF2',
+      salt: salt,
+      iterations: 100000,
+      hash: 'SHA-512'
+    },
+    keyMaterial,
+    { name: 'HMAC', hash: { name: 'SHA-512' }, length: 512 },
+    true,
+    ['sign']
+  )
 
-  return hash === originalHash
+  const hashBuffer = await crypto.subtle.exportKey('raw', derivedKey)
+  const hashArray = new Uint8Array(hashBuffer)
+
+  const originalHashBuffer = new Uint8Array(
+    originalHash?.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16))
+  )
+
+  if (hashArray.length !== originalHashBuffer.length) {
+    return false
+  }
+
+  let isValid = 1
+  for (let i = 0; i < hashArray.length; i++) {
+    isValid &= hashArray[i] === originalHashBuffer[i] ? 1 : 0
+  }
+  return isValid === 1
 }

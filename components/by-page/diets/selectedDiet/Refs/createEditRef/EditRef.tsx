@@ -83,6 +83,7 @@ type CreateOrEditProps =
       createVariation?: boolean
       meal?: undefined
       typeInput: 'Alimentos'
+      setCurrentIndex: never
     }
   | {
       creating?: false
@@ -91,6 +92,7 @@ type CreateOrEditProps =
       createFood?: boolean
       createVariation?: boolean
       typeInput?: 'Alimentos' | 'Lista'
+      setCurrentIndex: (index: number) => void
     }
 export default function EditRef({
   creating = false,
@@ -101,6 +103,7 @@ export default function EditRef({
   currentIndex,
   dietFromId,
   modalName,
+  setCurrentIndex,
   onCloseModal
 }: CreateOrEditProps & {
   dietFromId?: string
@@ -148,6 +151,7 @@ export default function EditRef({
       if (creating) {
         closeLast(true)
       } else if (!creating) {
+        setCurrentIndex(selectedVariation)
         setOriginalMealList(mealList)
         setIsModified(false)
         reset()

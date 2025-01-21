@@ -86,11 +86,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             await generateTokenAndSendEmailVerification(email)
             throw new CustomError('Token sent')
           } else {
-            const isMatch = verifyPassword(
+            const isMatch = await verifyPassword(
               credentials.password as string,
               user.hashedPassword
             )
-            if (!isMatch) {
+            if (isMatch !== true) {
               throw new CustomError('Invalid credentials')
             }
           }

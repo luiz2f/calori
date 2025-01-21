@@ -6,9 +6,9 @@ export default function ErrorPage({
   subtitle = 'Um erro inesperado ocorreu',
   children = <NavButton href='/'>Voltar</NavButton>
 }: {
-  title: string
-  subtitle: string
-  children: React.ReactNode
+  title?: string
+  subtitle?: string
+  children?: React.ReactNode
 }) {
   return (
     <div className='flex flex-col w-full h-full justify-between items-center'>

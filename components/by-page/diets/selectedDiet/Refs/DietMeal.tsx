@@ -78,6 +78,7 @@ export default function DietMeal({ meal }: { meal: MealMacro }) {
           <Modal.Window name={`editMeal${meal.id}`}>
             <EditRef
               meal={meal}
+              setCurrentIndex={setCurrentIndex}
               currentIndex={currentIndex}
               modalName={`editMeal${meal.id}`}
             />
@@ -85,6 +86,7 @@ export default function DietMeal({ meal }: { meal: MealMacro }) {
           <Modal.Window name={`editMealAlimento${meal.id}`}>
             <EditRef
               meal={meal}
+              setCurrentIndex={setCurrentIndex}
               currentIndex={currentIndex}
               typeInput='Alimentos'
               modalName={`editMealAlimento${meal.id}`}
@@ -94,6 +96,7 @@ export default function DietMeal({ meal }: { meal: MealMacro }) {
             <EditRef
               createFood={true}
               meal={meal}
+              setCurrentIndex={setCurrentIndex}
               currentIndex={currentIndex}
               typeInput='Alimentos'
               modalName={`editMealAlimentoCreate${meal.id}`}
@@ -103,6 +106,7 @@ export default function DietMeal({ meal }: { meal: MealMacro }) {
             <EditRef
               createVariation={true}
               meal={meal}
+              setCurrentIndex={setCurrentIndex}
               currentIndex={currentIndex}
               typeInput='Alimentos'
               modalName={`editMealVarCreate${meal.id}`}
