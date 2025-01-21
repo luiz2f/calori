@@ -217,7 +217,7 @@ export default function EditRefFoods({
           </div>
           {refFoods.length > 0 ? (
             <>
-              <div className='grid grid-cols-edref gap-2 text-center text-sm text-grey30 mb-1'>
+              <div className='grid grid-cols-edref gap-2 pt-3 text-center text-sm text-grey30 mb-1'>
                 <div>Quant.</div>
                 <div>Un.</div>
                 <div>Alimento</div>

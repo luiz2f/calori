@@ -53,7 +53,7 @@ export async function getDietMeals(dietId: string) {
                   }
                 },
                 orderBy: {
-                  createdAt: 'asc' // Ordena pela data de criação de forma ascendente
+                  quantity: 'desc'
                 }
               }
             }
