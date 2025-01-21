@@ -116,7 +116,7 @@ export const MacroProvider: React.FC<{ children: React.ReactNode }> = ({
     (data: DataItem[]) => {
       const sizePadrao = 32
       const sizeBase = sizePadrao
-      const sizeExtra = 4
+      const sizeExtra = 2
       const getMaxDigitsForMacroGroup = () => {
         const maxCarbDigits = Math.max(
           ...data.map(m =>
@@ -153,8 +153,6 @@ export const MacroProvider: React.FC<{ children: React.ReactNode }> = ({
         if (maxDigits === 2) return sizePadrao
         return sizeBase + sizeExtra * (maxDigits - 1)
       }
-
-      // 🐫🐪 Bug éo seguinte, ta tentando ler mas é udnefined,p orque essa praga pora lgum motivo ta dando undefined?
 
       const macroColumnSize = calculateColumnSize(maxDigits)
 

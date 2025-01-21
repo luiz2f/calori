@@ -5,8 +5,8 @@ export default function Home() {
   return (
     <main className='flex items-center  flex-col flex-grow h-full'>
       <div className='w-full grid grid-rows-[100px_1fr]  h-full'>
-        <div className='text-3xl self-center text-center '>
-          <Logo />
+        <div className='self-center w-fit mx-auto '>
+          <Logo height={25} />
         </div>
         {/* <div className='flex flex-col justify-between mt-8 '>
           <div>

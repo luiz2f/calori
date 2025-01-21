@@ -51,6 +51,9 @@ export async function getDietMeals(dietId: string) {
                       unitMultiplier: true
                     }
                   }
+                },
+                orderBy: {
+                  createdAt: 'asc' // Ordena pela data de criação de forma ascendente
                 }
               }
             }

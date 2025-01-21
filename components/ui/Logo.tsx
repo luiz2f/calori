@@ -1,3 +1,6 @@
-export default function Logo() {
-  return <img className="m-auto" src="logo_beta.png" alt="Logo" />;
+import Image from 'next/image'
+import logo from '@/public/logo.png'
+
+export default function Logo({ height = 20 }: { height?: number }) {
+  return <Image src={logo} alt='Logo' height={height} />
 }

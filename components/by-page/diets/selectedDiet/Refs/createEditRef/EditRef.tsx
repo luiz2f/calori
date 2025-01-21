@@ -83,7 +83,7 @@ type CreateOrEditProps =
       createVariation?: boolean
       meal?: undefined
       typeInput: 'Alimentos'
-      setCurrentIndex: never
+      setCurrentIndex?: never
     }
   | {
       creating?: false
@@ -151,7 +151,7 @@ export default function EditRef({
       if (creating) {
         closeLast(true)
       } else if (!creating) {
-        setCurrentIndex(selectedVariation)
+        setCurrentIndex?.(selectedVariation)
         setOriginalMealList(mealList)
         setIsModified(false)
         reset()
@@ -359,16 +359,25 @@ export default function EditRef({
 
   const handleSave = async () => {
     let error = false
-    const updatedMealList = mealList?.map(list => ({
+    let errorIndex = -1
+    const updatedMealList = mealList?.map((list, index) => ({
       ...list,
       mealListItems: list?.mealListItems?.map(item => {
         if (!item?.food?.id) {
           item.food.erro = true
           error = true // Marca que existe um erro
+          if (errorIndex === -1) {
+            // Only set the index the first time an error is encountered
+            errorIndex = index
+          }
         }
         if (!item?.unity?.id) {
           item.unity.erro = true
           error = true // Marca que existe um erro
+          if (errorIndex === -1) {
+            // Only set the index the first time an error is encountered
+            errorIndex = index
+          }
         }
         return item
       })
@@ -376,6 +385,8 @@ export default function EditRef({
 
     setMealList(updatedMealList)
     if (error) {
+      setType('Alimentos')
+      setSelectedVariation(errorIndex)
       return
     }
     if (mealName && mealTime) {
@@ -544,7 +555,7 @@ export default function EditRef({
           </Button>
         </div>
         {isLoading && (
-          <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex justify-center items-center bg-white w-full h-full bg-opacity-80'>
+          <div className='absolute top-1/2 left-1/2 z-20 transform -translate-x-1/2 -translate-y-1/2 flex justify-center items-center bg-white w-full h-full bg-opacity-80'>
             <Spinner />
           </div>
         )}

@@ -123,7 +123,7 @@ export default function MyWeight({
           </Button>
         </div>
         {isPending && (
-          <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex justify-center items-center bg-white w-full h-full bg-opacity-80'>
+          <div className='absolute top-1/2 left-1/2 z-20 transform -translate-x-1/2 -translate-y-1/2 flex justify-center items-center bg-white w-full h-full bg-opacity-80'>
             <Spinner />
           </div>
         )}

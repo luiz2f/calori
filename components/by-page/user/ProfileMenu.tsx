@@ -16,7 +16,7 @@ export default function ProfileMenu({
 }) {
   const ref = useOutsideClick<HTMLDivElement>(handler, false)
 
-  const buttonStyle = `flex gap-2 cursor-pointer items-center px-4 p-2 transition duration-200 
+  const buttonStyle = `flex gap-2 cursor-pointer items-center px-4 p-2 transition duration-fast 
   hover:bg-ulgrey 
   active:bg-greylight `
   return (

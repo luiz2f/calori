@@ -17,7 +17,7 @@ export default function LoginGoogle({ isLogin = true }: LoginGoogleProps) {
     >
       <div className='flex justify-center items-center gap-x-2'>
         <FcGoogle className='w-7 h-7' />
-        <p>{isLogin ? 'Logar' : 'Registrar'} com Google</p>
+        <p>{isLogin ? 'Entrar' : 'Registrar'} com Google</p>
       </div>
     </Button>
   )

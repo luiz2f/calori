@@ -33,7 +33,7 @@ export default function Header({ home = false }: { home?: boolean }) {
   return (
     <>
       <header className=''>
-        <div className='mx-auto max-w-screen-lg bg-white fixed h-14 w-full border-b-2 border-lightgreen flex  items-center justify-center z-50 '>
+        <div className='mx-auto max-w-screen-lg bg-white fixed h-14 w-full border-b-2  border-lightgreen flex  items-center justify-center z-50 '>
           {home ? (
             <button
               onClick={e => handleClick(e)}
@@ -45,7 +45,7 @@ export default function Header({ home = false }: { home?: boolean }) {
             ''
           )}
           <div
-            className='w-32 m-auto cursor-pointer'
+            className='pt-1 m-auto cursor-pointer'
             onClick={e => handleClick(e)}
           >
             <Logo />

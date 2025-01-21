@@ -41,8 +41,8 @@ function Header({
 
   const opacity =
     carbo + prot + fat === 0
-      ? 'opacity-30 transition duration-200'
-      : ' transition duration-200'
+      ? 'opacity-30 transition duration-fast'
+      : ' transition duration-fast'
 
   const colStyle = `text-center font-normal align-bottom ${opacity}`
 
@@ -56,7 +56,7 @@ function Header({
     <div
       role='row'
       style={{ gridTemplateColumns: context.columns }}
-      className='grid mt-4 pr-1 text-darkgreen'
+      className='grid mt-4 pr-1 pb-[2px] text-darkgreen transition-all duration-fast'
     >
       <div
         className={`text-left align-bottom text-xl font-normal self-end ${
@@ -105,14 +105,14 @@ function Row({
   }
   const opacity =
     carbo + prot + fat === 0
-      ? 'opacity-30 transition duration-200'
-      : ' transition duration-200'
+      ? 'opacity-30 transition duration-fast'
+      : ' transition duration-fast'
 
   return (
     <div
       role='row'
       style={{ gridTemplateColumns: context.columns }}
-      className='grid border-b-1 items-center border-white text-sm pr-1 [&>div]:py-1 [&>div]:text-center [&>div]:text-blacklight last:text-right last:border-b-0 odd:bg-neutralgreen'
+      className='grid border-b-1 items-center border-white text-sm pr-1 [&>div]:py-1 [&>div]:text-center [&>div]:text-blacklight last:text-right last:border-b-0 odd:bg-neutralgreen transition-all duration-fast'
     >
       <div role='cell' className='pl-2 !text-left !text-black'>
         {name}

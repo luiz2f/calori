@@ -166,10 +166,10 @@ export default function EditFoodRow({
       borderRadius: state.isSelected ? '4px' : '0',
 
       backgroundColor: state.isSelected
-        ? '#76C163'
+        ? '#549843'
         : state.isFocused
-        ? '#f9f9f9'
-        : 'transparent',
+          ? '#f9f9f9'
+          : 'transparent',
       textAlign: 'center'
     })
   }

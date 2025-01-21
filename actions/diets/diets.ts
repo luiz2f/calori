@@ -70,7 +70,8 @@ export async function getUserDiets() {
   if (userId) {
     const userDiets = await prisma.diet.findMany({
       where: {
-        userId: userId
+        userId: userId,
+        archived: false
       },
       orderBy: { index: 'asc' },
       select: {
