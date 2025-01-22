@@ -5,13 +5,12 @@ import { MacroProvider } from '@/app/context/useMacroContext'
 import Menus from '@/components/ui/Menu'
 import Modal from '@/components/ui/Modal'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import React, { useEffect } from 'react'
 import { DietFromSlider, Food, SelectedDiet } from './layout'
 
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: { staleTime: 60 * 1000 * 7 }
+    queries: { staleTime: 60 * 1000 * 80 }
   }
 })
 export type AppProps = {
@@ -44,7 +43,6 @@ export default function App({ defaultDiet, diets, foods, children }: AppProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ReactQueryDevtools initialIsOpen={false} />
       <DietProvider initialDiet={id}>
         <MacroProvider>
           <Modal>

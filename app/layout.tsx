@@ -28,6 +28,14 @@ const expose = localFont({
   ]
 })
 
+export const metadata = {
+  title: 'Calori',
+  description: 'Um planejador de Dietas simples, bonito e personalizável',
+  keywords:
+    'calórico, calorias, caloria, calorímetro, nutrição, comida, receita, planejador, pessoal, saúde, fitness, dieta, peso, rastreador, refeição, rastreador de refeições, planejador de refeições, planejador de receitas, rastreador calórico, rastreador de calorias, planejador calórico, planejador de calorias.',
+  icons: { icon: '/icon.png' }
+}
+
 export default async function RootLayout({
   children
 }: Readonly<{
