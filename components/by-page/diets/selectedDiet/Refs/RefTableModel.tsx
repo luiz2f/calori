@@ -67,7 +67,7 @@ function Header({
         {name}
       </div>
       <div className={colStyle}>
-        <div className='grayscale contrast-150 text-xs '>🍞</div>
+        <div className='grayscale contrast-150 text-xs opacity-50'>🍞</div>
         <div>{carbo}</div>
       </div>
       <div className={colStyle}>
