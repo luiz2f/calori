@@ -73,7 +73,7 @@ export async function getUserDiets() {
         userId: userId,
         archived: false
       },
-      orderBy: { index: 'asc' },
+      orderBy: { updatedAt: 'desc' },
       select: {
         id: true,
         name: true,

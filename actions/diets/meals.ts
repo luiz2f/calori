@@ -56,6 +56,9 @@ export async function getDietMeals(dietId: string) {
                   quantity: 'desc'
                 }
               }
+            },
+            orderBy: {
+              createdAt: 'asc'
             }
           }
         },
@@ -86,45 +89,6 @@ export async function deleteMeal(mealId: string) {
   })
   return mealToDelete?.dietId
 }
-// type Macro = {
-//   carb: number
-//   prot: number
-//   fat: number
-//   kcal: number
-// }
-// type Food = {
-//   carb: number
-//   protein: number
-//   fat: number
-//   id: string
-//   name: string
-//   unities?: Unity[]
-//   erro?: boolean
-// }
-// type Unity = {
-//   foodId: string
-//   id: string
-//   un: string
-//   unitMultiplier: number
-//   erro?: boolean
-// }
-// export type MealItem = {
-//   id: string
-//   foodId: string
-//   unityId: string
-//   quantity: number
-//   mealListId?: string
-//   index?: number
-//   food: Food
-//   unity: Unity
-// }
-// export type Meal = {
-//   id: string
-//   name: string
-//   index?: number
-//   mealListItems: MealItem[]
-//   macro?: Macro
-// }
 
 type updateMeal = {
   mealId: string
@@ -256,6 +220,13 @@ export async function updateMeal({
   })
 
   await Promise.all([...updateOrCreateMealLists, ...deleteMealLists])
+
+  await prisma.diet.update({
+    where: { id: mealToUpdate?.dietId },
+    data: {
+      updatedAt: new Date() // Força a atualização
+    }
+  })
 
   return mealToUpdate?.dietId
 }

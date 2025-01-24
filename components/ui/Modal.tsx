@@ -75,31 +75,27 @@ function Modal({ children }: ModalProps) {
     }
   }
   const closeLast = (force = false) => {
-    setOpenNames(prev => {
-      const lastName = prev.at(-1)
-      if (lastName) {
-        const canCloseLast = canClose.get(lastName)
-        if (canCloseLast || force) {
-          return prev.slice(0, prev.length - 1)
-        } else {
-          openUnsaved()
-        }
+    const lastName = openNames.at(-1)
+    if (lastName) {
+      const canCloseLast = canClose.get(lastName)
+      if (canCloseLast || force) {
+        setOpenNames(prev => prev.slice(0, prev.length - 1))
+      } else {
+        openUnsaved()
       }
-      return prev
-    })
+    }
   }
+
   const closeUnsaved = () => {
     setModified('')
     close('unsavedChanges')
     closeLast(true)
   }
   const openUnsaved = () => {
-    setOpenNames(prev => {
-      if (!prev.includes('unsavedChanges')) {
-        return [...prev, 'unsavedChanges']
-      }
-      return prev
-    })
+    if (openNames.includes('unsavedChanges')) {
+      return
+    }
+    open('unsavedChanges')
   }
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -150,8 +146,6 @@ function Window({ children, name }: WindowProps) {
   const { openNames, close, closeLast } = useContext(ModalContext)
   const mounted = openNames.includes(name) && React.isValidElement(children)
   const ref = useOutsideClickModal<HTMLDivElement>(closeLast, mounted, name)
-
-
   if (!openNames.includes(name)) return null
 
   if (!React.isValidElement(children)) {
