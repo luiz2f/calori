@@ -36,6 +36,15 @@ export const metadata = {
   icons: { icon: '/icon.png' }
 }
 
+export function generateViewport() {
+  return {
+    width: 'device-width',
+    initialScale: 1.0,
+    maximumScale: 1.0,
+    userScalable: false
+  }
+}
+
 export default async function RootLayout({
   children
 }: Readonly<{
