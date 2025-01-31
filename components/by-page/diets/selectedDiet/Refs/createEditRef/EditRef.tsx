@@ -513,7 +513,7 @@ export default function EditRef({
               type='time'
               onChange={handleTimeChange}
               onBlur={handleTimeBlur}
-              className={`font-medium p-2 w-22 border-1 text-darkgreen text-center rounded-lg ${
+              className={`font-medium p-1 bg-white w-16 h-full  border-1 text-darkgreen text-center rounded-lg ${
                 errors?.time
                   ? 'border-darkred bg-lightred text-darkred'
                   : 'border-grey-50'
