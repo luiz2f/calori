@@ -24,8 +24,9 @@ input:-webkit-autofill::first-line {
   width: 2rem;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: radial-gradient(farthest-side, #3e7b32 94%, transparent) top/10px
-      5px no-repeat,
+  background:
+    radial-gradient(farthest-side, #3e7b32 94%, transparent) top/10px 5px
+      no-repeat,
     conic-gradient(transparent 30%, #3e7b32);
   -webkit-mask: radial-gradient(
     farthest-side,
@@ -38,6 +39,37 @@ input:-webkit-autofill::first-line {
 @keyframes rotate {
   to {
     transform: rotate(1turn);
+  }
+}
+
+#loogloadholder::before {
+  content: 'Carregando dietas...';
+  text-align: left;
+  top: 55%;
+  font-size: 0.9rem;
+  color: #6d6d6d;
+  position: absolute;
+}
+
+#loogloadholder::after {
+  content: '🍞';
+  text-align: left;
+  animation: load 4s infinite; /* Duração da animação */
+  font-size: 3rem;
+  color: #000;
+  position: absolute;
+  font-family: monospace;
+}
+
+@keyframes load {
+  0% {
+    content: '🍞';
+  }
+  33% {
+    content: '🥩';
+  }
+  66% {
+    content: '🥑';
   }
 }
 

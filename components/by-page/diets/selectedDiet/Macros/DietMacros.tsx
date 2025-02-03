@@ -1,5 +1,5 @@
 'use client'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import Toggle from '@/components/ui/Toggle'
 import { useMacroContext } from '@/app/context/useMacroContext'
 import { useWeight } from '@/app/data/user/useWeight'
@@ -38,7 +38,7 @@ export default function DietMacros() {
     open('my-weight-false')
   }
 
-  useEffect(() => {
+  const newData = useMemo(() => {
     const totalKcal =
       totalMacros.carb * 4 + totalMacros.prot * 4 + totalMacros.fat * 9
 
@@ -47,10 +47,12 @@ export default function DietMacros() {
         ? `${(((macro * 4) / totalKcal) * 100).toFixed(0)}%`
         : '0%'
     }
+
     const setMacroPerWeight = (macro: number) => {
       return parseFloat((macro / weight).toFixed(1))
     }
-    const newData = {
+
+    return {
       'g/KG': {
         carb: setMacroPerWeight(totalMacros.carb),
         prot: setMacroPerWeight(totalMacros.prot),
@@ -68,14 +70,16 @@ export default function DietMacros() {
       },
       totalKcal: totalKcal
     }
+  }, [totalMacros, weight])
 
+  useEffect(() => {
     setData(prevData => {
       if (JSON.stringify(prevData) !== JSON.stringify(newData)) {
         return newData
       }
       return prevData
     })
-  }, [totalMacros, weight])
+  }, [newData])
 
   return (
     <div className='flex flex-col w-full p-4'>
