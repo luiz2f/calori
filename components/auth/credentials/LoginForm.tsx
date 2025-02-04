@@ -6,7 +6,6 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Input from '@/components/ui/Input'
 import PasswordInput from '@/components/ui/PasswordInput'
-import { isRedirectError } from 'next/dist/client/components/redirect'
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
@@ -61,9 +60,6 @@ export default function LoginForm() {
         }
       }
     } catch (error) {
-      if (isRedirectError(error)) {
-        return
-      }
       console.error(error)
       unexpectedError()
     }
