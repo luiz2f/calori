@@ -77,3 +77,34 @@ input:-webkit-autofill::first-line {
   overflow: hidden;
   scrollbar-gutter: stable;
 }
+
+@keyframes placeHolderShimmer {
+  0% {
+    background-position: 100% 0; /* Começa fora da tela */
+  }
+  100% {
+    background-position: -100% 0; /* Termina fora da tela */
+  }
+}
+
+.c-animated-background {
+  border-radius: 6px;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: infinite;
+  animation-name: placeHolderShimmer;
+  animation-timing-function: linear;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: #ffffff;
+  background: linear-gradient(to right, #fff 5%, #e5ffd9 25%, #fff 45%);
+  background-size: 200% 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  overflow: hidden;
+}
