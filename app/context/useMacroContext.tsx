@@ -109,8 +109,17 @@ export const MacroProvider: React.FC<{ children: React.ReactNode }> = ({
         newTotalMacros?.prot * 4 +
         newTotalMacros?.fat * 9
     )
-    setTotalMacros({ ...newTotalMacros, kcal })
-  }, [macros])
+
+    // Verifique se os valores realmente mudaram antes de atualizar o estado
+    if (
+      totalMacros.carb !== newTotalMacros.carb ||
+      totalMacros.prot !== newTotalMacros.prot ||
+      totalMacros.fat !== newTotalMacros.fat ||
+      totalMacros.kcal !== kcal
+    ) {
+      setTotalMacros({ ...newTotalMacros, kcal })
+    }
+  }, [macros, totalMacros])
 
   const calculateColumns = useCallback(
     (data: DataItem[]) => {
