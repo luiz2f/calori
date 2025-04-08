@@ -73,12 +73,14 @@ export default function DietMacros() {
   }, [totalMacros, weight])
 
   useEffect(() => {
-    setData(prevData => {
-      if (JSON.stringify(prevData) !== JSON.stringify(newData)) {
-        return newData
-      }
-      return prevData
-    })
+    if (
+      data.totalKcal !== newData.totalKcal ||
+      data['g'].carb !== newData['g'].carb ||
+      data['g'].prot !== newData['g'].prot ||
+      data['g'].fat !== newData['g'].fat
+    ) {
+      setData(newData)
+    }
   }, [newData])
 
   return (
