@@ -20,11 +20,6 @@ export default function DietMealsPage({
   dietId: string
   name: string
 }) {
-  const { isDeleting, deleteDiet, isSuccess } = useDeleteDiet()
-  const handleDeleteDiet = async () => {
-    await deleteDiet(dietId)
-  }
-
   return (
     <>
       <div className='flex flex-col w-full p-4 gap-12 mt-6 '>
@@ -33,23 +28,13 @@ export default function DietMealsPage({
           : meals?.map((meal: Meal) => <DietMeal key={meal.id} meal={meal} />)}
         <AddRef />
       </div>
-      <Modal.Open opens={`deleteDietG${dietId}`}>
+      <Modal.Open opens={`deleteDiet${dietId}`}>
         <div className='text-center mt-4 mb-4 underline-offset-2 underline cursor-pointer text-darkred'>
           Apagar Dieta
         </div>
       </Modal.Open>
       <Modal.Window name='unsavedChanges'>
         <UnsavedChanges />
-      </Modal.Window>
-      <Modal.Window name={`deleteDietG${dietId}`}>
-        <ConfirmDelete
-          loading={isDeleting}
-          loaded={!isDeleting && isSuccess}
-          resource='Dieta'
-          resourceName={`${name}`}
-          onConfirm={handleDeleteDiet}
-          modalName={`deleteDietG${dietId}`}
-        />
       </Modal.Window>
       <Modal.Window name={'createNewMeal'}>
         <EditRef
