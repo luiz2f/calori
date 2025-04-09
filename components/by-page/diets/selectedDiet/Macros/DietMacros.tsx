@@ -1,5 +1,5 @@
 'use client'
-import React, { useContext, useEffect, useMemo, useState } from 'react'
+import React, { useContext, useMemo, useState } from 'react'
 import Toggle from '@/components/ui/Toggle'
 import { useMacroContext } from '@/app/context/useMacroContext'
 import { useWeight } from '@/app/data/user/useWeight'

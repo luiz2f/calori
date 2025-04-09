@@ -3,8 +3,6 @@ import AddRef from './AddRef'
 import DietMeal from './DietMeal'
 import Modal from '@/components/ui/Modal'
 import EditRef from './createEditRef/EditRef'
-import { useDeleteDiet } from '@/app/data/diets/useDeleteDiet'
-import ConfirmDelete from '@/components/ui/ConfirmDelete'
 import UnsavedChanges from '@/components/ui/UnsavedChanges'
 import { Meal } from '@/app/(authenticated)/layout'
 import DietMealLoading from './DietMealLoading'
@@ -12,13 +10,11 @@ import DietMealLoading from './DietMealLoading'
 export default function DietMealsPage({
   meals,
   dietId,
-  name,
   isLoading
 }: {
   isLoading: boolean
   meals: Meal[]
   dietId: string
-  name: string
 }) {
   return (
     <>
