@@ -9,24 +9,6 @@ export default function DietMacros() {
   const [currentMetric, setCurrentMetric] = useState<'g/KG' | 'g' | '% kcal'>(
     'g'
   )
-  const [data, setData] = useState({
-    'g/KG': {
-      carb: 0,
-      prot: 0,
-      fat: 0
-    },
-    g: {
-      carb: 0,
-      prot: 0,
-      fat: 0
-    },
-    '% kcal': {
-      carb: '0%',
-      prot: '0%',
-      fat: '0%'
-    },
-    totalKcal: 0
-  })
   const { open } = useContext(ModalContext)
   const { totalMacros } = useMacroContext()
   const { data: wg } = useWeight()
@@ -38,7 +20,7 @@ export default function DietMacros() {
     open('my-weight-false')
   }
 
-  const newData = useMemo(() => {
+  const data = useMemo(() => {
     const totalKcal =
       totalMacros.carb * 4 + totalMacros.prot * 4 + totalMacros.fat * 9
 
@@ -71,17 +53,6 @@ export default function DietMacros() {
       totalKcal: totalKcal
     }
   }, [totalMacros, weight])
-
-  useEffect(() => {
-    if (
-      data.totalKcal !== newData.totalKcal ||
-      data['g'].carb !== newData['g'].carb ||
-      data['g'].prot !== newData['g'].prot ||
-      data['g'].fat !== newData['g'].fat
-    ) {
-      setData(newData)
-    }
-  }, [newData])
 
   return (
     <div className='flex flex-col w-full p-4'>
