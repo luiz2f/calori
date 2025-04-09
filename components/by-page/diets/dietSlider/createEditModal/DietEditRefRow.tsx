@@ -62,7 +62,7 @@ export default function DietEditRefRow({
         value={time}
         onChange={handleTimeChange}
         onBlur={onTimeBlur}
-        className={`border-1 w-20 text-center bg-white text-darkgreen p-1 rounded-lg font-medium ${
+        className={`border-1 pl-2 bg-white w-18 text-center  text-darkgreen rounded-lg font-medium ${
           timeError
             ? 'border-darkred bg-lightred text-darkred'
             : 'border-grey-50'
