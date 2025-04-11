@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import RefSlider from '../RefSlider'
-import EditFoodRow from './editFood/EditFoodRow'
+import { EditFoodRow } from './editFood/EditFoodRow'
 import Modal from '@/components/ui/Modal'
 import ConfirmDelete from '@/components/ui/ConfirmDelete'
 import { useFoods } from '@/app/data/foods/useFoods'
@@ -14,6 +14,7 @@ export default function EditRefFoods({
   currentIndex,
   onDeleteVariation,
   onFoodChange,
+  onQuantityChange,
   onNameChange,
   setIndex,
   handleAddVariation,
@@ -31,8 +32,11 @@ export default function EditRefFoods({
     data: {
       foodInfo: Food
       unityInfo: Unity
-      quantity: number
     }
+  ) => void
+  onQuantityChange: (
+    variationId: string,
+    data: { foodId: string; quantity: string }
   ) => void
   onNameChange: (variationId: string, newName: string) => void
   setIndex: (index: number) => void
@@ -77,6 +81,7 @@ export default function EditRefFoods({
       setVariationName('')
     }
   }, [currentIndex, mealsList, setIndex, setVariationName])
+
   const goLeft = () => {
     const newIndex = currentIndex > 0 ? currentIndex - 1 : mealsList.length - 1
     const newName = mealsList[newIndex]?.name || ''
@@ -124,16 +129,26 @@ export default function EditRefFoods({
   }, [createFoodReturn])
 
   const refFoods = currentMeal?.mealListItems || []
-  const handleFoodChangeWrapper = (
-    foodId: string,
-    data: {
-      foodInfo: Food
-      unityInfo: Unity
-      quantity: number
-    }
-  ) => {
-    onFoodChange(currentMeal?.id, foodId, data)
-  }
+
+  const handleFoodChangeWrapper = useCallback(
+    (
+      foodId: string,
+      data: {
+        foodInfo: Food
+        unityInfo: Unity
+      }
+    ) => {
+      onFoodChange(currentMeal?.id, foodId, data)
+    },
+    [currentMeal?.id, onQuantityChange]
+  )
+
+  const handleQuantityChangeWrapper = useCallback(
+    (data: { foodId: string; quantity: string }) => {
+      onQuantityChange(currentMeal?.id, data)
+    },
+    [currentMeal?.id, onQuantityChange]
+  )
 
   const carb = currentMeal?.macro?.carb || 0
   const prot = currentMeal?.macro?.prot || 0
@@ -237,6 +252,7 @@ export default function EditRefFoods({
                       foods={foods}
                       foodOptions={foodOptions}
                       onFoodChange={handleFoodChangeWrapper}
+                      onQuantityChange={handleQuantityChangeWrapper}
                       duplicateFood={() =>
                         handleDuplicateFood(currentMeal?.id, food.id)
                       }

@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useState, useContext, useEffect, useCallback } from 'react'
 import Button from '@/components/ui/Button'
 import { ModalContext } from '@/components/ui/Modal'
 import EditRefList from './EditRefList'
@@ -139,6 +139,15 @@ export default function EditRef({
   const isDisabled = !isModified || disabled || isLoading
 
   useEffect(() => {
+    if (createVariation) {
+      newVariation()
+    }
+    if (createFood) {
+      handleAddFood(mealList[currentIndex]?.id)
+    }
+  }, [])
+
+  useEffect(() => {
     if (isModified) {
       unsavedChanges(modalName)
     } else {
@@ -195,76 +204,7 @@ export default function EditRef({
     setMealTime(e.target.value)
   }
 
-  const handleAddVariation = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e?.stopPropagation()
-    newVariation()
-  }
-
-  const newVariation = () => {
-    const mealId = uuidv4()
-    setMealList([
-      ...mealList,
-      {
-        id: mealId,
-        name: 'Nova Variação',
-        index: 0,
-        macro: { carb: 0, prot: 0, fat: 0, kcal: 0 },
-        mealListItems: []
-      }
-    ])
-
-    handleAddFood(mealId)
-  }
-
-  const handleDuplicateVariation = (id: string) => {
-    const variationToDuplicate = mealList?.find(meal => meal?.id === id)
-    if (!variationToDuplicate) {
-      console.error('Variação não encontrada')
-      return
-    }
-    const newVar = {
-      ...variationToDuplicate,
-      id: uuidv4(),
-      name: `${variationToDuplicate?.name} - (Cópia)`
-    }
-
-    setMealList(prevMealList => [...prevMealList, newVar])
-  }
-
-  const handleDeleteVariation = (id: string) => {
-    const length = mealList?.length
-    if (selectedVariation + 1 === length && length > 1) {
-      setSelectedVariation(length - 2)
-    }
-    setMealList(prevMealList => prevMealList?.filter(meal => meal?.id !== id))
-  }
-
-  const handleNameChange = (variationId: string, newName: string) => {
-    setMealList(prevMealList =>
-      prevMealList?.map(variation =>
-        variation?.id === variationId
-          ? { ...variation, name: newName }
-          : variation
-      )
-    )
-  }
-
-  const deleteFoodFromMeal = (mealId: string, foodId: string) => {
-    setMealList(prevMealList =>
-      prevMealList?.map(meal =>
-        meal?.id === mealId
-          ? {
-              ...meal,
-              mealListItems: meal?.mealListItems?.filter(
-                item => item?.id !== foodId
-              )
-            }
-          : meal
-      )
-    )
-  }
-
-  const handleAddFood = (mealItemId: string) => {
+  const handleAddFood = useCallback((mealItemId: string) => {
     setMealList(prevMealList =>
       prevMealList?.map(variation =>
         variation?.id === mealItemId
@@ -297,65 +237,141 @@ export default function EditRef({
           : variation
       )
     )
-  }
-  const handleDuplicateFood = (mealId: string, foodId: string) => {
-    // Encontre a refeição que contém o alimento a ser duplicado
-    const mealToUpdate = mealList?.find(meal => meal?.id === mealId)
-    if (!mealToUpdate) {
-      console.error('Refeição não encontrada')
-      return
-    }
+  }, [])
 
-    // Encontre o alimento dentro da refeição
-    const foodToDuplicate = mealToUpdate?.mealListItems?.find(
-      item => item?.id === foodId
-    )
-    if (!foodToDuplicate) {
-      console?.error('Alimento não encontrado')
-      return
-    }
+  const newVariation = useCallback(() => {
+    const mealId = uuidv4()
+    setMealList(prevMealList => [
+      ...prevMealList,
+      {
+        id: mealId,
+        name: 'Nova Variação',
+        index: 0,
+        macro: { carb: 0, prot: 0, fat: 0, kcal: 0 },
+        mealListItems: []
+      }
+    ])
+    // Agora chamamos handleAddFood fora do setMealList
+    handleAddFood(mealId)
+  }, [handleAddFood])
 
-    // Criação da cópia do alimento
-    const duplicatedFood = {
-      ...foodToDuplicate,
-      id: uuidv4(), // Novo id para o alimento duplicado
-      food: { ...foodToDuplicate?.food },
-      unity: { ...foodToDuplicate?.unity }
-    }
+  const handleAddVariation = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e?.stopPropagation()
+      newVariation()
+    },
+    [newVariation]
+  )
 
-    // Encontre o índice do alimento original
-    const foodIndex = mealToUpdate?.mealListItems?.findIndex(
-      item => item?.id === foodId
-    )
+  const handleDuplicateVariation = useCallback(
+    (id: string) => {
+      const variationToDuplicate = mealList?.find(meal => meal?.id === id)
+      if (!variationToDuplicate) {
+        console.error('Variação não encontrada')
+        return
+      }
+      const newVar = {
+        ...variationToDuplicate,
+        id: uuidv4(),
+        name: `${variationToDuplicate?.name} - (Cópia)`
+      }
 
-    // Crie uma nova lista de mealListItems, inserindo a cópia logo após o original
-    const updatedMealListItems = [
-      ...mealToUpdate?.mealListItems?.slice(0, foodIndex + 1), // Todos os itens até o original
-      duplicatedFood, // O alimento duplicado
-      ...mealToUpdate?.mealListItems?.slice(foodIndex + 1) // Todos os itens depois do original
-    ]
+      setMealList(prevMealList => [...prevMealList, newVar])
+    },
+    [mealList]
+  )
 
-    // Atualiza a refeição com o novo alimento duplicado na posição correta
+  const handleDeleteVariation = useCallback(
+    (id: string) => {
+      const length = mealList?.length
+      if (selectedVariation + 1 === length && length > 1) {
+        setSelectedVariation(length - 2)
+      }
+      setMealList(prevMealList => prevMealList?.filter(meal => meal?.id !== id))
+    },
+    [mealList, selectedVariation]
+  )
+
+  const handleNameChange = useCallback(
+    (variationId: string, newName: string) => {
+      setMealList(prevMealList =>
+        prevMealList?.map(variation =>
+          variation?.id === variationId
+            ? { ...variation, name: newName }
+            : variation
+        )
+      )
+    },
+    []
+  )
+
+  const deleteFoodFromMeal = useCallback((mealId: string, foodId: string) => {
     setMealList(prevMealList =>
       prevMealList?.map(meal =>
         meal?.id === mealId
-          ? { ...meal, mealListItems: updatedMealListItems } // Atualiza a refeição com a nova lista
+          ? {
+              ...meal,
+              mealListItems: meal?.mealListItems?.filter(
+                item => item?.id !== foodId
+              )
+            }
           : meal
       )
     )
-  }
+  }, [])
+
+  const handleDuplicateFood = useCallback(
+    (mealId: string, foodId: string) => {
+      // Encontre a refeição que contém o alimento a ser duplicado
+      const mealToUpdate = mealList?.find(meal => meal?.id === mealId)
+      if (!mealToUpdate) {
+        console.error('Refeição não encontrada')
+        return
+      }
+
+      // Encontre o alimento dentro da refeição
+      const foodToDuplicate = mealToUpdate?.mealListItems?.find(
+        item => item?.id === foodId
+      )
+      if (!foodToDuplicate) {
+        console?.error('Alimento não encontrado')
+        return
+      }
+
+      // Criação da cópia do alimento
+      const duplicatedFood = {
+        ...foodToDuplicate,
+        id: uuidv4(), // Novo id para o alimento duplicado
+        food: { ...foodToDuplicate?.food },
+        unity: { ...foodToDuplicate?.unity }
+      }
+
+      // Encontre o índice do alimento original
+      const foodIndex = mealToUpdate?.mealListItems?.findIndex(
+        item => item?.id === foodId
+      )
+
+      // Crie uma nova lista de mealListItems, inserindo a cópia logo após o original
+      const updatedMealListItems = [
+        ...mealToUpdate?.mealListItems?.slice(0, foodIndex + 1), // Todos os itens até o original
+        duplicatedFood, // O alimento duplicado
+        ...mealToUpdate?.mealListItems?.slice(foodIndex + 1) // Todos os itens depois do original
+      ]
+
+      // Atualiza a refeição com o novo alimento duplicado na posição correta
+      setMealList(prevMealList =>
+        prevMealList?.map(meal =>
+          meal?.id === mealId
+            ? { ...meal, mealListItems: updatedMealListItems } // Atualiza a refeição com a nova lista
+            : meal
+        )
+      )
+    },
+    [mealList] // Dependência: mealList
+  )
   const createUserFood = () => {
     open('create-food-return')
   }
-
-  useEffect(() => {
-    if (createVariation) {
-      newVariation()
-    }
-    if (createFood) {
-      handleAddFood(mealList[currentIndex]?.id)
-    }
-  }, [])
 
   const handleSave = async () => {
     let error = false
@@ -419,11 +435,9 @@ export default function EditRef({
     data: {
       foodInfo: Food
       unityInfo: Unity
-      quantity: number
     }
   ) => {
-    const { foodInfo, unityInfo, quantity } = data
-    const newQuantity = isNaN(quantity) ? 0 : quantity
+    const { foodInfo, unityInfo } = data
     setMealList(prevMealList =>
       prevMealList?.map(variation =>
         variation?.id === variationId
@@ -435,7 +449,6 @@ export default function EditRef({
                       ...item,
                       foodId: foodInfo?.id,
                       unityId: unityInfo?.id,
-                      quantity: newQuantity,
                       food: {
                         id: foodInfo?.id,
                         name: foodInfo?.name,
@@ -449,6 +462,31 @@ export default function EditRef({
                         un: unityInfo?.un,
                         unitMultiplier: unityInfo?.unitMultiplier
                       }
+                    }
+                  : item
+              )
+            }
+          : variation
+      )
+    )
+  }
+
+  const handleQuantityChange = (
+    variationId: string,
+    { foodId, quantity }: { foodId: string; quantity: string }
+  ) => {
+    const parsedValue = parseFloat(quantity)
+    const newQuantity = isNaN(parsedValue) ? 0 : parsedValue
+    setMealList(prevMealList =>
+      prevMealList?.map(variation =>
+        variation?.id === variationId
+          ? {
+              ...variation,
+              mealListItems: variation?.mealListItems?.map(item =>
+                item?.id === foodId
+                  ? {
+                      ...item,
+                      quantity: newQuantity
                     }
                   : item
               )
@@ -537,6 +575,7 @@ export default function EditRef({
             currentIndex={selectedVariation}
             setIndex={setSelectedVariation}
             onFoodChange={handleFoodChange}
+            onQuantityChange={handleQuantityChange}
             onNameChange={handleNameChange}
             handleAddVariation={handleAddVariation}
             handleAddFood={handleAddFood}
