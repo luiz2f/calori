@@ -10,15 +10,11 @@ export function useDebouncerCallback<T extends (...args: any[]) => void>(
     (...args: Parameters<T>) => {
       // Limpa o temporizador anterior, se existir
       if (timerRef.current) {
-        console.log('LIMPOU LIMPOUC🧧🧧🧧')
-
         clearTimeout(timerRef.current)
       }
 
       // Define um novo temporizador
       timerRef.current = setTimeout(() => {
-        console.log('🧧🧧🧧')
-
         callback(...args)
       }, delay)
     },
