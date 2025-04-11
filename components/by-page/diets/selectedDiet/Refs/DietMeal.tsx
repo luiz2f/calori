@@ -47,7 +47,7 @@ export default function DietMeal({ meal }: { meal: MealMacro }) {
   return (
     <div>
       <div className='border-grey10 border-1 rounded-lg flex flex-col w-full relative'>
-        <div className='flex items-baseline  gap-1 absolute top-[-16px] bg-white px-1 left-0 '>
+        <div className='flex items-baseline gap-1 absolute top-[-16px] bg-white mx-1 px-[0.15rem] left-0 '>
           <Modal.Open opens={`editMeal${meal.id}`}>
             <button className='font-medium text-2xl cursor-pointer'>
               {meal.name}

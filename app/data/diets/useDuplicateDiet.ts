@@ -29,7 +29,7 @@ export function useDuplicateDiet() {
         queryClient.setQueryData([`meals-diet-${data?.id}`], data)
         const newDiet = filterData(data)
         queryClient.setQueryData(['diets'], oldDiets => {
-          return [...(Array.isArray(oldDiets) ? oldDiets : []), newDiet]
+          return [newDiet, ...(Array.isArray(oldDiets) ? oldDiets : [])]
         })
       }
     },

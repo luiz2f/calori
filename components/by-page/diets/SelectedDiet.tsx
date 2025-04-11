@@ -64,7 +64,6 @@ export default function SelectedDiet({ defaultDiet }: selectedDietProps) {
         key={dietId}
         meals={diet.meals}
         dietId={dietId}
-        name={name}
       />
     </div>
   )

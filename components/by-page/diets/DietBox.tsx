@@ -1,7 +1,6 @@
 'use client'
 import Menus from '@/components/ui/Menu'
 import Modal from '@/components/ui/Modal'
-import clsx from 'clsx'
 import {
   HiDotsHorizontal,
   HiOutlineDuplicate,
@@ -37,14 +36,6 @@ export default function DietBox({
   const adaptedName =
     name.length > characterLimit ? name.slice(0, characterLimit) + '...' : name
 
-  const borderClass = clsx(
-    'flex flex-col cursor-pointer justify-between w-44 h-24 text-left  white flex-shrink-0 rounded-lg p-db ',
-    {
-      ' shadow-dbbd text-darkgreen': active,
-      ' shadow-dbde text-blacklight   ': !active
-    }
-  )
-
   const handleDeleteDiet = async () => {
     await deleteDiet(dietId)
   }
@@ -54,7 +45,10 @@ export default function DietBox({
 
   return (
     <>
-      <div className={borderClass} onClick={onClick}>
+      <div
+        className={`flex flex-col cursor-pointer justify-between w-44 h-24 text-left  white flex-shrink-0 rounded-lg p-db ${active ? 'shadow-dbbd text-darkgreen' : 'shadow-dbde text-blacklight'}`}
+        onClick={onClick}
+      >
         <div className='flex justify-between w-full'>
           <div className='text-sm font-medium max-w-32 overflow-hidden ellipsis h-14 pt-2'>
             {adaptedName}
