@@ -3,7 +3,6 @@
 import ErrorPage from '@/components/by-page/auth/ErrorPage'
 import Button from '@/components/ui/Button'
 import Logo from '@/components/ui/Logo'
-import { useEffect } from 'react'
 
 export default function Error({
   error,
