@@ -1,26 +1,30 @@
-"use client";
-import { createDiet as createDietAPI } from "@/actions/diets/diets";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+'use client'
+import { createDiet as createDietAPI } from '@/actions/diets/diets'
+import { useDietContext } from '@/app/context/useDietContext'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { resumeDiet } from './useDuplicateDiet'
 
 export function useCreateDiet() {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
+  const { setSelectedDiet } = useDietContext()
+
   const {
     isPending: isCreating,
     isSuccess,
-    mutate: createDiet,
+    mutate: createDiet
   } = useMutation({
     mutationFn: createDietAPI,
-    onSuccess: () => {
-      // queryClient.setQueryData([`meals-diet-${data?.id}`], data);
-      // 🏓🏓
-      queryClient.invalidateQueries({
-        queryKey: ["diets"],
-      });
+    onSuccess: data => {
+      const newDiet = resumeDiet(data)
+      queryClient.setQueryData(['diets'], oldDiets => {
+        return [newDiet, ...(Array.isArray(oldDiets) ? oldDiets : [])]
+      })
+      setSelectedDiet(newDiet.id)
     },
-    onError: (error) => {
-      console.error("useCreateDiet", error);
-    },
-  });
+    onError: error => {
+      console.error('useCreateDiet', error)
+    }
+  })
 
-  return { isCreating, createDiet, isSuccess };
+  return { isCreating, createDiet, isSuccess }
 }
