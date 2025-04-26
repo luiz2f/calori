@@ -12,9 +12,9 @@ export default function Error({
   error: Error & { digest?: string }
   reset: () => void
 }) {
-  useEffect(() => {
-    console.error(error)
-  }, [error])
+  const databaseError = error.message.includes(
+    'Please make sure your database server is running at'
+  )
 
   return (
     <main className='w-full flex items-center  flex-col flex-grow h-full'>
@@ -24,8 +24,16 @@ export default function Error({
         </div>
         <div className='px-6'>
           <ErrorPage
-            title='Um erro inesperado ocorreu 😢'
-            subtitle='Tente novamente'
+            title={
+              databaseError
+                ? 'Não conseguimos carregar as informações 🤔'
+                : undefined
+            }
+            subtitle={
+              databaseError
+                ? 'Verifique sua conexão e tente novamente.'
+                : undefined
+            }
           >
             <Button onClick={reset}>Voltar para o início</Button>
           </ErrorPage>
