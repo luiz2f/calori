@@ -7,6 +7,7 @@ import { useDiets } from '@/app/data/diets/useDiets'
 import Spinner from '@/components/ui/Spinner'
 import { DietFromSlider } from '@/app/(authenticated)/layout'
 import AddBasicDiet from './dietSlider/AddBasicDiet'
+import { useDuplicateDiet } from '@/app/data/diets/useDuplicateDiet'
 
 type DietSliderProps = {
   initialDataDiets: DietFromSlider[]
@@ -14,6 +15,8 @@ type DietSliderProps = {
 
 export default function DietsSlider({ initialDataDiets }: DietSliderProps) {
   const { data: diets, isLoading } = useDiets(initialDataDiets)
+  const { isDuplicating, duplicateDiet } = useDuplicateDiet()
+
   const { selectedDiet, setSelectedDiet } = useDietContext()
   const isEmpty = !diets || diets.length === 0
 
@@ -35,12 +38,26 @@ export default function DietsSlider({ initialDataDiets }: DietSliderProps) {
             <AddBasicDiet />
           ) : (
             <>
+              {isDuplicating ? (
+                <div
+                  className={`flex flex-col cursor-pointer justify-between w-44 h-24 text-left  white flex-shrink-0 rounded-lg p-db shadow-dbde text-blacklight`}
+                >
+                  <div className=''>
+                    <div className='text-sm font-medium max-w-32 overflow-hidden ellipsis h-14 pt-2'>
+                      Duplicando Dieta
+                    </div>
+                  </div>
+                  <Spinner small />
+                  <div className='font-bold pr-3 w-full align-bottom text-right'></div>
+                </div>
+              ) : null}
               {diets.map(diet => (
                 <DietBox
                   name={diet?.name}
                   diet={diet}
                   active={selectedDiet === diet?.id}
                   key={diet.id}
+                  duplicateDiet={() => duplicateDiet(diet.id)}
                   onClick={() => handleDietClick(diet.id)}
                 />
               ))}
