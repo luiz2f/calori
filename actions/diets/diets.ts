@@ -2,6 +2,7 @@
 
 import prisma from '@/prisma'
 import { getSessionId } from '../session'
+import { getDietMeals } from './meals'
 
 export type Ref = {
   id: string
@@ -150,52 +151,79 @@ export async function duplicateDiet(dietId: string) {
     const newIndex = await getDietIndex(dietToDuplicate.userId)
     const newDietName = `${dietToDuplicate.name} - Cópia`
 
+    // Cria a nova dieta
     const newDiet = await prisma.diet.create({
       data: {
         name: newDietName,
         userId: dietToDuplicate.userId,
         index: newIndex,
-        archived: false,
-        meals: {
-          create: dietToDuplicate.meals.map(meal => ({
-            name: meal.name,
-            time: meal.time,
-            mealList: {
-              create: meal.mealList.map((mealList, mealListIndex) => ({
-                name: mealList.name,
-                index: mealListIndex,
-                mealListItems: {
-                  create: mealList.mealListItems.map((item, itemIndex) => ({
-                    foodId: item.foodId,
-                    unityId: item.unityId,
-                    quantity: item.quantity,
-                    index: itemIndex
-                  }))
-                }
-              }))
-            }
-          }))
-        }
-      },
-      include: {
-        meals: {
-          include: {
-            mealList: {
-              include: {
-                mealListItems: { include: { food: true, unity: true } }
-              }
-            }
-          }
-        }
+        archived: false
       }
     })
 
-    return newDiet
+    // Cria os meals em ordem
+    for (
+      let mealIndex = 0;
+      mealIndex < dietToDuplicate.meals.length;
+      mealIndex++
+    ) {
+      const meal = dietToDuplicate.meals[mealIndex]
+
+      const newMeal = await prisma.meal.create({
+        data: {
+          name: meal.name,
+          time: meal.time,
+          dietId: newDiet.id
+        }
+      })
+
+      // Cria os mealLists em ordem
+      for (
+        let mealListIndex = 0;
+        mealListIndex < meal.mealList.length;
+        mealListIndex++
+      ) {
+        const mealList = meal.mealList[mealListIndex]
+
+        const newMealList = await prisma.mealList.create({
+          data: {
+            name: mealList.name,
+            mealId: newMeal.id,
+            index: mealListIndex + 1 // Define o índice explicitamente
+          }
+        })
+
+        // Cria os mealListItems em ordem
+        for (
+          let itemIndex = 0;
+          itemIndex < mealList.mealListItems.length;
+          itemIndex++
+        ) {
+          const item = mealList.mealListItems[itemIndex]
+
+          await prisma.mealListItem.create({
+            data: {
+              foodId: item.foodId,
+              unityId: item.unityId,
+              quantity: item.quantity,
+              mealListId: newMealList.id,
+              index: itemIndex + 1 // Define o índice explicitamente
+            }
+          })
+        }
+      }
+    }
+
+    // Retorna a nova dieta com todas as relações
+    const fullDiet = await getDietMeals(newDiet.id)
+
+    return fullDiet
   } catch (error) {
     console.error('Erro ao duplicar dieta:', error)
     throw new Error('Erro ao duplicar dieta')
   }
 }
+
 type UpdateDiet = {
   dietId: string
   dietName: string
