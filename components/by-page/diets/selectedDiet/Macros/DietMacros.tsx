@@ -4,6 +4,7 @@ import Toggle from '@/components/ui/Toggle'
 import { useMacroContext } from '@/app/context/useMacroContext'
 import { useWeight } from '@/app/data/user/useWeight'
 import { ModalContext } from '@/components/ui/Modal'
+import { useAnimatedNumber } from '@/hooks/useAnimatedNumber'
 
 export default function DietMacros() {
   const [currentMetric, setCurrentMetric] = useState<'g/KG' | 'g' | '% kcal'>(
@@ -54,6 +55,8 @@ export default function DietMacros() {
     }
   }, [totalMacros, weight])
 
+  const animatedKcal = useAnimatedNumber(data.totalKcal)
+
   return (
     <div className='flex flex-col w-full p-4'>
       <div className='flex w-full justify-between'>
@@ -74,7 +77,7 @@ export default function DietMacros() {
             <div className='text-2xl mb-1'>🍞</div>
             <div>Carboidrato</div>
             <div className='text-2xl text-darkgreen'>
-              {data[currentMetric].carb}
+              {data[currentMetric].prot}
             </div>
           </div>
           <div className='flex flex-col align-middle text-center'>
@@ -108,7 +111,7 @@ export default function DietMacros() {
 
         <div className=' w-full flex justify-between flex-col text-center'>
           <div className='leading-[8px]'>Total</div>
-          <div className='font-black text-4xl'>{data.totalKcal}</div>
+          <div className='font-black text-4xl'>{animatedKcal}</div>
           <div className='leading-[8px]'>kcal</div>
         </div>
         <div className='flex w-full bg-grey10 h-[1px]'></div>
