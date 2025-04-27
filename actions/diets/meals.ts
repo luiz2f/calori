@@ -102,6 +102,7 @@ export async function updateMeal({
   mealTime,
   refs
 }: updateMeal) {
+  // Busca o estado atual do meal no banco de dados
   const mealToUpdate = await prisma.meal.findUnique({
     where: { id: mealId },
     select: {
@@ -130,14 +131,18 @@ export async function updateMeal({
     }
   })
 
-  // Atualiza dados básicos da refeição
+  if (!mealToUpdate) {
+    throw new Error('Meal not found')
+  }
+
+  // Atualiza os dados básicos da refeição
   await prisma.meal.update({
     where: { id: mealId },
     data: { name: mealName, time: mealTime }
   })
 
   // Identifica listas para remover
-  const originalMealListIds = mealToUpdate?.mealList.map(list => list.id) || []
+  const originalMealListIds = mealToUpdate.mealList.map(list => list.id)
   const currentMealListIds = refs.map(list => list.id)
   const listsToDelete = originalMealListIds.filter(
     id => !currentMealListIds.includes(id)
@@ -152,7 +157,7 @@ export async function updateMeal({
   for (const [listIndex, list] of refs.entries()) {
     if (!list.id.includes('-')) {
       // Atualiza lista existente
-      const originalList = mealToUpdate?.mealList.find(ml => ml.id === list.id)
+      const originalList = mealToUpdate.mealList.find(ml => ml.id === list.id)
 
       // Atualiza dados da lista
       await prisma.mealList.update({
