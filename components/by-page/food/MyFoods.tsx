@@ -20,8 +20,17 @@ export default function MyFoods({
   const [search, setSearch] = useState('')
 
   const filteredFoods = userFoods?.filter(food => {
-    const newFood = food?.name?.toLowerCase()?.includes(search.toLowerCase())
-    return newFood
+    const normalizedFoodName = food?.name
+      ?.toLowerCase()
+      ?.normalize('NFD')
+      ?.replace(/[\u0300-\u036f]/g, '')
+    const normalizedSearch = search
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+    const filteredFood = normalizedFoodName?.includes(normalizedSearch)
+
+    return filteredFood
   })
   return (
     <>
