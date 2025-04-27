@@ -8,6 +8,7 @@ import Spinner from '@/components/ui/Spinner'
 import { DietFromSlider } from '@/app/(authenticated)/layout'
 import AddBasicDiet from './dietSlider/AddBasicDiet'
 import { useDuplicateDiet } from '@/app/data/diets/useDuplicateDiet'
+import { useMemo } from 'react'
 
 type DietSliderProps = {
   initialDataDiets: DietFromSlider[]
@@ -23,6 +24,21 @@ export default function DietsSlider({ initialDataDiets }: DietSliderProps) {
   const handleDietClick = (dietId: string) => {
     setSelectedDiet(dietId)
   }
+
+  // Memoriza o mapeamento das DietBox
+  const renderedDiets = useMemo(() => {
+    return diets?.map(diet => (
+      <DietBox
+        name={diet?.name}
+        diet={diet}
+        active={selectedDiet === diet?.id}
+        key={diet.id}
+        duplicateDiet={() => duplicateDiet(diet.id)}
+        onClick={() => handleDietClick(diet.id)}
+      />
+    ))
+  }, [diets, selectedDiet])
+
   return (
     <>
       <div className='mt-14 flex flex-col w-full pt-8 bg-white z-10'>
@@ -51,16 +67,7 @@ export default function DietsSlider({ initialDataDiets }: DietSliderProps) {
                   <div className='font-bold pr-3 w-full align-bottom text-right'></div>
                 </div>
               ) : null}
-              {diets.map(diet => (
-                <DietBox
-                  name={diet?.name}
-                  diet={diet}
-                  active={selectedDiet === diet?.id}
-                  key={diet.id}
-                  duplicateDiet={() => duplicateDiet(diet.id)}
-                  onClick={() => handleDietClick(diet.id)}
-                />
-              ))}
+              {renderedDiets}
             </>
           )}
           <AddDiet isFirstDiet={isEmpty} />
