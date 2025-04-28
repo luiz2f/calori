@@ -10,7 +10,6 @@ import {
 import ConfirmDelete from '@/components/ui/ConfirmDelete'
 import EditDiet from './dietSlider/createEditModal/EditDiet'
 import { useDeleteDiet } from '@/app/data/diets/useDeleteDiet'
-import { useDuplicateDiet } from '@/app/data/diets/useDuplicateDiet'
 import { DietFromSlider } from '@/app/(authenticated)/layout'
 
 export const dynamic = 'force-dynamic'
@@ -21,17 +20,17 @@ export default function DietBox({
   name,
   active,
   diet,
+  duplicateDiet,
   onClick
 }: {
   name: string
   active: boolean
   diet: DietFromSlider
+  duplicateDiet: () => void
   onClick: () => void
 }) {
   const { isDeleting, deleteDiet, isSuccess } = useDeleteDiet()
-  const { duplicateDiet } = useDuplicateDiet()
   const dietId = diet?.id
-  // isDuplicating
 
   const adaptedName =
     name.length > characterLimit ? name.slice(0, characterLimit) + '...' : name
@@ -40,7 +39,7 @@ export default function DietBox({
     await deleteDiet(dietId)
   }
   const handleDuplicateDiet = async () => {
-    await duplicateDiet(dietId)
+    await duplicateDiet()
   }
 
   return (

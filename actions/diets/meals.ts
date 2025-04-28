@@ -102,6 +102,7 @@ export async function updateMeal({
   mealTime,
   refs
 }: updateMeal) {
+  // Busca o estado atual do meal no banco de dados
   const mealToUpdate = await prisma.meal.findUnique({
     where: { id: mealId },
     select: {
@@ -113,122 +114,119 @@ export async function updateMeal({
         select: {
           id: true,
           name: true,
+          index: true,
           mealListItems: {
             select: {
               id: true,
               foodId: true,
               unityId: true,
               quantity: true,
-              mealListId: true
-            }
+              index: true
+            },
+            orderBy: { index: 'asc' }
           }
-        }
+        },
+        orderBy: { index: 'asc' }
       }
     }
   })
 
+  if (!mealToUpdate) {
+    throw new Error('Meal not found')
+  }
+
+  // Atualiza os dados básicos da refeição
   await prisma.meal.update({
     where: { id: mealId },
-    data: {
-      name: mealName,
-      time: mealTime
-    }
+    data: { name: mealName, time: mealTime }
   })
 
-  const originalMealLists = mealToUpdate?.mealList.map(list => list.id)
-  const currentMealLists = refs.map(list => list.id)
-
-  const listsToDelete = originalMealLists?.filter(
-    id => !currentMealLists?.includes(id)
+  // Identifica listas para remover
+  const originalMealListIds = mealToUpdate.mealList.map(list => list.id)
+  const currentMealListIds = refs.map(list => list.id)
+  const listsToDelete = originalMealListIds.filter(
+    id => !currentMealListIds.includes(id)
   )
 
-  const deleteMealLists =
-    listsToDelete?.map(async listId => {
-      await prisma.mealList.delete({
-        where: { id: listId }
-      })
-    }) || []
+  // Deleta listas removidas
+  for (const listId of listsToDelete) {
+    await prisma.mealList.delete({ where: { id: listId } })
+  }
 
-  const updateOrCreateMealLists = refs?.map(async list => {
-    if (!list.id?.includes('-')) {
+  // Processa cada lista de refeição em ordem
+  for (const [listIndex, list] of refs.entries()) {
+    if (!list.id.includes('-')) {
+      // Atualiza lista existente
+      const originalList = mealToUpdate.mealList.find(ml => ml.id === list.id)
+
+      // Atualiza dados da lista
       await prisma.mealList.update({
         where: { id: list.id },
         data: {
-          name: list.name
+          name: list.name,
+          index: listIndex
         }
       })
 
-      const originalItemIds =
-        mealToUpdate?.mealList
-          ?.find(ml => ml.id === list.id)
-          ?.mealListItems?.map(item => item.id) || []
+      // Processa itens da lista
+      const originalItems = originalList?.mealListItems || []
+      const currentItems = list.mealListItems || []
 
-      const currentItemIds = list.mealListItems?.map(item => item.id)
-      const itemsToDelete = originalItemIds?.filter(
-        id => !currentItemIds?.includes(id)
-      )
+      // Identifica itens para remover
+      const itemsToDelete = originalItems
+        .filter(item => !currentItems.some(ci => ci.id === item.id))
+        .map(item => item.id)
 
-      const deleteItems = itemsToDelete?.map(async itemId => {
-        await prisma.mealListItem.delete({
-          where: { id: itemId }
-        })
-      })
+      // Remove itens excluídos
+      for (const itemId of itemsToDelete) {
+        await prisma.mealListItem.delete({ where: { id: itemId } })
+      }
 
-      const updateOrCreateItems =
-        list.mealListItems?.map(async item => {
-          if (!item.id.includes('-')) {
-            await prisma.mealListItem.update({
-              where: { id: item.id },
-              data: {
-                foodId: item.foodId,
-                unityId: item.unityId,
-                quantity: toNumber(item.quantity)
-              }
-            })
-          } else {
-            await prisma.mealListItem.create({
-              data: {
-                foodId: item.foodId,
-                unityId: item.unityId,
-                quantity: toNumber(item.quantity),
-                mealListId: list.id,
-                index: 0
-              }
-            })
-          }
-        }) || []
-
-      await Promise.all(updateOrCreateItems)
-      await Promise.all(deleteItems)
+      // Atualiza ou cria itens em ordem
+      for (const [itemIndex, item] of currentItems.entries()) {
+        if (!item.id.includes('-')) {
+          // Atualiza item existente
+          await prisma.mealListItem.update({
+            where: { id: item.id },
+            data: {
+              foodId: item.foodId,
+              unityId: item.unityId,
+              quantity: toNumber(item.quantity),
+              index: itemIndex
+            }
+          })
+        } else {
+          // Cria novo item
+          await prisma.mealListItem.create({
+            data: {
+              foodId: item.foodId,
+              unityId: item.unityId,
+              quantity: toNumber(item.quantity),
+              mealListId: list.id,
+              index: itemIndex
+            }
+          })
+        }
+      }
     } else {
+      // Cria nova lista com todos os itens
       await prisma.mealList.create({
         data: {
           name: list.name,
           mealId: mealId,
-          index: 1,
+          index: listIndex,
           mealListItems: {
-            create: list.mealListItems?.map(item => ({
+            create: list.mealListItems.map((item, itemIndex) => ({
               foodId: item.foodId,
               unityId: item.unityId,
               quantity: toNumber(item.quantity),
-              index: 1
+              index: itemIndex
             }))
           }
         }
       })
     }
-  })
-
-  await Promise.all([...updateOrCreateMealLists, ...deleteMealLists])
-
-  await prisma.diet.update({
-    where: { id: mealToUpdate?.dietId },
-    data: {
-      updatedAt: new Date() // Força a atualização
-    }
-  })
-
-  return mealToUpdate?.dietId
+  }
 }
 
 type createMeal = {
@@ -252,25 +250,23 @@ export async function createMeal({
   })
 
   if (refs) {
-    const createMealLists = refs?.map(async list => {
+    for (const [listIndex, list] of refs.entries()) {
       await prisma.mealList.create({
         data: {
           name: list.name,
           mealId: newMeal.id,
-          index: 1,
+          index: listIndex,
           mealListItems: {
-            create: list.mealListItems?.map(item => ({
+            create: list.mealListItems?.map((item, itemIndex) => ({
               foodId: item.foodId,
               unityId: item.unityId,
               quantity: toNumber(item.quantity),
-              index: 1
+              index: itemIndex
             }))
           }
         }
       })
-    })
-
-    await Promise.all(createMealLists)
+    }
   }
 
   return dietId

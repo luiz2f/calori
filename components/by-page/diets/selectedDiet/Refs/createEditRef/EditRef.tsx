@@ -1,5 +1,11 @@
 'use client'
-import React, { useState, useContext, useEffect, useCallback } from 'react'
+import React, {
+  useState,
+  useContext,
+  useEffect,
+  useCallback,
+  useLayoutEffect
+} from 'react'
 import Button from '@/components/ui/Button'
 import { ModalContext } from '@/components/ui/Modal'
 import EditRefList from './EditRefList'
@@ -155,7 +161,7 @@ export default function EditRef({
     }
   }, [unsavedChanges, modalName, isModified])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (isSuccess && !isLoading) {
       if (creating) {
         closeLast(true)
@@ -175,7 +181,7 @@ export default function EditRef({
     }
   }, [meal?.mealList])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!creating) {
       const isModified =
         JSON.stringify(mealList) !== JSON.stringify(originalMealList) ||

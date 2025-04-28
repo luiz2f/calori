@@ -1,9 +1,10 @@
 'use client'
 import { duplicateDiet as duplicateDietAPI } from '@/actions/diets/diets'
 import { DietFromSlider } from '@/app/(authenticated)/layout'
+import { useDietContext } from '@/app/context/useDietContext'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-const filterData = (data: DietFromSlider) => {
+export const resumeDiet = (data: DietFromSlider) => {
   return {
     id: data?.id,
     name: data?.name,
@@ -20,6 +21,8 @@ const filterData = (data: DietFromSlider) => {
   }
 }
 export function useDuplicateDiet() {
+  const { setSelectedDiet } = useDietContext()
+
   const queryClient = useQueryClient()
 
   const { isPending: isDuplicating, mutate: duplicateDiet } = useMutation({
@@ -27,10 +30,11 @@ export function useDuplicateDiet() {
     onSuccess: data => {
       if (data) {
         queryClient.setQueryData([`meals-diet-${data?.id}`], data)
-        const newDiet = filterData(data)
+        const newDiet = resumeDiet(data)
         queryClient.setQueryData(['diets'], oldDiets => {
           return [newDiet, ...(Array.isArray(oldDiets) ? oldDiets : [])]
         })
+        setSelectedDiet(newDiet.id)
       }
     },
     onError: error => {

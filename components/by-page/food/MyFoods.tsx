@@ -3,8 +3,8 @@
 import Button from '@/components/ui/Button'
 import Modal from '@/components/ui/Modal'
 import MyFoodRow from './MyFoodRow'
-import { IoSearchSharp } from 'react-icons/io5'
-import { useState } from 'react'
+import { IoClose, IoSearchSharp } from 'react-icons/io5'
+import { useMemo, useState } from 'react'
 import Spinner from '@/components/ui/Spinner'
 import { Food } from '@/app/(authenticated)/layout'
 
@@ -19,10 +19,31 @@ export default function MyFoods({
 }) {
   const [search, setSearch] = useState('')
 
-  const filteredFoods = userFoods?.filter(food => {
-    const newFood = food?.name?.toLowerCase()?.includes(search.toLowerCase())
-    return newFood
-  })
+  const emptySearch = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setSearch('')
+  }
+
+  const filteredFoods = useMemo(() => {
+    if (!search) return userFoods
+    console.log(1)
+
+    const normalizedSearch = search
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+
+    return userFoods?.filter(food => {
+      const normalizedFoodName = food?.name
+        ?.toLowerCase()
+        ?.normalize('NFD')
+        ?.replace(/[\u0300-\u036f]/g, '')
+
+      return normalizedFoodName?.includes(normalizedSearch)
+    })
+  }, [search, userFoods])
+
   return (
     <>
       <div className='relative'>
@@ -35,8 +56,20 @@ export default function MyFoods({
             onChange={e => setSearch(e.target.value)}
             className='p-2 w-full border-1 rounded-lg border-grey-50'
           />
-          <div className='absolute top-0 right-0 p-3 text-grey50 line leading-3'>
-            <IoSearchSharp />
+          <div className='absolute top-0 right-0 p-3 text-grey50 leading-3'>
+            {search ? (
+              <button
+                type='button'
+                onClick={emptySearch}
+                className='p-0 m-0 bg-transparent border-none'
+              >
+                <IoClose />
+              </button>
+            ) : (
+              <div>
+                <IoSearchSharp />
+              </div>
+            )}
           </div>
         </div>
         {isLoading ? (

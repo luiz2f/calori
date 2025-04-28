@@ -177,7 +177,9 @@ export default function EditDiet({
   return (
     <>
       <form onSubmit={handleSubmit} className='relative'>
-        <div className='font-bold text-xl mb-10 text-center'>Editar Dieta</div>
+        <div className='font-bold text-xl mb-10 text-center'>
+          {creating ? 'Criar dieta' : 'Editar dieta'}
+        </div>
         <div className='relative'>
           <label className='absolute top-[-6px] text-grey50 px-1 ml-1 text-sm bg-white line leading-3'>
             Nome da dieta
