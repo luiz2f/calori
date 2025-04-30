@@ -64,14 +64,11 @@ export default function DietMeal({ meal }: { meal: MealMacro }) {
             <Modal.Open opens={`editMeal${meal.id}`}>
               <Menus.Button icon={<HiOutlinePencilAlt />}>
                 Editar refeição
-                {/* modal🐥 */}
               </Menus.Button>
             </Modal.Open>
             <Modal.Open opens={deleteModalName}>
               <Menus.Button icon={<HiOutlineTrash />}>
                 Apagar refeição
-                {/* confirm ⛔ */}
-                {/* action 🐥 */}
               </Menus.Button>
             </Modal.Open>
           </Menus.List>
@@ -131,7 +128,6 @@ export default function DietMeal({ meal }: { meal: MealMacro }) {
           mealsList={meal?.mealList}
           selectedMeal={selectedMeal}
         />
-        {/* 😀 */}
       </div>
     </div>
   )
