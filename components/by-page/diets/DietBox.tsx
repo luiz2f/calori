@@ -61,7 +61,6 @@ export default function DietBox({
               <Modal.Open opens={`editDiet${dietId}`}>
                 <Menus.Button icon={<HiOutlinePencilAlt />}>
                   Editar dieta
-                  {/* modal🐥 */}
                 </Menus.Button>
               </Modal.Open>
               <Menus.Button
@@ -69,13 +68,10 @@ export default function DietBox({
                 onClick={handleDuplicateDiet}
               >
                 Duplicar dieta
-                {/* action 🐥 */}
               </Menus.Button>
               <Modal.Open opens={`deleteDiet${dietId}`}>
                 <Menus.Button icon={<HiOutlineTrash />}>
                   Apagar dieta
-                  {/* confirm ⛔ */}
-                  {/* action 🐥 */}
                 </Menus.Button>
               </Modal.Open>
             </Menus.List>

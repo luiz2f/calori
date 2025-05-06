@@ -411,15 +411,16 @@ export default function EditRef({
       setSelectedVariation(errorIndex)
       return
     }
-    if (mealName && mealTime) {
+    if (mealName && mealTime && dietId) {
       if (!creating && meal?.id) {
         await updateMeal({
+          dietId,
           mealId: meal?.id,
           mealName,
           mealTime,
           refs: updatedMealList
         })
-      } else if (creating && dietId) {
+      } else if (creating) {
         await createMeal({
           dietId,
           mealName,
