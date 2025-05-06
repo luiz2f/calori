@@ -1,7 +1,7 @@
 'use client'
 import { createBasicDiet as createBasicDietAPI } from '@/actions/diets/createBasicDiet'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { resumeDiet } from './useDuplicateDiet'
+import { resumeDiet } from '@/utils/resumeDiet'
 import { useDietContext } from '@/app/context/useDietContext'
 
 export function useCreateBasicDiet() {

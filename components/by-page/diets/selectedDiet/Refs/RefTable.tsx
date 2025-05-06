@@ -4,7 +4,7 @@ import Table from './RefTableModel'
 import RefSlider from './RefSlider'
 import { ModalContext } from '@/components/ui/Modal'
 import { MealVarMacro, useMacroContext } from '@/app/context/useMacroContext'
-import { MealItem } from '@/app/(authenticated)/layout'
+import { transformFoodData } from '@/utils/transformFoodData'
 
 export default function RefTable({
   mealId,
@@ -60,34 +60,6 @@ export default function RefTable({
   const meal = mealsList[currentIndex]
   const macro = selectedMeal?.macro
 
-  function transformFoodData(foodData: MealItem[] | undefined) {
-    return foodData?.map(item => {
-      const { food, unity, quantity } = item
-
-      const carb = Math.round(food.carb * (quantity * unity.unitMultiplier))
-      const prot = Math.round(food.protein * (quantity * unity.unitMultiplier))
-      const fat = Math.round(food.fat * (quantity * unity.unitMultiplier))
-      const kcal = Math.round((carb + prot) * 4 + fat * 9)
-
-      return {
-        name: (
-          <>
-            <strong>
-              {quantity} {unity.un}
-            </strong>{' '}
-            - {food.name}
-          </>
-        ),
-        carb: carb,
-        prot: prot,
-        fat: fat,
-        kcal: kcal,
-        quantity: quantity,
-        unit: unity.un.replace(/"/g, '') // Remove aspas se houver
-      }
-    })
-  }
-
   function handleOpenVar() {
     open(`editMealAlimento${mealId}`)
   }
@@ -118,6 +90,8 @@ export default function RefTable({
           simplifiedData.map((item, index) => (
             <Table.Row
               key={index}
+              quantity={item.quantity}
+              unit={item.unit}
               name={item.name}
               carbo={item.carb}
               prot={item.prot}

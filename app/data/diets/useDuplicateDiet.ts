@@ -1,25 +1,9 @@
 'use client'
 import { duplicateDiet as duplicateDietAPI } from '@/actions/diets/diets'
-import { DietFromSlider } from '@/app/(authenticated)/layout'
 import { useDietContext } from '@/app/context/useDietContext'
+import { resumeDiet } from '@/utils/resumeDiet'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-export const resumeDiet = (data: DietFromSlider) => {
-  return {
-    id: data?.id,
-    name: data?.name,
-    userId: data?.userId,
-    index: data?.index,
-    meals: data?.meals
-      .filter(meal => meal.hasOwnProperty('mealList'))
-      .map(meal => ({
-        id: meal.id,
-        name: meal.name,
-        time: meal.time,
-        dietId: meal.dietId
-      }))
-  }
-}
 export function useDuplicateDiet() {
   const { setSelectedDiet } = useDietContext()
 
