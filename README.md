@@ -1,36 +1,95 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Calori 🍃
 
-## Getting Started
+Calori is a simple, beautiful, and customizable diet planner. It allows you to create, edit, and manage diets, meals, and foods efficiently.
 
-First, run the development server:
+## 🚀 Project Access
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Hosted**: The project is available online and can be accessed at [Calori](https://calorii.vercel.app).
+- **Locally**: You can also run the project locally with a Docker-based database.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠️ Local Setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### **Prerequisites**
 
-## Learn More
+- [Node.js](https://nodejs.org/)
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
 
-To learn more about Next.js, take a look at the following resources:
+### **Steps to Run Locally**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/your-username/caloricalori.git
+   cd caloricalori
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+2. **Start the Database with Docker**
+   Ensure Docker is installed and running:
+   ```bash
+   docker-compose up -d
+   ```
 
-## Deploy on Vercel
+3. **Install Dependencies**
+   Use your preferred package manager:
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+4. **Set Up Environment Variables**
+   Create a `.env` file in the root directory with the following variables:
+   ```env
+   DATABASE_URL="postgresql://user:password@localhost:5432/calori"
+   NEXTAUTH_URL="http://localhost:3000"
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+5. **Run Database Migrations**
+   ```bash
+   npx prisma migrate dev
+   ```
+
+6. **Start the Development Server**
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+7. **Access the Project**
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+## 🌐 Deployment
+
+The project is hosted on [Vercel](https://vercel.com). You can access it directly at [https://calorii.vercel.app](https://calorii.vercel.app).
+
+---
+
+## 🧰 Technologies Used
+
+- **Frontend**: [Next.js](https://nextjs.org)
+- **Database**: [PostgreSQL](https://www.postgresql.org) (via Docker)
+- **ORM**: [Prisma](https://www.prisma.io)
+- **Hosting**: [Vercel](https://vercel.com)
+- **State Management**: React Context API
+- **Styling**: TailwindCSS
+- **Tests**: Jest (in Progress)
+---
+
+## 📚 Features
+
+- **Diet Management**:
+  - Create, edit, and duplicate diets.
+  - Add multiple meals variations and foods.
+
+- **Automatic Macro Calculation**:
+  - Automatically calculates carbohydrates, proteins, fats, and calories per gram, per gram per kg, and as a percentage of total kcal.
+---
+
+## 📄 License
+
+This project is licensed under the MIT License. See the `LICENSE` file for more details.
