@@ -97,27 +97,31 @@ export const MacroProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const newTotalMacros = macros.reduce(
       (totals, { macro }) => {
-        totals.carb += Math.round(macro?.carb || 0)
-        totals.prot += Math.round(macro?.prot || 0)
-        totals.fat += Math.round(macro?.fat || 0)
+        totals.carb += macro?.carb || 0
+        totals.prot += macro?.prot || 0
+        totals.fat += macro?.fat || 0
         return totals
       },
       { carb: 0, prot: 0, fat: 0, kcal: 0 }
     )
-    const kcal = Math.round(
-      newTotalMacros?.carb * 4 +
-        newTotalMacros?.prot * 4 +
-        newTotalMacros?.fat * 9
-    )
+
+    const roundedTotalMacros = {
+      carb: Math.round(newTotalMacros.carb),
+      prot: Math.round(newTotalMacros.prot),
+      fat: Math.round(newTotalMacros.fat),
+      kcal: Math.round(
+        (newTotalMacros.carb + newTotalMacros.prot) * 4 + newTotalMacros.fat * 9
+      )
+    }
 
     // Verifique se os valores realmente mudaram antes de atualizar o estado
     if (
-      totalMacros.carb !== newTotalMacros.carb ||
-      totalMacros.prot !== newTotalMacros.prot ||
-      totalMacros.fat !== newTotalMacros.fat ||
-      totalMacros.kcal !== kcal
+      totalMacros.carb !== roundedTotalMacros.carb ||
+      totalMacros.prot !== roundedTotalMacros.prot ||
+      totalMacros.fat !== roundedTotalMacros.fat ||
+      totalMacros.kcal !== roundedTotalMacros.kcal
     ) {
-      setTotalMacros({ ...newTotalMacros, kcal })
+      setTotalMacros({ ...roundedTotalMacros })
     }
   }, [macros, totalMacros])
 
