@@ -87,13 +87,17 @@ function Header({
 }
 
 function Row({
+  quantity,
+  unit,
   name,
   carbo,
   prot,
   fat,
   kcal
 }: {
-  name: ReactNode
+  quantity: number
+  unit: string
+  name: string
   carbo: number
   prot: number
   fat: number
@@ -115,7 +119,10 @@ function Row({
       className='grid border-b-1 items-center border-white text-sm pr-1 [&>div]:py-1 [&>div]:text-center [&>div]:text-blacklight last:text-right last:border-b-0 odd:bg-neutralgreen transition-all duration-fast'
     >
       <div role='cell' className='pl-2 !text-left !text-black'>
-        {name}
+        <strong>
+          {quantity} {unit}
+        </strong>{' '}
+        - {name}
       </div>
       <div role='cell' className={opacity}>
         {carbo}

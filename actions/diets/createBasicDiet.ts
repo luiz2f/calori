@@ -96,7 +96,19 @@ export async function createBasicDiet() {
       }
     })
 
-    return newDiet
+    const simplifiedDiet = {
+      id: newDiet.id,
+      name: newDiet.name,
+      userId: newDiet.userId,
+      index: newDiet.index,
+      meals: newDiet.meals.map(meal => ({
+        id: meal.id,
+        name: meal.name,
+        time: meal.time
+      }))
+    }
+
+    return { newDiet, simplifiedDiet }
   } catch (error) {
     console.error('Erro ao criar dieta básica:', error)
     throw new Error('Erro ao criar dieta básica')
