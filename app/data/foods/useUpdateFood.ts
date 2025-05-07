@@ -2,8 +2,8 @@
 
 import { updateFood as updateFoodAPI } from '@/actions/foods'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { calculateMacros } from '../meals/useMeals'
 import { Food, SelectedDiet } from '@/app/(authenticated)/layout'
+import { calculateMacros } from '@/utils/calculateMacros'
 
 export function useUpdateFood() {
   const queryClient = useQueryClient()

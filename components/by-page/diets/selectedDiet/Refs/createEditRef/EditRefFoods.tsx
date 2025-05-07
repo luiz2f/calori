@@ -4,10 +4,10 @@ import { EditFoodRow } from './editFood/EditFoodRow'
 import Modal from '@/components/ui/Modal'
 import ConfirmDelete from '@/components/ui/ConfirmDelete'
 import { useFoods } from '@/app/data/foods/useFoods'
-import { calculateMacros } from '@/app/data/meals/useMeals'
 import { useQueryClient } from '@tanstack/react-query'
 import { Food, MealVar, Unity } from './EditRef'
 import { MealVarMacro } from '@/app/context/useMacroContext'
+import { calculateMacros } from '@/utils/calculateMacros'
 
 export default function EditRefFoods({
   mealsList,

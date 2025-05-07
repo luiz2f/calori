@@ -26,14 +26,12 @@ export default function MyWeight({
   const { isPending, updateWeight, isSuccess, isError } = useUpdateWeight()
   const isEqual = weight === defaultWeight || defaultWeightlb === weight
   useEffect(() => {
-    if (!isPending && isSuccess) {
-      if (closeAfter && onCloseModal) {
+    if (closeAfter && !isPending && isSuccess) {
+      if (onCloseModal) {
         onCloseModal()
-      } else {
-        setWeight(toNumber(defaultWeight))
       }
     }
-  }, [closeAfter, defaultWeight, isPending, isSuccess, onCloseModal])
+  }, [closeAfter, isPending, isSuccess, onCloseModal])
 
   useEffect(() => {
     if (isError) {
@@ -53,12 +51,14 @@ export default function MyWeight({
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
     let weightKg = toNumber(weight)
+
     if (!weightKg) {
       setError(true)
     }
     if (unity === 'lb') {
-      weightKg = parseFloat((weight * 2.20462).toFixed(2))
+      weightKg = parseFloat((weight / 2.20462).toFixed(2))
     }
+
     updateWeight(weightKg)
   }
 
@@ -74,7 +74,7 @@ export default function MyWeight({
   const toggleUnity = (type: string) => {
     setUnity(type)
     if (type === 'kg') {
-      setWeight(prevWeight => parseFloat((prevWeight / 2.20462).toFixed(2))) // Convert kg to lblb to kg
+      setWeight(prevWeight => parseFloat((prevWeight / 2.20462).toFixed(2))) // Convert lb to kg
     } else {
       setWeight(prevWeight => parseFloat((prevWeight * 2.20462).toFixed(2))) // Convert kg to lb
     }
