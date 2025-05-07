@@ -50,7 +50,7 @@ export default function EditDiet({
   const [isFormValid, setIsFormValid] = useState(true)
   const [isModified, setIsModified] = useState(modifiedDefault)
   const { data } = useSession()
-  const userId = data?.userId || ''
+  const userId = data?.userId
 
   const {
     isUpdating,
@@ -66,7 +66,7 @@ export default function EditDiet({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (creating) {
+    if (creating && userId) {
       try {
         createDiet({
           userId,

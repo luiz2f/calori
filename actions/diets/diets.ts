@@ -126,7 +126,20 @@ export async function createDiet({ userId, dietName, refs }: CreateDiet) {
           }))
         }
       },
-      include: { meals: true }
+      select: {
+        id: true,
+        name: true,
+        userId: true,
+        index: true,
+        meals: {
+          select: {
+            id: true,
+            name: true,
+            time: true,
+            dietId: true
+          }
+        }
+      }
     })
 
     return newDiet
@@ -217,7 +230,23 @@ export async function duplicateDiet(dietId: string) {
     // Retorna a nova dieta com todas as relações
     const fullDiet = await getDietMeals(newDiet.id)
 
-    return fullDiet
+    if (!fullDiet) {
+      throw new Error('Diet not found')
+    }
+
+    const simplifiedDiet = {
+      id: fullDiet.id,
+      name: fullDiet.name,
+      userId: fullDiet.userId,
+      index: fullDiet.index,
+      meals: fullDiet.meals.map(meal => ({
+        id: meal.id,
+        name: meal.name,
+        time: meal.time
+      }))
+    }
+
+    return { newDiet: fullDiet, simplifiedDiet }
   } catch (error) {
     console.error('Erro ao duplicar dieta:', error)
     throw new Error('Erro ao duplicar dieta')

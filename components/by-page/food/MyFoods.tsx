@@ -27,7 +27,6 @@ export default function MyFoods({
 
   const filteredFoods = useMemo(() => {
     if (!search) return userFoods
-    console.log(1)
 
     const normalizedSearch = search
       .toLowerCase()

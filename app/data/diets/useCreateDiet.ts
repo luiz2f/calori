@@ -2,7 +2,6 @@
 import { createDiet as createDietAPI } from '@/actions/diets/diets'
 import { useDietContext } from '@/app/context/useDietContext'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { resumeDiet } from '@/utils/resumeDiet'
 
 export function useCreateDiet() {
   const queryClient = useQueryClient()
@@ -15,7 +14,7 @@ export function useCreateDiet() {
   } = useMutation({
     mutationFn: createDietAPI,
     onSuccess: data => {
-      const newDiet = resumeDiet(data)
+      const newDiet = data
       queryClient.setQueryData(['diets'], oldDiets => {
         return [newDiet, ...(Array.isArray(oldDiets) ? oldDiets : [])]
       })

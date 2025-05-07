@@ -1,7 +1,6 @@
 'use client'
 import { createBasicDiet as createBasicDietAPI } from '@/actions/diets/createBasicDiet'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { resumeDiet } from '@/utils/resumeDiet'
 import { useDietContext } from '@/app/context/useDietContext'
 
 export function useCreateBasicDiet() {
@@ -15,12 +14,13 @@ export function useCreateBasicDiet() {
   } = useMutation({
     mutationFn: createBasicDietAPI,
     onSuccess: data => {
-      queryClient.setQueryData([`meals-diet-${data?.id}`], data)
-      const newDiet = resumeDiet(data)
+      const { newDiet, simplifiedDiet } = data
+      const dietId = newDiet.id
+      queryClient.setQueryData([`meals-diet-${dietId}`], newDiet)
       queryClient.setQueryData(['diets'], oldDiets => {
-        return [newDiet, ...(Array.isArray(oldDiets) ? oldDiets : [])]
+        return [simplifiedDiet, ...(Array.isArray(oldDiets) ? oldDiets : [])]
       })
-      setSelectedDiet(newDiet.id)
+      setSelectedDiet(dietId)
     },
     onError: error => {
       console.error('useCreateBasicDiet', error)
