@@ -73,7 +73,9 @@ const emailHeader = `
   </head>
   <div id="body">
     <div class="email-container">
-      <img src="https://i.imgur.com/vq0G819.png" alt="Calori Logo" />
+      <img width="100"
+        src="https://raw.githubusercontent.com/luiz2f/calori/refs/heads/main/public/logo.png"
+        alt="Calori Logo"/>
   `
 const emailFooter = `<div class="email-footer">
         <p>Calori <a href="#">calorii.vercel.app</a></p>
