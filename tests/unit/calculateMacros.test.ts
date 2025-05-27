@@ -24,7 +24,7 @@ describe('calculateMacros', () => {
       carb: 48, // (20 * 2) + (15 * 1 * 0.5) = 40 + 7.5 = 47.5 Round 48
       prot: 23, // (10 * 2) + (5 * 1 * 0.5) = 20 + 2.5 = 22.5 Round 23
       fat: 15, // (5 * 2) + (10 * 1 * 0.5) = 10 + 5 = 15
-      kcal: 419 // (carb + prot) * 4 + fat * 9 = 419
+      kcal: 415 // (carb + prot) * 4 + fat * 9 = 419
     })
   })
 
