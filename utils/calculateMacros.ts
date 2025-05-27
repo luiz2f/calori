@@ -21,10 +21,10 @@ export const calculateMacros = (variation: MealVarMacro) => {
         (item?.unity?.unitMultiplier ?? 0)
     })
 
+    kcal = Math.round((carb + prot) * 4 + fat * 9)
     carb = Math.round(carb)
     prot = Math.round(prot)
     fat = Math.round(fat)
-    kcal = Math.round((carb + prot) * 4 + fat * 9)
   }
 
   return { carb, prot, fat, kcal }

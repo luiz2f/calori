@@ -80,10 +80,10 @@ export default function RefTable({
       <Table.Header
         onClick={handleOpenVar}
         name={meal?.name}
-        carbo={Math.round(macro?.carb || 0)}
-        prot={Math.round(macro?.prot || 0)}
-        fat={Math.round(macro?.fat || 0)}
-        kcal={Math.round(macro?.kcal || 0)}
+        carbo={macro?.carb || 0}
+        prot={macro?.prot || 0}
+        fat={macro?.fat || 0}
+        kcal={macro?.kcal || 0}
       />
       <Table.Body>
         {simplifiedData?.length ? (

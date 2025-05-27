@@ -91,12 +91,14 @@ export async function deleteMeal(mealId: string) {
 }
 
 type updateMeal = {
+  dietId: string
   mealId: string
   mealName: string
   mealTime: string
   refs: MealVar[]
 }
 export async function updateMeal({
+  dietId,
   mealId,
   mealName,
   mealTime,
@@ -227,6 +229,8 @@ export async function updateMeal({
       })
     }
   }
+
+  return dietId
 }
 
 type createMeal = {
